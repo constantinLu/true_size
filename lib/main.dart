@@ -10,16 +10,20 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'True size',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: Column(
-        children: [
-          Center(child: Text('TRUE SIZE')),
-          Center(child: Text('TO BE CONTINUED ...')),
-        ],
+      home: Scaffold(
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Center(child: Text('TRUE SIZE')),
+            Center(child: Text('TO BE CONTINUED ...')),
+          ],
+        ),
       ),
     );
   }
