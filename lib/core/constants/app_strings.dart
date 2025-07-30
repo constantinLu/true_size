@@ -10,8 +10,8 @@ class AppStrings {
   static const String signOutError = 'Failed to sign out. Please try again.';
 
   // Home
-  static const String myMeasurements = 'My Measurements';
-  static const String keepTrackSizes = 'Keep track of your sizes';
+  static const String myMeasurements = 'True size';
+  static const String keepTrackSizes = 'Keeping track of your measurements';
   static const String searchPlaceholder = 'Search measurements or tags...';
   static const String noMeasurementsFound = 'No measurements found';
   static const String addFirstMeasurement = 'Add your first measurement';

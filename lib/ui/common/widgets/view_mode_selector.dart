@@ -8,17 +8,16 @@ class ViewModeSelector extends StatelessWidget {
   final Function(ViewMode) onModeChanged;
 
   const ViewModeSelector({
-    Key? key,
+    super.key,
     required this.currentMode,
     required this.onModeChanged,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
         borderRadius: BorderRadius.circular(AppSizes.borderRadius),
       ),
       child: Row(

@@ -3,25 +3,25 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../ui_helpers.dart';
 
-class CustomSearchBar extends StatefulWidget {
+class SearchBar extends StatefulWidget {
   final String hintText;
   final ValueChanged<String>? onChanged;
   final VoidCallback? onClear;
   final String? initialValue;
 
-  const CustomSearchBar({
-    Key? key,
+  const SearchBar({
+    super.key,
     required this.hintText,
     this.onChanged,
     this.onClear,
     this.initialValue,
-  }) : super(key: key);
+  });
 
   @override
-  State<CustomSearchBar> createState() => _CustomSearchBarState();
+  State<SearchBar> createState() => _SearchBarState();
 }
 
-class _CustomSearchBarState extends State<CustomSearchBar> {
+class _SearchBarState extends State<SearchBar> {
   late TextEditingController _controller;
   bool _hasText = false;
 
@@ -59,7 +59,6 @@ class _CustomSearchBarState extends State<CustomSearchBar> {
     return Container(
       height: AppSizes.searchBarHeight,
       decoration: BoxDecoration(
-        color: AppColors.surfaceVariant,
         borderRadius: UIHelpers.defaultBorderRadius,
         border: Border.all(color: AppColors.border),
       ),

@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TrueSize - Color Palette Options</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #7f8c8d;
+            font-size: 1.2em;
+            margin: 0;
+        }
+
+        .palettes-comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1200px) {
+            .palettes-comparison {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+        }
+
+        .palette-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            border: 2px solid #f1f2f6;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .palette-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+
+        .palette-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f8f9fa;
+        }
+
+        .palette-header h2 {
+            font-size: 2em;
+            margin: 0 0 10px 0;
+            font-weight: 700;
+        }
+
+        .palette-header .subtitle {
+            font-size: 1.1em;
+            opacity: 0.8;
+            font-weight: 500;
+        }
+
+        .color-section {
+            margin-bottom: 25px;
+        }
+
+        .color-section h3 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #495057;
+        }
+
+        .color-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            margin-bottom: 12px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .color-block {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            position: relative;
+            transition: transform 0.2s ease;
+        }
+
+        .color-block:hover {
+            transform: scale(1.05);
+            z-index: 1;
+            cursor: pointer;
+        }
+
+        .color-name {
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .hex-code {
+            font-size: 12px;
+            opacity: 0.8;
+            font-family: 'Courier New', monospace;
+            background: rgba(0,0,0,0.1);
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .mood-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 20px 0;
+        }
+
+        .mood-tag {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #495057;
+        }
+
+        .usage-examples {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .usage-examples strong {
+            color: #343a40;
+        }
+
+        /* Tailor Theme Styling */
+        .tailor-theme .palette-header h2 {
+            color: #8B4513;
+        }
+
+        .tailor-theme .mood-tag {
+            background: linear-gradient(45deg, #8B4513 0%, #A0522D 100%);
+        }
+
+        /* Playful Theme Styling */
+        .playful-theme .palette-header h2 {
+            color: #008B8B;
+        }
+
+        .playful-theme .mood-tag {
+            background: linear-gradient(45deg, #20B2AA 0%, #48CAE4 100%);
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            transform: translateX(300px);
+            transition: transform 0.3s ease;
+        }
+
+        .copy-notification.show {
+            transform: translateX(0);
+        }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>TrueSize App</h1>
+    <p>Two Distinct Brand Personalities</p>
+</div>
+
+<div class="palettes-comparison">
+    <!-- Sophisticated Tailor Theme -->
+    <div class="palette-card tailor-theme">
+        <div class="palette-header">
+            <h2>🧥 Sophisticated Tailor</h2>
+            <p class="subtitle">Mature • Professional • Craftsmanship</p>
+        </div>
+
+        <div class="color-section">
+            <h3>Primary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #8B4513; color: white;">
+                    <span class="color-name">Saddle Brown</span>
+                    <span class="hex-code">#8B4513</span>
+                </div>
+                <div class="color-block" style="background: #F4E4BC; color: #654321;">
+                    <span class="color-name">On Primary</span>
+                    <span class="hex-code">#F4E4BC</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-block" style="background: #D2B48C; color: #5D4037;">
+                    <span class="color-name">Primary Container</span>
+                    <span class="hex-code">#D2B48C</span>
+                </div>
+                <div class="color-block" style="background: #654321; color: #F4E4BC;">
+                    <span class="color-name">On Primary Container</span>
+                    <span class="hex-code">#654321</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Secondary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #A0522D; color: white;">
+                    <span class="color-name">Sienna</span>
+                    <span class="hex-code">#A0522D</span>
+                </div>
+                <div class="color-block" style="background: #F5DEB3; color: #8B4513;">
+                    <span class="color-name">On Secondary</span>
+                    <span class="hex-code">#F5DEB3</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Tertiary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #CD853F; color: white;">
+                    <span class="color-name">Peru</span>
+                    <span class="hex-code">#CD853F</span>
+                </div>
+                <div class="color-block" style="background: #FAEBD7; color: #8B7355;">
+                    <span class="color-name">On Tertiary</span>
+                    <span class="hex-code">#FAEBD7</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Surface Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #FFF8DC; color: #3E2723;">
+                    <span class="color-name">Light Surface</span>
+                    <span class="hex-code">#FFF8DC</span>
+                </div>
+                <div class="color-block" style="background: #2F1B14; color: #FFF8DC;">
+                    <span class="color-name">Dark Surface</span>
+                    <span class="hex-code">#2F1B14</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Accent Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #B8860B; color: white;">
+                    <span class="color-name">Dark Goldenrod</span>
+                    <span class="hex-code">#B8860B</span>
+                </div>
+                <div class="color-block" style="background: #8B0000; color: white;">
+                    <span class="color-name">Dark Red</span>
+                    <span class="hex-code">#8B0000</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mood-tags">
+            <div class="mood-tag">Luxurious</div>
+            <div class="mood-tag">Craftsmanship</div>
+            <div class="mood-tag">Heritage</div>
+            <div class="mood-tag">Premium</div>
+        </div>
+
+        <div class="description">
+            <strong>Brand Personality:</strong> Sophisticated, timeless, and professional. Evokes the feeling of a high-end tailor shop with rich leather, fine woods, and quality craftsmanship.
+
+            <div class="usage-examples">
+                <strong>Perfect for:</strong><br>
+                • Premium clothing brands<br>
+                • Custom tailoring services<br>
+                • Luxury fashion apps<br>
+                • Professional measurement tools<br>
+                • Heritage brand experiences
+            </div>
+        </div>
+    </div>
+
+    <!-- Playful Turquoise Theme -->
+    <div class="palette-card playful-theme">
+        <div class="palette-header">
+            <h2>🌊 Playful Turquoise</h2>
+            <p class="subtitle">Modern • Fresh • Approachable</p>
+        </div>
+
+        <div class="color-section">
+            <h3>Primary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #20B2AA; color: white;">
+                    <span class="color-name">Light Sea Green</span>
+                    <span class="hex-code">#20B2AA</span>
+                </div>
+                <div class="color-block" style="background: #E0F7FA; color: #00695C;">
+                    <span class="color-name">On Primary</span>
+                    <span class="hex-code">#E0F7FA</span>
+                </div>
+            </div>
+            <div class="color-row">
+                <div class="color-block" style="background: #B2DFDB; color: #004D40;">
+                    <span class="color-name">Primary Container</span>
+                    <span class="hex-code">#B2DFDB</span>
+                </div>
+                <div class="color-block" style="background: #00695C; color: #E0F7FA;">
+                    <span class="color-name">On Primary Container</span>
+                    <span class="hex-code">#00695C</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Secondary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #48CAE4; color: white;">
+                    <span class="color-name">Sky Blue</span>
+                    <span class="hex-code">#48CAE4</span>
+                </div>
+                <div class="color-block" style="background: #E1F5FE; color: #01579B;">
+                    <span class="color-name">On Secondary</span>
+                    <span class="hex-code">#E1F5FE</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Tertiary Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #26A69A; color: white;">
+                    <span class="color-name">Teal</span>
+                    <span class="hex-code">#26A69A</span>
+                </div>
+                <div class="color-block" style="background: #E0F2F1; color: #00695C;">
+                    <span class="color-name">On Tertiary</span>
+                    <span class="hex-code">#E0F2F1</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Surface Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #F0FDFF; color: #263238;">
+                    <span class="color-name">Light Surface</span>
+                    <span class="hex-code">#F0FDFF</span>
+                </div>
+                <div class="color-block" style="background: #0D1B1E; color: #F0FDFF;">
+                    <span class="color-name">Dark Surface</span>
+                    <span class="hex-code">#0D1B1E</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="color-section">
+            <h3>Accent Colors</h3>
+            <div class="color-row">
+                <div class="color-block" style="background: #FFB74D; color: white;">
+                    <span class="color-name">Orange Accent</span>
+                    <span class="hex-code">#FFB74D</span>
+                </div>
+                <div class="color-block" style="background: #AB47BC; color: white;">
+                    <span class="color-name">Purple Accent</span>
+                    <span class="hex-code">#AB47BC</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="mood-tags">
+            <div class="mood-tag">Fresh</div>
+            <div class="mood-tag">Modern</div>
+            <div class="mood-tag">Friendly</div>
+            <div class="mood-tag">Innovative</div>
+        </div>
+
+        <div class="description">
+            <strong>Brand Personality:</strong> Fresh, modern, and approachable. Conveys innovation, trustworthiness, and a user-friendly experience that makes sizing fun and accessible.
+
+            <div class="usage-examples">
+                <strong>Perfect for:</strong><br>
+                • Modern sizing apps<br>
+                • Youth-focused fashion<br>
+                • Tech-forward solutions<br>
+                • Fitness and wellness apps<br>
+                • Social shopping experiences
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy notification -->
+<div class="copy-notification" id="copyNotification">
+    Color copied to clipboard! 📋
+</div>
+
+<script>
+    // Copy to clipboard functionality
+    document.querySelectorAll('.color-block').forEach(block => {
+        block.addEventListener('click', function() {
+            const hexCode = this.querySelector('.hex-code');
+            if (hexCode) {
+                const colorValue = hexCode.textContent;
+                navigator.clipboard.writeText(colorValue).then(() => {
+                    showCopyNotification();
+                });
+            }
+        });
+    });
+
+    function showCopyNotification() {
+        const notification = document.getElementById('copyNotification');
+        notification.classList.add('show');
+        setTimeout(() => {
+            notification.classList.remove('show');
+        }, 2000);
+    }
+
+    // Add hover effects and interaction feedback
+    document.querySelectorAll('.color-block').forEach(block => {
+        block.addEventListener('mouseenter', function() {
+            this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.2)';
+        });
+
+        block.addEventListener('mouseleave', function() {
+            this.style.boxShadow = 'none';
+        });
+    });
+</script>
+</body>
+</html>

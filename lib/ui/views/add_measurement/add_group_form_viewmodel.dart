@@ -310,11 +310,11 @@ class AddGroupFormViewModel extends FormViewModel {
       // for (final measurement in measurements) {
       //   await _measurementService.insert(measurement);
       // }
-
       _snackbarService.showSnackbar(
         message: 'Group created successfully!',
         duration: const Duration(seconds: 2),
       );
+      closeForm();
       navigationService.back();
     } catch (e) {
       _snackbarService.showSnackbar(message: 'Error saving group: $e');

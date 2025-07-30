@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide SearchBar;
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:stacked/stacked.dart';
 
@@ -14,26 +14,21 @@ import '../../common/widgets/view_mode_selector.dart';
 import 'home_viewmodel.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
-  const HomeView({Key? key}) : super(key: key);
+  const HomeView({super.key});
 
   @override
-  Widget builder(
-    BuildContext context,
-    HomeViewModel viewModel,
-    Widget? child,
-  ) {
+  Widget builder(BuildContext context, HomeViewModel viewModel, Widget? child) {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
-          backgroundColor: AppColors.background,
           appBar: _buildAppBar(viewModel),
           body: SafeArea(
             child: Column(
               children: [
                 // Search Bar
                 Padding(
-                  padding: UIHelpers.screenPaddingHorizontal,
-                  child: CustomSearchBar(
+                  padding: UIHelpers.screenPaddingVertical,
+                  child: SearchBar(
                     hintText: AppStrings.searchPlaceholder,
                     onChanged: viewModel.onSearchChanged,
                     onClear: viewModel.clearSearch,
@@ -66,27 +61,29 @@ class HomeView extends StackedView<HomeViewModel> {
 
   PreferredSizeWidget _buildAppBar(HomeViewModel viewModel) {
     return AppBar(
-      backgroundColor: Colors.white,
       elevation: 0,
-      title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            AppStrings.myMeasurements,
-            style: TextStyle(
-              fontSize: 28,
-              fontWeight: FontWeight.w700,
-              color: AppColors.textPrimary,
+      title: Padding(
+        padding: UIHelpers.screenPaddingVertical,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              AppStrings.myMeasurements,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w700,
+                color: AppColors.textPrimary,
+              ),
             ),
-          ),
-          const Text(
-            AppStrings.keepTrackSizes,
-            style: TextStyle(
-              fontSize: 16,
-              color: AppColors.textSecondary,
+            const Text(
+              AppStrings.keepTrackSizes,
+              style: TextStyle(
+                fontSize: 12,
+                color: AppColors.textSecondary,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         PopupMenuButton<String>(
@@ -139,8 +136,7 @@ class HomeView extends StackedView<HomeViewModel> {
     );
   }
 
-  Widget _buildContent(
-      HomeViewModel viewModel, SizingInformation sizingInformation) {
+  Widget _buildContent(HomeViewModel viewModel, SizingInformation sizingInformation) {
     if (viewModel.isBusy) {
       return const Center(
         child: LoadingIndicator(message: 'Loading measurements...'),
@@ -186,12 +182,8 @@ class HomeView extends StackedView<HomeViewModel> {
 
     if (viewModel.filteredMeasurements.isEmpty) {
       return UIHelpers.buildEmptyState(
-        title: viewModel.isSearching
-            ? AppStrings.noMeasurementsFound
-            : AppStrings.addFirstMeasurement,
-        subtitle: viewModel.isSearching
-            ? 'Try adjusting your search terms'
-            : 'Tap the + button to add your first measurement',
+        title: viewModel.isSearching ? AppStrings.noMeasurementsFound : AppStrings.addFirstMeasurement,
+        subtitle: viewModel.isSearching ? 'Try adjusting your search terms' : 'Tap the + button to add your first measurement',
         icon: viewModel.isSearching ? Icons.search_off : Icons.straighten,
         action: viewModel.isSearching
             ? null
@@ -202,8 +194,7 @@ class HomeView extends StackedView<HomeViewModel> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: UIHelpers.defaultBorderRadius,
                   ),
@@ -218,8 +209,7 @@ class HomeView extends StackedView<HomeViewModel> {
     );
   }
 
-  Widget _buildMeasurementsView(
-      HomeViewModel viewModel, SizingInformation sizingInformation) {
+  Widget _buildMeasurementsView(HomeViewModel viewModel, SizingInformation sizingInformation) {
     switch (viewModel.currentViewMode) {
       case ViewMode.grid:
         return _buildGridView(viewModel, sizingInformation);
@@ -232,10 +222,8 @@ class HomeView extends StackedView<HomeViewModel> {
     }
   }
 
-  Widget _buildGridView(
-      HomeViewModel viewModel, SizingInformation sizingInformation) {
-    final isTablet =
-        sizingInformation.deviceScreenType == DeviceScreenType.tablet;
+  Widget _buildGridView(HomeViewModel viewModel, SizingInformation sizingInformation) {
+    final isTablet = sizingInformation.deviceScreenType == DeviceScreenType.tablet;
     final crossAxisCount = isTablet ? 2 : 1;
 
     if (crossAxisCount == 1) {

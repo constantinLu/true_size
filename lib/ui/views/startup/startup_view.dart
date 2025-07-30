@@ -1,48 +1,31 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:sizer/sizer.dart';
 import 'package:stacked/stacked.dart';
-import 'startup_viewmodel.dart';
+import 'package:true_size/ui/theme/theme_extension.dart';
+
 import '../../common/ui_helpers.dart';
-import '../../../core/constants/app_colors.dart';
+import 'startup_viewmodel.dart';
 
 class StartupView extends StackedView<StartupViewModel> {
-  const StartupView({Key? key}) : super(key: key);
+  const StartupView({super.key});
 
   @override
-  Widget builder(
-    BuildContext context,
-    StartupViewModel viewModel,
-    Widget? child,
-  ) {
+  Widget builder(BuildContext context, StartupViewModel viewModel, Widget? child) {
     return Scaffold(
-      backgroundColor: AppColors.primary,
+      backgroundColor: context.surface,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             // App Logo
-            Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(60),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  '📏',
-                  style: TextStyle(fontSize: 48),
-                ),
-              ),
+            SvgPicture.asset(
+              'assets/logos/logo.svg',
+              width: 10.w,
+              height: 30.h,
+              fit: BoxFit.contain,
             ),
             UIHelpers.verticalSpaceLarge,
-
             // App Name
             const Text(
               'TrueSize',
@@ -52,7 +35,7 @@ class StartupView extends StackedView<StartupViewModel> {
                 color: Colors.white,
               ),
             ),
-            UIHelpers.verticalSpaceSmall,
+            UIHelpers.verticalSpaceLarge,
 
             // Loading Indicator
             const SizedBox(
@@ -73,6 +56,5 @@ class StartupView extends StackedView<StartupViewModel> {
   StartupViewModel viewModelBuilder(BuildContext context) => StartupViewModel();
 
   @override
-  void onViewModelReady(StartupViewModel viewModel) =>
-      viewModel.runStartupLogic();
+  void onViewModelReady(StartupViewModel viewModel) => viewModel.runStartupLogic();
 }

@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import 'app/app.bottomsheet.dart';
 import 'app/app.locator.dart';
 import 'app/app.router.dart';
-import 'app/setup_bottom_sheet.dart';
-import 'core/constants/app_colors.dart';
+import 'app/app.theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +17,6 @@ void main() async {
 
   // Setup Stacked locator with your services
   await setupLocator();
-
   setupBottomSheetUi();
 
   runApp(MyApp());
@@ -30,167 +29,59 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return Sizer(
       builder: (context, orientation, screenType) {
+        // Use with Google Fonts package to use downloadable fonts
+        TextTheme textTheme = AppTheme.createTextTheme(context, "Lexend", "AR One Sans");
         return MaterialApp(
           title: 'TrueSize',
           navigatorKey: StackedService.navigatorKey,
           onGenerateRoute: StackedRouter().onGenerateRoute,
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-            useMaterial3: true,
+
+          // Use your integrated theme with Google Fonts
+          theme: AppTheme.lightTheme.copyWith(
+            textTheme: textTheme.apply(
+              bodyColor: AppTheme.onSurfaceLight,
+              displayColor: AppTheme.onSurfaceLight,
+            ),
           ),
+
+          darkTheme: AppTheme.darkTheme.copyWith(
+            textTheme: textTheme.apply(
+              bodyColor: AppTheme.onSurfaceDark,
+              displayColor: AppTheme.onSurfaceDark,
+            ),
+          ),
+          // Default to dark theme
+          themeMode: ThemeMode.dark,
+          debugShowCheckedModeBanner: false,
         );
       },
     );
   }
 }
-
-ThemeData _buildTheme() {
-  return ThemeData(
-    useMaterial3: true,
-    primarySwatch: _createMaterialColor(AppColors.primary),
-    primaryColor: AppColors.primary,
-    scaffoldBackgroundColor: AppColors.background,
-    appBarTheme: const AppBarTheme(
-      backgroundColor: AppColors.surface,
-      foregroundColor: AppColors.textPrimary,
-      elevation: 0,
-      centerTitle: false,
-      titleTextStyle: TextStyle(
-        color: AppColors.textPrimary,
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-      ),
-    ),
-    // FIXED: Use CardThemeData instead of CardTheme
-    cardTheme: CardThemeData(
-      color: AppColors.surface,
-      elevation: 4,
-      shadowColor: Colors.black.withOpacity(0.1),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-    ),
-    elevatedButtonTheme: ElevatedButtonThemeData(
-      style: ElevatedButton.styleFrom(
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 2,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        textStyle: const TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-    floatingActionButtonTheme: const FloatingActionButtonThemeData(
-      backgroundColor: AppColors.primary,
-      foregroundColor: Colors.white,
-      elevation: 6,
-    ),
-    inputDecorationTheme: InputDecorationTheme(
-      filled: true,
-      fillColor: AppColors.surfaceVariant,
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.border),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
-      ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error),
-      ),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      hintStyle: const TextStyle(color: AppColors.textTertiary),
-    ),
-    textTheme: const TextTheme(
-      displayLarge: TextStyle(
-        fontSize: 32,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-      ),
-      displayMedium: TextStyle(
-        fontSize: 28,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-      ),
-      displaySmall: TextStyle(
-        fontSize: 24,
-        fontWeight: FontWeight.w700,
-        color: AppColors.textPrimary,
-      ),
-      headlineMedium: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
-      headlineSmall: TextStyle(
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
-      titleLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        color: AppColors.textPrimary,
-      ),
-      bodyLarge: TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textPrimary,
-      ),
-      bodyMedium: TextStyle(
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        color: AppColors.textSecondary,
-      ),
-      bodySmall: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textSecondary,
-      ),
-      labelLarge: TextStyle(
-        fontSize: 11,
-        fontWeight: FontWeight.w500,
-        color: AppColors.textTertiary,
-      ),
-    ),
-    colorScheme: ColorScheme.fromSeed(
-      seedColor: AppColors.primary,
-      brightness: Brightness.light,
-      surface: AppColors.surface,
-      background: AppColors.background,
-    ),
-  );
-}
-
-MaterialColor _createMaterialColor(Color color) {
-  List<double> strengths = <double>[.05];
-  final Map<int, Color> swatch = <int, Color>{};
-  final int r = color.red, g = color.green, b = color.blue;
-
-  for (int i = 1; i < 10; i++) {
-    strengths.add(0.1 * i);
-  }
-
-  for (double strength in strengths) {
-    final double ds = 0.5 - strength;
-    swatch[(strength * 1000).round()] = Color.fromRGBO(
-      r + ((ds < 0 ? r : (255 - r)) * ds).round(),
-      g + ((ds < 0 ? g : (255 - g)) * ds).round(),
-      b + ((ds < 0 ? b : (255 - b)) * ds).round(),
-      1,
-    );
-  }
-
-  return MaterialColor(color.value, swatch);
-}
+//
+// @override
+// Widget build(BuildContext context) {
+//   return Sizer(
+//     builder: (context, orientation, screenType) {
+//       return ThemeBuilder(
+//         themes: getThemes(),
+//         statusBarColorBuilder: (theme) => Colors.yellow,
+//         darkTheme: darkTheme,
+//         lightTheme: lightTheme,
+//         defaultThemeMode: darkTheme,
+//         builder: (context, regularTheme, darkTheme, themeMode) {
+//           return MaterialApp(
+//             title: 'TrueSize',
+//             theme: regularTheme,
+//             darkTheme: darkTheme,
+//             themeMode: themeMode,
+//             navigatorKey: StackedService.navigatorKey,
+//             onGenerateRoute: StackedRouter().onGenerateRoute,
+//             debugShowCheckedModeBanner: false,
+//           );
+//         },
+//       );
+//     },
+//   );
+// }
+// }

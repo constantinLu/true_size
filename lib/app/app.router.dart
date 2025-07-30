@@ -9,12 +9,10 @@ import 'package:flutter/material.dart' as _i7;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart' as _i1;
 import 'package:stacked_services/stacked_services.dart' as _i8;
-import 'package:true_size/ui/views/add_measurement/add_group_form_view.dart'
-    as _i6;
+import 'package:true_size/ui/views/add_measurement/add_group_form_view.dart' as _i6;
 import 'package:true_size/ui/views/home/home_view.dart' as _i4;
 import 'package:true_size/ui/views/login/login_view.dart' as _i3;
-import 'package:true_size/ui/views/measurement_detail/measurement_detail_view.dart'
-    as _i5;
+import 'package:true_size/ui/views/measurement_detail/measurement_detail_view.dart' as _i5;
 import 'package:true_size/ui/views/startup/startup_view.dart' as _i2;
 
 class Routes {
@@ -83,8 +81,7 @@ class StackedRouter extends _i1.RouterBase {
     _i5.MeasurementDetailView: (data) {
       final args = data.getArgs<MeasurementDetailViewArguments>(nullOk: false);
       return _i7.MaterialPageRoute<dynamic>(
-        builder: (context) => _i5.MeasurementDetailView(
-            key: args.key, measurementId: args.measurementId),
+        builder: (context) => _i5.MeasurementDetailView(key: args.key, measurementId: args.measurementId),
         settings: data,
       );
     },
@@ -135,42 +132,30 @@ extension NavigatorStateExtension on _i8.NavigationService {
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return navigateTo<dynamic>(Routes.startupView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> navigateToLoginView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return navigateTo<dynamic>(Routes.loginView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> navigateToHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return navigateTo<dynamic>(Routes.homeView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> navigateToMeasurementDetailView({
@@ -179,12 +164,10 @@ extension NavigatorStateExtension on _i8.NavigationService {
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   }) async {
     return navigateTo<dynamic>(Routes.measurementDetailView,
-        arguments: MeasurementDetailViewArguments(
-            key: key, measurementId: measurementId),
+        arguments: MeasurementDetailViewArguments(key: key, measurementId: measurementId),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -195,56 +178,40 @@ extension NavigatorStateExtension on _i8.NavigationService {
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return navigateTo<dynamic>(Routes.addGroupFormView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> replaceWithStartupView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return replaceWith<dynamic>(Routes.startupView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> replaceWithLoginView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return replaceWith<dynamic>(Routes.loginView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> replaceWithHomeView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return replaceWith<dynamic>(Routes.homeView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 
   Future<dynamic> replaceWithMeasurementDetailView({
@@ -253,12 +220,10 @@ extension NavigatorStateExtension on _i8.NavigationService {
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   }) async {
     return replaceWith<dynamic>(Routes.measurementDetailView,
-        arguments: MeasurementDetailViewArguments(
-            key: key, measurementId: measurementId),
+        arguments: MeasurementDetailViewArguments(key: key, measurementId: measurementId),
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -269,13 +234,9 @@ extension NavigatorStateExtension on _i8.NavigationService {
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
-    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
-        transition,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)? transition,
   ]) async {
     return replaceWith<dynamic>(Routes.addGroupFormView,
-        id: routerId,
-        preventDuplicates: preventDuplicates,
-        parameters: parameters,
-        transition: transition);
+        id: routerId, preventDuplicates: preventDuplicates, parameters: parameters, transition: transition);
   }
 }

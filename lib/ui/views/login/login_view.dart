@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'login_viewmodel.dart';
-import '../../common/ui_helpers.dart';
+import 'package:stacked/stacked.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../common/ui_helpers.dart';
+import 'login_viewmodel.dart';
 
 class LoginView extends StackedView<LoginViewModel> {
   const LoginView({super.key});
@@ -75,9 +76,7 @@ class LoginView extends StackedView<LoginViewModel> {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
-                          onPressed: viewModel.isBusy
-                              ? null
-                              : viewModel.signInWithGoogle,
+                          onPressed: viewModel.isBusy ? null : viewModel.signInWithGoogle,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: AppColors.textPrimary,
@@ -93,8 +92,7 @@ class LoginView extends StackedView<LoginViewModel> {
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        AppColors.primary),
+                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                                   ),
                                 )
                               : Image.asset(

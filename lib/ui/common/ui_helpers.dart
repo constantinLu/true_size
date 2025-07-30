@@ -13,10 +13,6 @@ class UIHelpers {
   static const Widget horizontalSpaceMedium = SizedBox(width: AppSizes.padding);
   static const Widget horizontalSpaceLarge = SizedBox(width: AppSizes.paddingLarge);
 
-  //color
-  static const kColorGrey = Color(0xFF676767);
-  static const kColorLightGrey = Color(0xFFF7F6F6);
-
   static EdgeInsets get screenPadding => const EdgeInsets.symmetric(
         horizontal: AppSizes.padding,
         vertical: AppSizes.padding,

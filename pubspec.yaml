@@ -15,7 +15,7 @@ dependencies:
   sizer: ^3.0.5
 #  stacked_themes: ^0.3.15
   stacked_hooks: ^0.2.4
-  stacked_themes: ^0.3.10
+  #stacked_themes: ^0.3.15
 
   # Responsive Design
   responsive_builder: ^0.7.0
@@ -32,9 +32,11 @@ dependencies:
   flutter_svg: ^2.0.9
   cached_network_image: ^3.3.0
   hugeicons: ^0.0.11
+  flex_color_scheme: ^8.2.0
+  google_fonts: ^6.2.1
 
   # State Management & Navigation
-  get_it: ^7.6.4
+  get_it: ^8.0.2
   auto_route: ^7.8.4
 
   # Utilities
