@@ -9,10 +9,10 @@ class StartupView extends StackedView<StartupViewModel> {
 
   @override
   Widget builder(
-      BuildContext context,
-      StartupViewModel viewModel,
-      Widget? child,
-      ) {
+    BuildContext context,
+    StartupViewModel viewModel,
+    Widget? child,
+  ) {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Center(
@@ -73,5 +73,6 @@ class StartupView extends StackedView<StartupViewModel> {
   StartupViewModel viewModelBuilder(BuildContext context) => StartupViewModel();
 
   @override
-  void onViewModelReady(StartupViewModel viewModel) => viewModel.runStartupLogic();
+  void onViewModelReady(StartupViewModel viewModel) =>
+      viewModel.runStartupLogic();
 }

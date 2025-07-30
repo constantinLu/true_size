@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_sizes.dart';
 
 class UIHelpers {
+  static const Widget verticalSpaceTiny = SizedBox(height: AppSizes.paddingExtraSmall);
   static const Widget verticalSpaceSmall = SizedBox(height: AppSizes.paddingSmall);
   static const Widget verticalSpaceMedium = SizedBox(height: AppSizes.padding);
   static const Widget verticalSpaceLarge = SizedBox(height: AppSizes.paddingLarge);
@@ -11,34 +13,40 @@ class UIHelpers {
   static const Widget horizontalSpaceMedium = SizedBox(width: AppSizes.padding);
   static const Widget horizontalSpaceLarge = SizedBox(width: AppSizes.paddingLarge);
 
+  //color
+  static const kColorGrey = Color(0xFF676767);
+  static const kColorLightGrey = Color(0xFFF7F6F6);
+
   static EdgeInsets get screenPadding => const EdgeInsets.symmetric(
-    horizontal: AppSizes.padding,
-    vertical: AppSizes.padding,
-  );
+        horizontal: AppSizes.padding,
+        vertical: AppSizes.padding,
+      );
 
   static EdgeInsets get screenPaddingHorizontal => const EdgeInsets.symmetric(
-    horizontal: AppSizes.padding,
-  );
+        horizontal: AppSizes.padding,
+      );
 
   static EdgeInsets get screenPaddingVertical => const EdgeInsets.symmetric(
-    vertical: AppSizes.padding,
-  );
+        vertical: AppSizes.padding,
+      );
 
   static BorderRadius get defaultBorderRadius => BorderRadius.circular(AppSizes.borderRadius);
+
   static BorderRadius get largeBorderRadius => BorderRadius.circular(AppSizes.borderRadiusLarge);
+
   static BorderRadius get smallBorderRadius => BorderRadius.circular(AppSizes.borderRadiusSmall);
 
   static BoxShadow get defaultShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.1),
-    blurRadius: 10,
-    offset: const Offset(0, 4),
-  );
+        color: Colors.black.withOpacity(0.1),
+        blurRadius: 10,
+        offset: const Offset(0, 4),
+      );
 
   static BoxShadow get elevatedShadow => BoxShadow(
-    color: Colors.black.withOpacity(0.15),
-    blurRadius: 20,
-    offset: const Offset(0, 8),
-  );
+        color: Colors.black.withOpacity(0.15),
+        blurRadius: 20,
+        offset: const Offset(0, 8),
+      );
 
   static Color getCategoryColor(String category) {
     switch (category.toLowerCase()) {

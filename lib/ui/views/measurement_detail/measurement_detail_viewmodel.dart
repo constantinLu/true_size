@@ -1,11 +1,11 @@
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:true_size/core/services/navigation_service_extension.dart';
+
 import '../../../app/app.locator.dart';
 import '../../../app/app.router.dart';
-import '../../../core/services/firestore_service.dart';
-import '../../../core/models/measurement_entry.dart';
+import '../../../core/models/group.dart';
 import '../../../core/utils/helpers.dart';
+import '../../../services/firestore_service.dart';
 
 class MeasurementDetailViewModel extends BaseViewModel {
   final _firestoreService = locator<FirestoreService>();
@@ -14,11 +14,11 @@ class MeasurementDetailViewModel extends BaseViewModel {
   final _snackbarService = locator<SnackbarService>();
 
   final String measurementId;
-  MeasurementEntry? _measurement;
+  Group? _measurement;
 
   MeasurementDetailViewModel({required this.measurementId});
 
-  MeasurementEntry? get measurement => _measurement;
+  Group? get measurement => _measurement;
 
   Future<void> initialize() async {
     await _loadMeasurement();
@@ -27,7 +27,7 @@ class MeasurementDetailViewModel extends BaseViewModel {
   Future<void> _loadMeasurement() async {
     setBusy(true);
     try {
-      _measurement = await _firestoreService.getMeasurement(measurementId);
+      _measurement = await _firestoreService.getGroup(measurementId);
       if (_measurement == null) {
         setError('Measurement not found');
       }
@@ -50,10 +50,10 @@ class MeasurementDetailViewModel extends BaseViewModel {
   }
 
   Future<void> navigateToEdit() async {
-    final result = await _navigationService.navigateToAddMeasurementView(
-      measurementId: measurementId,
-    );
-    if (result == true) {
+    // final result = await _navigationService.navigateToAddMeasurementView(
+    //   measurementId: measurementId,
+    // );
+    if (true) {
       await refresh();
       _snackbarService.showSnackbar(
         message: 'Measurement updated successfully!',
@@ -76,7 +76,8 @@ class MeasurementDetailViewModel extends BaseViewModel {
   Future<void> _confirmDelete() async {
     final result = await _dialogService.showConfirmationDialog(
       title: 'Delete Measurement',
-      description: 'Are you sure you want to delete "${_measurement?.title}"? This action cannot be undone.',
+      description:
+          'Are you sure you want to delete "${_measurement?.name}"? This action cannot be undone.',
       confirmationTitle: 'Delete',
       cancelTitle: 'Cancel',
     );
@@ -89,7 +90,7 @@ class MeasurementDetailViewModel extends BaseViewModel {
   Future<void> _deleteMeasurement() async {
     setBusy(true);
     try {
-      await _firestoreService.deleteMeasurement(measurementId);
+      await _firestoreService.deleteGroup(measurementId);
       _snackbarService.showSnackbar(
         message: 'Measurement deleted successfully',
         duration: const Duration(seconds: 2),

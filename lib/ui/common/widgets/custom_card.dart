@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:true_size/ui/common/widgets/tag_widget.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../../../core/models/measurement_entry.dart';
+import '../../../core/models/group.dart';
 import '../ui_helpers.dart';
-import 'measurement_tag.dart';
 
 class CustomCard extends StatelessWidget {
-  final MeasurementEntry entry;
+  final Group group;
   final VoidCallback? onTap;
   final VoidCallback? onLongPress;
 
   const CustomCard({
-    Key? key,
-    required this.entry,
+    super.key,
+    required this.group,
     this.onTap,
     this.onLongPress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -40,12 +41,13 @@ class CustomCard extends StatelessWidget {
                     width: 48,
                     height: 48,
                     decoration: BoxDecoration(
-                      color: UIHelpers.getCategoryColor(entry.category),
-                      borderRadius: BorderRadius.circular(AppSizes.borderRadius),
+                      color: UIHelpers.getCategoryColor(group.color),
+                      borderRadius:
+                          BorderRadius.circular(AppSizes.borderRadius),
                     ),
                     child: Center(
                       child: Text(
-                        entry.icon,
+                        group.icon,
                         style: const TextStyle(fontSize: 20),
                       ),
                     ),
@@ -56,7 +58,7 @@ class CustomCard extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          entry.title,
+                          group.name,
                           style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -65,7 +67,7 @@ class CustomCard extends StatelessWidget {
                         ),
                         UIHelpers.verticalSpaceSmall,
                         Text(
-                          '${entry.measurements.length} measurement${entry.measurements.length != 1 ? 's' : ''}',
+                          '${group.measurements.length} measurement${group.measurements.length != 1 ? 's' : ''}',
                           style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.textSecondary,
@@ -79,11 +81,11 @@ class CustomCard extends StatelessWidget {
               UIHelpers.verticalSpaceMedium,
 
               // Sample measurements
-              if (entry.measurements.isNotEmpty) ...[
+              if (group.measurements.isNotEmpty) ...[
                 Wrap(
                   spacing: 8,
                   runSpacing: 4,
-                  children: entry.measurements.take(3).map((measurement) {
+                  children: group.measurements.take(3).map((measurement) {
                     return Container(
                       padding: const EdgeInsets.symmetric(
                         horizontal: 8,
@@ -91,10 +93,11 @@ class CustomCard extends StatelessWidget {
                       ),
                       decoration: BoxDecoration(
                         color: AppColors.surfaceVariant,
-                        borderRadius: BorderRadius.circular(AppSizes.borderRadiusSmall),
+                        borderRadius:
+                            BorderRadius.circular(AppSizes.borderRadiusSmall),
                       ),
                       child: Text(
-                        '${measurement.brand}: ${measurement.size}',
+                        '${measurement.brand}: ${measurement.value}',
                         style: const TextStyle(
                           fontSize: 12,
                           color: AppColors.textSecondary,
@@ -108,12 +111,12 @@ class CustomCard extends StatelessWidget {
               ],
 
               // Tags
-              if (entry.tags.isNotEmpty)
+              if (group.tags.isNotEmpty)
                 Wrap(
                   spacing: 6,
                   runSpacing: 4,
-                  children: entry.tags.map((tag) {
-                    return MeasurementTag(tag: tag);
+                  children: group.tags.map((tag) {
+                    return TileWidget(label: tag.name);
                   }).toList(),
                 ),
             ],

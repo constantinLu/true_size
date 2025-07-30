@@ -1,28 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'home_viewmodel.dart';
+import 'package:stacked/stacked.dart';
+
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../common/ui_helpers.dart';
 import '../../common/widgets/custom_card.dart';
-import '../../common/widgets/search_bar.dart';
 import '../../common/widgets/loading_indicator.dart';
-import '../../common/widgets/view_mode_selector.dart';
-import '../../common/widgets/measurement_grid_view.dart';
 import '../../common/widgets/measurement_list_view.dart';
-import '../../common/widgets/measurement_calendar_view.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/app_sizes.dart';
+import '../../common/widgets/search_bar.dart';
+import '../../common/widgets/view_mode_selector.dart';
+import 'home_viewmodel.dart';
 
 class HomeView extends StackedView<HomeViewModel> {
   const HomeView({Key? key}) : super(key: key);
 
   @override
   Widget builder(
-      BuildContext context,
-      HomeViewModel viewModel,
-      Widget? child,
-      ) {
+    BuildContext context,
+    HomeViewModel viewModel,
+    Widget? child,
+  ) {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
@@ -140,7 +139,8 @@ class HomeView extends StackedView<HomeViewModel> {
     );
   }
 
-  Widget _buildContent(HomeViewModel viewModel, SizingInformation sizingInformation) {
+  Widget _buildContent(
+      HomeViewModel viewModel, SizingInformation sizingInformation) {
     if (viewModel.isBusy) {
       return const Center(
         child: LoadingIndicator(message: 'Loading measurements...'),
@@ -193,19 +193,22 @@ class HomeView extends StackedView<HomeViewModel> {
             ? 'Try adjusting your search terms'
             : 'Tap the + button to add your first measurement',
         icon: viewModel.isSearching ? Icons.search_off : Icons.straighten,
-        action: viewModel.isSearching ? null : ElevatedButton.icon(
-          onPressed: viewModel.navigateToAddMeasurement,
-          icon: const Icon(Icons.add),
-          label: const Text('Add Measurement'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: UIHelpers.defaultBorderRadius,
-            ),
-          ),
-        ),
+        action: viewModel.isSearching
+            ? null
+            : ElevatedButton.icon(
+                onPressed: viewModel.navigateToAddGroupFormView,
+                icon: const Icon(Icons.add),
+                label: const Text('Add Measurement'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: UIHelpers.defaultBorderRadius,
+                  ),
+                ),
+              ),
       );
     }
 
@@ -215,7 +218,8 @@ class HomeView extends StackedView<HomeViewModel> {
     );
   }
 
-  Widget _buildMeasurementsView(HomeViewModel viewModel, SizingInformation sizingInformation) {
+  Widget _buildMeasurementsView(
+      HomeViewModel viewModel, SizingInformation sizingInformation) {
     switch (viewModel.currentViewMode) {
       case ViewMode.grid:
         return _buildGridView(viewModel, sizingInformation);
@@ -225,16 +229,13 @@ class HomeView extends StackedView<HomeViewModel> {
           onTap: viewModel.navigateToMeasurementDetail,
           onLongPress: viewModel.showMeasurementOptions,
         );
-      case ViewMode.calendar:
-        return MeasurementCalendarView(
-          measurements: viewModel.filteredMeasurements,
-          onTap: viewModel.navigateToMeasurementDetail,
-        );
     }
   }
 
-  Widget _buildGridView(HomeViewModel viewModel, SizingInformation sizingInformation) {
-    final isTablet = sizingInformation.deviceScreenType == DeviceScreenType.tablet;
+  Widget _buildGridView(
+      HomeViewModel viewModel, SizingInformation sizingInformation) {
+    final isTablet =
+        sizingInformation.deviceScreenType == DeviceScreenType.tablet;
     final crossAxisCount = isTablet ? 2 : 1;
 
     if (crossAxisCount == 1) {
@@ -247,7 +248,7 @@ class HomeView extends StackedView<HomeViewModel> {
           return Padding(
             padding: const EdgeInsets.only(bottom: AppSizes.padding),
             child: CustomCard(
-              entry: entry,
+              group: entry,
               onTap: () => viewModel.navigateToMeasurementDetail(entry),
               onLongPress: () => viewModel.showMeasurementOptions(entry),
             ),
@@ -269,7 +270,7 @@ class HomeView extends StackedView<HomeViewModel> {
       itemBuilder: (context, index) {
         final entry = viewModel.filteredMeasurements[index];
         return CustomCard(
-          entry: entry,
+          group: entry,
           onTap: () => viewModel.navigateToMeasurementDetail(entry),
           onLongPress: () => viewModel.showMeasurementOptions(entry),
         );
@@ -279,7 +280,7 @@ class HomeView extends StackedView<HomeViewModel> {
 
   Widget _buildFAB(HomeViewModel viewModel) {
     return FloatingActionButton(
-      onPressed: viewModel.navigateToAddMeasurement,
+      onPressed: viewModel.navigateToAddGroupFormView,
       backgroundColor: AppColors.primary,
       child: const Icon(
         Icons.add,

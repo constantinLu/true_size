@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import '../../../core/models/measurement_entry.dart';
+import '../../../core/models/group.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../ui_helpers.dart';
 import 'custom_card.dart';
 
 class MeasurementGridView extends StatelessWidget {
-  final List<MeasurementEntry> measurements;
-  final Function(MeasurementEntry) onTap;
-  final Function(MeasurementEntry) onLongPress;
+  final List<Group> measurements;
+  final Function(Group) onTap;
+  final Function(Group) onLongPress;
 
   const MeasurementGridView({
     Key? key,
@@ -30,7 +30,7 @@ class MeasurementGridView extends StatelessWidget {
       itemBuilder: (context, index) {
         final entry = measurements[index];
         return CustomCard(
-          entry: entry,
+          group: entry,
           onTap: () => onTap(entry),
           onLongPress: () => onLongPress(entry),
         );

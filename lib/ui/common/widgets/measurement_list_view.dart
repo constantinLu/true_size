@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import '../../../core/models/measurement_entry.dart';
+import '../../../core/models/group.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../ui_helpers.dart';
 import '../../../core/utils/helpers.dart';
 
 class MeasurementListView extends StatelessWidget {
-  final List<MeasurementEntry> measurements;
-  final Function(MeasurementEntry) onTap;
-  final Function(MeasurementEntry) onLongPress;
+  final List<Group> measurements;
+  final Function(Group) onTap;
+  final Function(Group) onLongPress;
 
   const MeasurementListView({
     Key? key,
@@ -32,7 +32,7 @@ class MeasurementListView extends StatelessWidget {
     );
   }
 
-  Widget _buildListItem(MeasurementEntry entry) {
+  Widget _buildListItem(Group entry) {
     return Card(
       elevation: AppSizes.cardElevation,
       shape: RoundedRectangleBorder(
@@ -50,7 +50,7 @@ class MeasurementListView extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: UIHelpers.getCategoryColor(entry.category),
+                  color: UIHelpers.getCategoryColor(entry.color),
                   borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                 ),
                 child: Center(
@@ -66,7 +66,7 @@ class MeasurementListView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      entry.title,
+                      entry.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

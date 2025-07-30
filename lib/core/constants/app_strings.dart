@@ -1,6 +1,7 @@
 class AppStrings {
   static const String appName = 'TrueSize';
-  static const String appTagline = 'Keep track of all your measurements and sizes in one place';
+  static const String appTagline =
+      'Keep track of all your measurements and sizes in one place';
 
   // Authentication
   static const String welcomeTitle = 'Welcome to TrueSize';
@@ -38,12 +39,14 @@ class AppStrings {
   // Validation
   static const String fieldRequired = 'This field is required';
   static const String invalidEmail = 'Please enter a valid email';
-  static const String measurementTitleRequired = 'Measurement title is required';
+  static const String measurementTitleRequired =
+      'Measurement title is required';
   static const String brandRequired = 'Brand name is required';
   static const String sizeRequired = 'Size is required';
 
   // Error Messages
   static const String genericError = 'Something went wrong. Please try again.';
-  static const String networkError = 'Network error. Please check your connection.';
+  static const String networkError =
+      'Network error. Please check your connection.';
   static const String permissionDenied = 'Permission denied. Please try again.';
 }

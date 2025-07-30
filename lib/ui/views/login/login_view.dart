@@ -7,14 +7,14 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 
 class LoginView extends StackedView<LoginViewModel> {
-  const LoginView({Key? key}) : super(key: key);
+  const LoginView({super.key});
 
   @override
   Widget builder(
-      BuildContext context,
-      LoginViewModel viewModel,
-      Widget? child,
-      ) {
+    BuildContext context,
+    LoginViewModel viewModel,
+    Widget? child,
+  ) {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
@@ -75,7 +75,9 @@ class LoginView extends StackedView<LoginViewModel> {
                         width: double.infinity,
                         height: 56,
                         child: ElevatedButton.icon(
-                          onPressed: viewModel.isBusy ? null : viewModel.signInWithGoogle,
+                          onPressed: viewModel.isBusy
+                              ? null
+                              : viewModel.signInWithGoogle,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.white,
                             foregroundColor: AppColors.textPrimary,
@@ -87,18 +89,19 @@ class LoginView extends StackedView<LoginViewModel> {
                           ),
                           icon: viewModel.isBusy
                               ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-                            ),
-                          )
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        AppColors.primary),
+                                  ),
+                                )
                               : Image.asset(
-                            'assets/icons/google_logo.png',
-                            width: 24,
-                            height: 24,
-                          ),
+                                  'assets/icons/google_logo.png',
+                                  width: 24,
+                                  height: 24,
+                                ),
                           label: const Text(
                             AppStrings.continueWithGoogle,
                             style: TextStyle(

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_sizes.dart';
 
-class MeasurementTag extends StatelessWidget {
-  final String tag;
+import '../../../core/constants/app_colors.dart';
+
+class TileWidget extends StatelessWidget {
+  final String label;
+  final IconData? iconData;
   final bool isSelected;
   final VoidCallback? onTap;
 
-  const MeasurementTag({
-    Key? key,
-    required this.tag,
+  const TileWidget({
+    super.key,
+    required this.label,
     this.isSelected = false,
+    this.iconData,
     this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -24,11 +26,13 @@ class MeasurementTag extends StatelessWidget {
           vertical: 3,
         ),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary : AppColors.secondary.withOpacity(0.1),
+          color: isSelected
+              ? AppColors.primary
+              : AppColors.secondary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(
-          tag.startsWith('#') ? tag : '#$tag',
+          label,
           style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,

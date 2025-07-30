@@ -71,7 +71,7 @@ lib/
 - Orientation-aware UI components
 
 ## 4. Data Models
-- MeasurementEntry: Main entry container (shoes, body, etc.)
+- Group: Main entry container (shoes, body, etc.)
 - MeasurementItem: Individual measurements within entry
 - Tag system for categorization and search
 - Brand-specific measurements support

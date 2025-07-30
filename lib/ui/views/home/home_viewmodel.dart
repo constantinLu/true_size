@@ -1,43 +1,48 @@
 import 'dart:async';
+
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
+import 'package:true_size/app/app.router.dart';
+
 import '../../../app/app.locator.dart';
-import '../../../core/services/auth_service.dart';
-import '../../../core/services/firestore_service.dart';
-import '../../../core/models/measurement_entry.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../core/models/group.dart';
+import '../../../services/auth_service.dart';
+import '../../../services/firestore_service.dart';
 
-enum ViewMode { grid, list, calendar }
+enum ViewMode { grid, list }
 
-class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
+class HomeViewModel extends StreamViewModel<List<Group>> {
   final _authService = locator<AuthService>();
   final _firestoreService = locator<FirestoreService>();
   final _navigationService = locator<NavigationService>();
   final _dialogService = locator<DialogService>();
   final _snackbarService = locator<SnackbarService>();
 
-  List<MeasurementEntry> _allMeasurements = [];
+  List<Group> groups = [];
   String _searchQuery = '';
   String _userDisplayName = '';
   ViewMode _currentViewMode = ViewMode.grid;
 
-  List<MeasurementEntry> get filteredMeasurements {
+  List<Group> get filteredMeasurements {
     if (_searchQuery.isEmpty) {
-      return _allMeasurements;
+      return groups;
     }
 
-    return _allMeasurements.where((entry) {
+    return groups.where((group) {
       final query = _searchQuery.toLowerCase();
-      return entry.title.toLowerCase().contains(query) ||
-          entry.tags.any((tag) => tag.toLowerCase().contains(query)) ||
-          entry.measurements.any((measurement) =>
-          measurement.brand.toLowerCase().contains(query) ||
-              measurement.size.toLowerCase().contains(query));
+      return group.name.toLowerCase().contains(query);
+      // return group.name.toLowerCase().contains(query) ||
+      //     group.tags.any((tag) => tag..name.toLowerCase().contains(query)) ||
+      //     group.measurements
+      //         .any((measurement) => measurement.brand.toLowerCase().contains(query) || measurement.size.toLowerCase().contains(query));
     }).toList();
   }
 
   bool get isSearching => _searchQuery.isNotEmpty;
+
   ViewMode get currentViewMode => _currentViewMode;
+
   String get userInitials {
     if (_userDisplayName.isEmpty) return 'U';
     final names = _userDisplayName.split(' ');
@@ -60,17 +65,17 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
   }
 
   @override
-  Stream<List<MeasurementEntry>> get stream {
+  Stream<List<Group>> get stream {
     final currentUser = _authService.currentUser;
     if (currentUser == null) {
       return Stream.value([]);
     }
-    return _firestoreService.getMeasurements(currentUser.uid);
+    return _firestoreService.getGroups(currentUser.uid);
   }
 
   @override
-  void onData(List<MeasurementEntry>? data) {
-    _allMeasurements = data ?? [];
+  void onData(List<Group>? data) {
+    groups = data ?? [];
     notifyListeners();
   }
 
@@ -89,9 +94,9 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
     notifyListeners();
   }
 
-  // INSTANCE METHODS (not static)
-  Future<void> navigateToAddMeasurement() async {
-    final result = await _navigationService.navigateTo('/add-measurement');
+  Future<void> navigateToAddGroupFormView() async {
+    final result = await _navigationService.navigateToAddGroupFormView();
+
     if (result == true) {
       _snackbarService.showSnackbar(
         message: 'Measurement added successfully!',
@@ -100,11 +105,9 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
     }
   }
 
-  Future<void> navigateToMeasurementDetail(MeasurementEntry entry) async {
-    final result = await _navigationService.navigateTo(
-        '/measurement',
-        arguments: {'measurementId': entry.id}
-    );
+  Future<void> navigateToMeasurementDetail(Group entry) async {
+    final result = await _navigationService
+        .navigateTo('/measurement', arguments: {'measurementId': entry.id});
     if (result == true) {
       _snackbarService.showSnackbar(
         message: 'Measurement updated successfully!',
@@ -113,11 +116,9 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
     }
   }
 
-  Future<void> navigateToEditMeasurement(MeasurementEntry entry) async {
-    final result = await _navigationService.navigateTo(
-        '/add-measurement',
-        arguments: {'measurementId': entry.id}
-    );
+  Future<void> navigateToEditMeasurement(Group entry) async {
+    final result = await _navigationService
+        .navigateTo('/add-measurement', arguments: {'measurementId': entry.id});
     if (result == true) {
       _snackbarService.showSnackbar(
         message: 'Measurement updated successfully!',
@@ -127,9 +128,9 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
   }
 
   // INSTANCE METHOD (not static) - This is the one causing issues
-  Future<void> showMeasurementOptions(MeasurementEntry entry) async {
+  Future<void> showMeasurementOptions(Group entry) async {
     final result = await _dialogService.showCustomDialog(
-      title: entry.title,
+      title: entry.name,
       description: 'What would you like to do?',
       mainButtonTitle: 'Edit',
       secondaryButtonTitle: 'Delete',
@@ -144,10 +145,11 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
     }
   }
 
-  Future<void> _confirmDeleteMeasurement(MeasurementEntry entry) async {
+  Future<void> _confirmDeleteMeasurement(Group entry) async {
     final result = await _dialogService.showConfirmationDialog(
       title: 'Delete Measurement',
-      description: 'Are you sure you want to delete "${entry.title}"? This action cannot be undone.',
+      description:
+          'Are you sure you want to delete "${entry.name}"? This action cannot be undone.',
       confirmationTitle: 'Delete',
       cancelTitle: 'Cancel',
     );
@@ -157,10 +159,10 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
     }
   }
 
-  Future<void> _deleteMeasurement(MeasurementEntry entry) async {
+  Future<void> _deleteMeasurement(Group entry) async {
     setBusy(true);
     try {
-      await _firestoreService.deleteMeasurement(entry.id);
+      await _firestoreService.deleteGroup(entry.id);
       _snackbarService.showSnackbar(
         message: 'Measurement deleted successfully',
         duration: const Duration(seconds: 2),
@@ -177,10 +179,10 @@ class HomeViewModel extends StreamViewModel<List<MeasurementEntry>> {
   Future<void> onMenuItemSelected(String value) async {
     switch (value) {
       case 'profile':
-      // Navigate to profile
+        // Navigate to profile
         break;
       case 'settings':
-      // Navigate to settings
+        // Navigate to settings
         break;
       case 'logout':
         await _signOut();

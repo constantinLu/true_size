@@ -33,11 +33,6 @@ class ViewModeSelector extends StatelessWidget {
             icon: Icons.list,
             label: 'List',
           ),
-          _buildModeButton(
-            mode: ViewMode.calendar,
-            icon: Icons.calendar_month,
-            label: 'Calendar',
-          ),
         ],
       ),
     );

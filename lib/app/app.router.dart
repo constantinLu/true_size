@@ -9,7 +9,7 @@ import 'package:flutter/material.dart' as _i7;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart' as _i1;
 import 'package:stacked_services/stacked_services.dart' as _i8;
-import 'package:true_size/ui/views/add_measurement/add_measurement_view.dart'
+import 'package:true_size/ui/views/add_measurement/add_group_form_view.dart'
     as _i6;
 import 'package:true_size/ui/views/home/home_view.dart' as _i4;
 import 'package:true_size/ui/views/login/login_view.dart' as _i3;
@@ -26,14 +26,14 @@ class Routes {
 
   static const measurementDetailView = '/measurement';
 
-  static const addMeasurementView = '/add-measurement';
+  static const addGroupFormView = '/add-group';
 
   static const all = <String>{
     startupView,
     loginView,
     homeView,
     measurementDetailView,
-    addMeasurementView,
+    addGroupFormView,
   };
 }
 
@@ -56,8 +56,8 @@ class StackedRouter extends _i1.RouterBase {
       page: _i5.MeasurementDetailView,
     ),
     _i1.RouteDef(
-      Routes.addMeasurementView,
-      page: _i6.AddMeasurementView,
+      Routes.addGroupFormView,
+      page: _i6.AddGroupFormView,
     ),
   ];
 
@@ -88,13 +88,9 @@ class StackedRouter extends _i1.RouterBase {
         settings: data,
       );
     },
-    _i6.AddMeasurementView: (data) {
-      final args = data.getArgs<AddMeasurementViewArguments>(
-        orElse: () => const AddMeasurementViewArguments(),
-      );
+    _i6.AddGroupFormView: (data) {
       return _i7.MaterialPageRoute<dynamic>(
-        builder: (context) => _i6.AddMeasurementView(
-            key: args.key, measurementId: args.measurementId),
+        builder: (context) => const _i6.AddGroupFormView(),
         settings: data,
       );
     },
@@ -124,33 +120,6 @@ class MeasurementDetailViewArguments {
 
   @override
   bool operator ==(covariant MeasurementDetailViewArguments other) {
-    if (identical(this, other)) return true;
-    return other.key == key && other.measurementId == measurementId;
-  }
-
-  @override
-  int get hashCode {
-    return key.hashCode ^ measurementId.hashCode;
-  }
-}
-
-class AddMeasurementViewArguments {
-  const AddMeasurementViewArguments({
-    this.key,
-    this.measurementId,
-  });
-
-  final _i7.Key? key;
-
-  final String? measurementId;
-
-  @override
-  String toString() {
-    return '{"key": "$key", "measurementId": "$measurementId"}';
-  }
-
-  @override
-  bool operator ==(covariant AddMeasurementViewArguments other) {
     if (identical(this, other)) return true;
     return other.key == key && other.measurementId == measurementId;
   }
@@ -222,18 +191,14 @@ extension NavigatorStateExtension on _i8.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> navigateToAddMeasurementView({
-    _i7.Key? key,
-    String? measurementId,
+  Future<dynamic> navigateToAddGroupFormView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  }) async {
-    return navigateTo<dynamic>(Routes.addMeasurementView,
-        arguments:
-            AddMeasurementViewArguments(key: key, measurementId: measurementId),
+  ]) async {
+    return navigateTo<dynamic>(Routes.addGroupFormView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,
@@ -300,18 +265,14 @@ extension NavigatorStateExtension on _i8.NavigationService {
         transition: transition);
   }
 
-  Future<dynamic> replaceWithAddMeasurementView({
-    _i7.Key? key,
-    String? measurementId,
+  Future<dynamic> replaceWithAddGroupFormView([
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
     Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
         transition,
-  }) async {
-    return replaceWith<dynamic>(Routes.addMeasurementView,
-        arguments:
-            AddMeasurementViewArguments(key: key, measurementId: measurementId),
+  ]) async {
+    return replaceWith<dynamic>(Routes.addGroupFormView,
         id: routerId,
         preventDuplicates: preventDuplicates,
         parameters: parameters,

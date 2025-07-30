@@ -14,8 +14,10 @@ extension NavigationServiceExtensions on NavigationService {
     return navigateTo('/home');
   }
 
-  Future<dynamic> navigateToMeasurementDetailView({required String measurementId}) async {
-    return navigateTo('/measurement', arguments: {'measurementId': measurementId});
+  Future<dynamic> navigateToMeasurementDetailView(
+      {required String measurementId}) async {
+    return navigateTo('/measurement',
+        arguments: {'measurementId': measurementId});
   }
 
   Future<dynamic> replaceWithHomeView() async {

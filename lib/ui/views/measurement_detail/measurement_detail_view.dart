@@ -3,7 +3,7 @@ import 'package:stacked/stacked.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'measurement_detail_viewmodel.dart';
 import '../../common/ui_helpers.dart';
-import '../../common/widgets/measurement_tag.dart';
+import '../../common/widgets/tag_widget.dart';
 import '../../common/widgets/loading_indicator.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
@@ -12,14 +12,14 @@ import '../../../core/constants/app_sizes.dart';
 class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
   final String measurementId;
 
-  const MeasurementDetailView({Key? key, required this.measurementId}) : super(key: key);
+  const MeasurementDetailView({super.key, required this.measurementId});
 
   @override
   Widget builder(
-      BuildContext context,
-      MeasurementDetailViewModel viewModel,
-      Widget? child,
-      ) {
+    BuildContext context,
+    MeasurementDetailViewModel viewModel,
+    Widget? child,
+  ) {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
@@ -43,7 +43,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
         icon: const Icon(Icons.arrow_back),
       ),
       title: Text(
-        viewModel.measurement?.title ?? '',
+        viewModel.measurement?.name ?? '',
         style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
@@ -142,7 +142,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(
-            color: UIHelpers.getCategoryColor(measurement.category),
+            color: UIHelpers.getCategoryColor(measurement.color),
             borderRadius: BorderRadius.circular(AppSizes.borderRadiusLarge),
           ),
           child: Center(
@@ -158,7 +158,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                measurement.title,
+                measurement.name,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w700,
@@ -219,7 +219,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
                   border: index < measurements.length - 1
-                      ? const Border(bottom: BorderSide(color: AppColors.borderLight))
+                      ? const Border(
+                          bottom: BorderSide(color: AppColors.borderLight))
                       : null,
                 ),
                 child: Row(
@@ -230,7 +231,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            measurement.brand,
+                            measurement.brand!.name,
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
@@ -251,7 +252,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
                       ),
                     ),
                     Text(
-                      measurement.size,
+                      measurement.value,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
@@ -290,9 +291,10 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
           ),
           child: Column(
             children: [
-              _buildInfoRow('Category', viewModel.measurement!.category),
-              _buildInfoRow('Created', viewModel.getFormattedDate(viewModel.measurement!.createdAt)),
-              _buildInfoRow('Last Updated', viewModel.getFormattedDate(viewModel.measurement!.updatedAt)),
+              _buildInfoRow('Created',
+                  viewModel.getFormattedDate(viewModel.measurement!.createdAt)),
+              _buildInfoRow('Last Updated',
+                  viewModel.getFormattedDate(viewModel.measurement!.updatedAt)),
             ],
           ),
         ),
@@ -347,7 +349,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
           spacing: 8,
           runSpacing: 8,
           children: tags.map((tag) {
-            return MeasurementTag(tag: tag);
+            return TileWidget(label: tag.name);
           }).toList(),
         ),
       ],

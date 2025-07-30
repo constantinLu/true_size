@@ -16,7 +16,7 @@ enum MeasurementType {
 
   static MeasurementType fromString(String value) {
     return MeasurementType.values.firstWhere(
-          (type) => type.value == value,
+      (type) => type.value == value,
       orElse: () => MeasurementType.custom,
     );
   }
