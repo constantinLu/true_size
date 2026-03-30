@@ -19,7 +19,7 @@ import '../ui/views/startup/startup_view.dart';
     MaterialRoute(page: StartupView, path: '/', initial: true),
     MaterialRoute(page: LoginView, path: '/login'),
     MaterialRoute(page: HomeView, path: '/home'),
-    MaterialRoute(page: MeasurementDetailView, path: '/measurement'),
+    MaterialRoute(page: GroupDetailView, path: '/measurement'),
     MaterialRoute(page: AddGroupFormView, path: '/add-group'),
   ],
   dependencies: [

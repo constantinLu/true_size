@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart' hide SearchBar;
 import 'package:responsive_builder/responsive_builder.dart';
+import 'package:sizer/sizer.dart';
 import 'package:stacked/stacked.dart';
+import 'package:true_size/ui/theme/theme_extension.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
@@ -48,7 +50,7 @@ class HomeView extends StackedView<HomeViewModel> {
 
                 // Content
                 Expanded(
-                  child: _buildContent(viewModel, sizingInformation),
+                  child: _buildContent(context, viewModel, sizingInformation),
                 ),
               ],
             ),
@@ -62,6 +64,7 @@ class HomeView extends StackedView<HomeViewModel> {
   PreferredSizeWidget _buildAppBar(HomeViewModel viewModel) {
     return AppBar(
       elevation: 0,
+      toolbarHeight: 10.h,
       title: Padding(
         padding: UIHelpers.screenPaddingVertical,
         child: Column(
@@ -72,14 +75,12 @@ class HomeView extends StackedView<HomeViewModel> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
               ),
             ),
             const Text(
               AppStrings.keepTrackSizes,
               style: TextStyle(
                 fontSize: 12,
-                color: AppColors.textSecondary,
               ),
             ),
           ],
@@ -121,11 +122,9 @@ class HomeView extends StackedView<HomeViewModel> {
             ),
           ],
           child: CircleAvatar(
-            backgroundColor: AppColors.primary,
             child: Text(
               viewModel.userInitials,
               style: const TextStyle(
-                color: Colors.white,
                 fontWeight: FontWeight.w600,
               ),
             ),
@@ -136,7 +135,7 @@ class HomeView extends StackedView<HomeViewModel> {
     );
   }
 
-  Widget _buildContent(HomeViewModel viewModel, SizingInformation sizingInformation) {
+  Widget _buildContent(BuildContext context, HomeViewModel viewModel, SizingInformation sizingInformation) {
     if (viewModel.isBusy) {
       return const Center(
         child: LoadingIndicator(message: 'Loading measurements...'),
@@ -154,20 +153,18 @@ class HomeView extends StackedView<HomeViewModel> {
               color: AppColors.error,
             ),
             UIHelpers.verticalSpaceMedium,
-            const Text(
+            Text(
               'Something went wrong',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: context.error,
               ),
             ),
             UIHelpers.verticalSpaceSmall,
             Text(
               viewModel.modelError.toString(),
-              style: const TextStyle(
-                color: AppColors.textTertiary,
-              ),
+              style: const TextStyle(),
               textAlign: TextAlign.center,
             ),
             UIHelpers.verticalSpaceLarge,
@@ -211,14 +208,14 @@ class HomeView extends StackedView<HomeViewModel> {
 
   Widget _buildMeasurementsView(HomeViewModel viewModel, SizingInformation sizingInformation) {
     switch (viewModel.currentViewMode) {
-      case ViewMode.grid:
-        return _buildGridView(viewModel, sizingInformation);
       case ViewMode.list:
-        return MeasurementListView(
-          measurements: viewModel.filteredMeasurements,
+        return GroupListView(
+          groups: viewModel.filteredMeasurements,
           onTap: viewModel.navigateToMeasurementDetail,
           onLongPress: viewModel.showMeasurementOptions,
         );
+      case ViewMode.grid:
+        return _buildGridView(viewModel, sizingInformation);
     }
   }
 

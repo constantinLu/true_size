@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../common/palette.dart';
-import '../../widget/icon_selector_view.dart';
+import '../../iconselector/icon_selector_view.dart';
 import '../add_group_form_viewmodel.dart';
 import '../helper.dart';
 import '../icons_helper.dart';
@@ -23,8 +23,7 @@ class DisplayIconWidget extends StatelessWidget {
       children: [
         buildBackgroundIcons(),
         SizedBox(
-          height:
-              MediaQuery.of(context).size.height * 0.3, // 30% of screen height
+          height: MediaQuery.of(context).size.height * 0.3, // 30% of screen height
           child: Center(
             child: GestureDetector(
               onTap: showIconSelector,

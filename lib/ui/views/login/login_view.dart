@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:responsive_builder/responsive_builder.dart';
 import 'package:stacked/stacked.dart';
+import 'package:true_size/ui/theme/theme_extension.dart';
 
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../common/ui_helpers.dart';
 import 'login_viewmodel.dart';
@@ -17,9 +17,8 @@ class LoginView extends StackedView<LoginViewModel> {
     Widget? child,
   ) {
     return ResponsiveBuilder(
-      builder: (context, sizingInformation) {
+      builder: (ctx, sizingInformation) {
         return Scaffold(
-          backgroundColor: AppColors.background,
           body: SafeArea(
             child: Center(
               child: SingleChildScrollView(
@@ -34,7 +33,6 @@ class LoginView extends StackedView<LoginViewModel> {
                         width: 120,
                         height: 120,
                         decoration: BoxDecoration(
-                          color: AppColors.primary,
                           borderRadius: BorderRadius.circular(60),
                           boxShadow: [UIHelpers.defaultShadow],
                         ),
@@ -54,7 +52,6 @@ class LoginView extends StackedView<LoginViewModel> {
                         style: TextStyle(
                           fontSize: 32,
                           fontWeight: FontWeight.w700,
-                          color: AppColors.textPrimary,
                         ),
                         textAlign: TextAlign.center,
                       ),
@@ -63,7 +60,6 @@ class LoginView extends StackedView<LoginViewModel> {
                         AppStrings.appTagline,
                         style: TextStyle(
                           fontSize: 16,
-                          color: AppColors.textSecondary,
                           height: 1.5,
                         ),
                         textAlign: TextAlign.center,
@@ -78,21 +74,18 @@ class LoginView extends StackedView<LoginViewModel> {
                         child: ElevatedButton.icon(
                           onPressed: viewModel.isBusy ? null : viewModel.signInWithGoogle,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.white,
-                            foregroundColor: AppColors.textPrimary,
                             elevation: 2,
                             shape: RoundedRectangleBorder(
                               borderRadius: UIHelpers.defaultBorderRadius,
-                              side: const BorderSide(color: AppColors.border),
                             ),
                           ),
                           icon: viewModel.isBusy
-                              ? const SizedBox(
+                              ? SizedBox(
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                                    valueColor: AlwaysStoppedAnimation<Color>(context.primary),
                                   ),
                                 )
                               : Image.asset(

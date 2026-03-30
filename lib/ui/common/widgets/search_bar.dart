@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../ui_helpers.dart';
@@ -60,7 +61,7 @@ class _SearchBarState extends State<SearchBar> {
       height: AppSizes.searchBarHeight,
       decoration: BoxDecoration(
         borderRadius: UIHelpers.defaultBorderRadius,
-        border: Border.all(color: AppColors.border),
+        border: Border.all(color: AppColors.disabledBackgroundColor),
       ),
       child: Row(
         children: [
@@ -82,7 +83,7 @@ class _SearchBarState extends State<SearchBar> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: const TextStyle(
-                  color: AppColors.textTertiary,
+                  color: AppColors.kColorGrey,
                   fontSize: 16,
                 ),
                 border: InputBorder.none,

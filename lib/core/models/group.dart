@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:true_size/core/models/tag.dart';
 
@@ -26,14 +28,17 @@ class Group {
     required this.updatedAt,
   });
 
+ //Color get getColor => Color(Integer.value(color));
+//String get selectedIcon => _selectedIcon;
+  //}
+
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
       'name': name,
       'icon': icon,
       'color': color,
-      'measurementIds':
-          measurements.map((measurement) => measurement.id).toList(),
+      'measurementIds': measurements.map((measurement) => measurement.id).toList(),
       'tagIds': tags.map((tag) => tag.id).toList(),
       'userId': userId,
       'createdAt': Timestamp.fromDate(createdAt),

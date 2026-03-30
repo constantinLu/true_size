@@ -22,7 +22,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   List<Group> groups = [];
   String _searchQuery = '';
   String _userDisplayName = '';
-  ViewMode _currentViewMode = ViewMode.grid;
+  ViewMode _currentViewMode = ViewMode.list;
 
   List<Group> get filteredMeasurements {
     if (_searchQuery.isEmpty) {
@@ -94,40 +94,6 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
     notifyListeners();
   }
 
-  Future<void> navigateToAddGroupFormView() async {
-    final result = await _navigationService.navigateToAddGroupFormView();
-
-    if (result == true) {
-      _snackbarService.showSnackbar(
-        message: 'Measurement added successfully!',
-        duration: const Duration(seconds: 2),
-      );
-    }
-  }
-
-  Future<void> navigateToMeasurementDetail(Group entry) async {
-    final result = await _navigationService
-        .navigateTo('/measurement', arguments: {'measurementId': entry.id});
-    if (result == true) {
-      _snackbarService.showSnackbar(
-        message: 'Measurement updated successfully!',
-        duration: const Duration(seconds: 2),
-      );
-    }
-  }
-
-  Future<void> navigateToEditMeasurement(Group entry) async {
-    final result = await _navigationService
-        .navigateTo('/add-measurement', arguments: {'measurementId': entry.id});
-    if (result == true) {
-      _snackbarService.showSnackbar(
-        message: 'Measurement updated successfully!',
-        duration: const Duration(seconds: 2),
-      );
-    }
-  }
-
-  // INSTANCE METHOD (not static) - This is the one causing issues
   Future<void> showMeasurementOptions(Group entry) async {
     final result = await _dialogService.showCustomDialog(
       title: entry.name,
@@ -148,8 +114,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   Future<void> _confirmDeleteMeasurement(Group entry) async {
     final result = await _dialogService.showConfirmationDialog(
       title: 'Delete Measurement',
-      description:
-          'Are you sure you want to delete "${entry.name}"? This action cannot be undone.',
+      description: 'Are you sure you want to delete "${entry.name}"? This action cannot be undone.',
       confirmationTitle: 'Delete',
       cancelTitle: 'Cancel',
     );
@@ -187,6 +152,38 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
       case 'logout':
         await _signOut();
         break;
+    }
+  }
+
+
+  Future<void> navigateToAddGroupFormView() async {
+    final result = await _navigationService.navigateToAddGroupFormView();
+
+    if (result == true) {
+      _snackbarService.showSnackbar(
+        message: 'Measurement added successfully!',
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
+
+  Future<void> navigateToMeasurementDetail(Group entry) async {
+    final result = await _navigationService.navigateToMeasurementDetailView(measurementId: entry.id);
+    if (result == true) {
+      _snackbarService.showSnackbar(
+        message: 'Measurement updated successfully!',
+        duration: const Duration(seconds: 2),
+      );
+    }
+  }
+
+  Future<void> navigateToEditMeasurement(Group entry) async {
+    final result = await _navigationService.navigateTo('/add-measurement', arguments: {'measurementId': entry.id});
+    if (result == true) {
+      _snackbarService.showSnackbar(
+        message: 'Measurement updated successfully!',
+        duration: const Duration(seconds: 2),
+      );
     }
   }
 

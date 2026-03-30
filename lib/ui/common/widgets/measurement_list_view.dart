@@ -1,38 +1,41 @@
+import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import '../../../core/models/group.dart';
+import 'package:true_size/ui/theme/color_extension.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
-import '../ui_helpers.dart';
+import '../../../core/models/group.dart';
 import '../../../core/utils/helpers.dart';
+import '../ui_helpers.dart';
 
-class MeasurementListView extends StatelessWidget {
-  final List<Group> measurements;
+class GroupListView extends StatelessWidget {
+  final List<Group> groups;
   final Function(Group) onTap;
   final Function(Group) onLongPress;
 
-  const MeasurementListView({
-    Key? key,
-    required this.measurements,
+  const GroupListView({
+    super.key,
+    required this.groups,
     required this.onTap,
     required this.onLongPress,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
       padding: UIHelpers.screenPaddingHorizontal,
-      itemCount: measurements.length,
+      itemCount: groups.length,
       itemBuilder: (context, index) {
-        final entry = measurements[index];
+        final entry = groups[index];
         return Padding(
           padding: const EdgeInsets.only(bottom: AppSizes.padding),
-          child: _buildListItem(entry),
+          child: _buildGroupItem(entry),
         );
       },
     );
   }
 
-  Widget _buildListItem(Group entry) {
+  Widget _buildGroupItem(Group entry) {
     return Card(
       elevation: AppSizes.cardElevation,
       shape: RoundedRectangleBorder(
@@ -50,7 +53,7 @@ class MeasurementListView extends StatelessWidget {
                 width: 48,
                 height: 48,
                 decoration: BoxDecoration(
-                  color: UIHelpers.getCategoryColor(entry.color),
+                  color: entry.color.toColors(),
                   borderRadius: BorderRadius.circular(AppSizes.borderRadius),
                 ),
                 child: Center(

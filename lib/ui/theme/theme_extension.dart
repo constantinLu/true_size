@@ -13,4 +13,6 @@ extension ThemeExtension on BuildContext {
   Color get surface => Theme.of(this).colorScheme.surface;
 
   Color get primaryContainer => Theme.of(this).colorScheme.primaryContainer;
+
+  Color get error => Theme.of(this).colorScheme.error;
 }

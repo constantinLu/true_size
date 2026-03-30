@@ -2,33 +2,32 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
-import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
 import '../../../core/utils/helpers.dart';
 import '../../../services/firestore_service.dart';
 
-class MeasurementDetailViewModel extends BaseViewModel {
+class GroupDetailViewModel extends BaseViewModel {
   final _firestoreService = locator<FirestoreService>();
   final _navigationService = locator<NavigationService>();
   final _dialogService = locator<DialogService>();
   final _snackbarService = locator<SnackbarService>();
 
-  final String measurementId;
-  Group? _measurement;
+  final String groupId;
+  Group? _group;
 
-  MeasurementDetailViewModel({required this.measurementId});
+  GroupDetailViewModel({required this.groupId});
 
-  Group? get measurement => _measurement;
+  Group? get group => _group;
 
   Future<void> initialize() async {
-    await _loadMeasurement();
+    await _loadGroup();
   }
 
-  Future<void> _loadMeasurement() async {
+  Future<void> _loadGroup() async {
     setBusy(true);
     try {
-      _measurement = await _firestoreService.getGroup(measurementId);
-      if (_measurement == null) {
+      _group = await _firestoreService.getGroup(groupId);
+      if (_group == null) {
         setError('Measurement not found');
       }
     } catch (e) {
@@ -38,7 +37,7 @@ class MeasurementDetailViewModel extends BaseViewModel {
   }
 
   Future<void> refresh() async {
-    await _loadMeasurement();
+    await _loadGroup();
   }
 
   String getRelativeTime(DateTime dateTime) {
@@ -76,8 +75,7 @@ class MeasurementDetailViewModel extends BaseViewModel {
   Future<void> _confirmDelete() async {
     final result = await _dialogService.showConfirmationDialog(
       title: 'Delete Measurement',
-      description:
-          'Are you sure you want to delete "${_measurement?.name}"? This action cannot be undone.',
+      description: 'Are you sure you want to delete "${_group?.name}"? This action cannot be undone.',
       confirmationTitle: 'Delete',
       cancelTitle: 'Cancel',
     );
@@ -90,7 +88,7 @@ class MeasurementDetailViewModel extends BaseViewModel {
   Future<void> _deleteMeasurement() async {
     setBusy(true);
     try {
-      await _firestoreService.deleteGroup(measurementId);
+      await _firestoreService.deleteGroup(groupId);
       _snackbarService.showSnackbar(
         message: 'Measurement deleted successfully',
         duration: const Duration(seconds: 2),

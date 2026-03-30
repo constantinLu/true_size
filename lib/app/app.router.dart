@@ -51,7 +51,7 @@ class StackedRouter extends _i1.RouterBase {
     ),
     _i1.RouteDef(
       Routes.measurementDetailView,
-      page: _i5.MeasurementDetailView,
+      page: _i5.GroupDetailView,
     ),
     _i1.RouteDef(
       Routes.addGroupFormView,
@@ -78,10 +78,10 @@ class StackedRouter extends _i1.RouterBase {
         settings: data,
       );
     },
-    _i5.MeasurementDetailView: (data) {
+    _i5.GroupDetailView: (data) {
       final args = data.getArgs<MeasurementDetailViewArguments>(nullOk: false);
       return _i7.MaterialPageRoute<dynamic>(
-        builder: (context) => _i5.MeasurementDetailView(key: args.key, measurementId: args.measurementId),
+        builder: (context) => _i5.GroupDetailView(key: args.key, measurementId: args.measurementId),
         settings: data,
       );
     },

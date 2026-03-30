@@ -1,29 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:stacked/stacked.dart';
 import 'package:responsive_builder/responsive_builder.dart';
-import 'measurement_detail_viewmodel.dart';
-import '../../common/ui_helpers.dart';
-import '../../common/widgets/tag_widget.dart';
-import '../../common/widgets/loading_indicator.dart';
-import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../core/constants/app_sizes.dart';
+import 'package:stacked/stacked.dart';
+import 'package:true_size/ui/views/add_measurement/icons_helper.dart';
 
-class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
+import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_sizes.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../common/ui_helpers.dart';
+import '../../common/widgets/loading_indicator.dart';
+import '../../common/widgets/tag_widget.dart';
+import 'measurement_detail_viewmodel.dart';
+
+class GroupDetailView extends StackedView<GroupDetailViewModel> {
   final String measurementId;
 
-  const MeasurementDetailView({super.key, required this.measurementId});
+  const GroupDetailView({super.key, required this.measurementId});
 
   @override
-  Widget builder(
-    BuildContext context,
-    MeasurementDetailViewModel viewModel,
-    Widget? child,
-  ) {
+  Widget builder(BuildContext context, GroupDetailViewModel viewModel, Widget? child) {
     return ResponsiveBuilder(
       builder: (context, sizingInformation) {
         return Scaffold(
-          backgroundColor: AppColors.background,
           appBar: _buildAppBar(viewModel),
           body: SafeArea(
             child: _buildBody(viewModel),
@@ -34,16 +31,15 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  PreferredSizeWidget _buildAppBar(MeasurementDetailViewModel viewModel) {
+  PreferredSizeWidget _buildAppBar(GroupDetailViewModel viewModel) {
     return AppBar(
-      backgroundColor: AppColors.surface,
       elevation: 0,
       leading: IconButton(
         onPressed: viewModel.navigateBack,
         icon: const Icon(Icons.arrow_back),
       ),
       title: Text(
-        viewModel.measurement?.name ?? '',
+        viewModel.group?.name ?? '',
         style: const TextStyle(
           fontSize: 20,
           fontWeight: FontWeight.w600,
@@ -80,14 +76,14 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildBody(MeasurementDetailViewModel viewModel) {
+  Widget _buildBody(GroupDetailViewModel viewModel) {
     if (viewModel.isBusy) {
       return const Center(
         child: LoadingIndicator(message: 'Loading measurement...'),
       );
     }
 
-    if (viewModel.hasError || viewModel.measurement == null) {
+    if (viewModel.hasError || viewModel.group == null) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -133,8 +129,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildHeaderSection(MeasurementDetailViewModel viewModel) {
-    final measurement = viewModel.measurement!;
+  Widget _buildHeaderSection(GroupDetailViewModel viewModel) {
+    final measurement = viewModel.group!;
 
     return Row(
       children: [
@@ -146,9 +142,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
             borderRadius: BorderRadius.circular(AppSizes.borderRadiusLarge),
           ),
           child: Center(
-            child: Text(
-              measurement.icon,
-              style: const TextStyle(fontSize: 32),
+            child: Icon(
+              allIcons[measurement.icon],
             ),
           ),
         ),
@@ -188,8 +183,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildMeasurementsSection(MeasurementDetailViewModel viewModel) {
-    final measurements = viewModel.measurement!.measurements;
+  Widget _buildMeasurementsSection(GroupDetailViewModel viewModel) {
+    final measurements = viewModel.group!.measurements;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -218,10 +213,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
               return Container(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 decoration: BoxDecoration(
-                  border: index < measurements.length - 1
-                      ? const Border(
-                          bottom: BorderSide(color: AppColors.borderLight))
-                      : null,
+                  border: index < measurements.length - 1 ? const Border(bottom: BorderSide(color: AppColors.borderLight)) : null,
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -269,7 +261,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildAdditionalInfoSection(MeasurementDetailViewModel viewModel) {
+  Widget _buildAdditionalInfoSection(GroupDetailViewModel viewModel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -291,10 +283,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
           ),
           child: Column(
             children: [
-              _buildInfoRow('Created',
-                  viewModel.getFormattedDate(viewModel.measurement!.createdAt)),
-              _buildInfoRow('Last Updated',
-                  viewModel.getFormattedDate(viewModel.measurement!.updatedAt)),
+              _buildInfoRow('Created', viewModel.getFormattedDate(viewModel.group!.createdAt)),
+              _buildInfoRow('Last Updated', viewModel.getFormattedDate(viewModel.group!.updatedAt)),
             ],
           ),
         ),
@@ -328,8 +318,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildTagsSection(MeasurementDetailViewModel viewModel) {
-    final tags = viewModel.measurement!.tags;
+  Widget _buildTagsSection(GroupDetailViewModel viewModel) {
+    final tags = viewModel.group!.tags;
 
     if (tags.isEmpty) return const SizedBox.shrink();
 
@@ -356,7 +346,7 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
     );
   }
 
-  Widget _buildEditFAB(MeasurementDetailViewModel viewModel) {
+  Widget _buildEditFAB(GroupDetailViewModel viewModel) {
     return FloatingActionButton(
       onPressed: viewModel.navigateToEdit,
       backgroundColor: AppColors.primary,
@@ -368,10 +358,8 @@ class MeasurementDetailView extends StackedView<MeasurementDetailViewModel> {
   }
 
   @override
-  MeasurementDetailViewModel viewModelBuilder(BuildContext context) =>
-      MeasurementDetailViewModel(measurementId: measurementId);
+  GroupDetailViewModel viewModelBuilder(BuildContext context) => GroupDetailViewModel(groupId: measurementId);
 
   @override
-  void onViewModelReady(MeasurementDetailViewModel viewModel) =>
-      viewModel.initialize();
+  void onViewModelReady(GroupDetailViewModel viewModel) => viewModel.initialize();
 }

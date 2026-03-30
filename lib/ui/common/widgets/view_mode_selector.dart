@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
 import '../../views/home/home_viewmodel.dart';
@@ -23,27 +24,24 @@ class ViewModeSelector extends StatelessWidget {
       child: Row(
         children: [
           _buildModeButton(
-            mode: ViewMode.grid,
-            icon: Icons.grid_view,
-            label: 'Grid',
-          ),
-          _buildModeButton(
+            context,
             mode: ViewMode.list,
             icon: Icons.list,
             label: 'List',
+          ),
+          _buildModeButton(
+            context,
+            mode: ViewMode.grid,
+            icon: Icons.grid_view,
+            label: 'Grid',
           ),
         ],
       ),
     );
   }
 
-  Widget _buildModeButton({
-    required ViewMode mode,
-    required IconData icon,
-    required String label,
-  }) {
+  Widget _buildModeButton(BuildContext context, {required ViewMode mode, required IconData icon, required String label}) {
     final isSelected = currentMode == mode;
-
     return Expanded(
       child: GestureDetector(
         onTap: () => onModeChanged(mode),
@@ -58,16 +56,14 @@ class ViewModeSelector extends StatelessWidget {
             children: [
               Icon(
                 icon,
-                size: 16,
-                color: isSelected ? Colors.white : AppColors.textTertiary,
+                color: AppColors.textPrimary,
               ),
               const SizedBox(width: 6),
               Text(
                 label,
                 style: TextStyle(
-                  fontSize: 12,
                   fontWeight: FontWeight.w500,
-                  color: isSelected ? Colors.white : AppColors.textTertiary,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ],
