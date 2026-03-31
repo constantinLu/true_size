@@ -13,18 +13,18 @@ class LoginViewModel extends BaseViewModel {
 
   Future<void> signInWithGoogle() async {
     setBusy(true);
-    await _navigationService.navigateToHomeView();
-    // try {
-    //   final user = await _authService.signInWithGoogle();
-    //   if (user != null) {
-    //     await _navigationService.navigateToHomeView();
-    //   }
-    // } catch (e) {
-    //   _snackbarService.showSnackbar(
-    //     message: AppStrings.signInError,
-    //     duration: const Duration(seconds: 3),
-    //   );
-    // }
-    setBusy(false);
+    try {
+      final user = await _authService.signInWithGoogle();
+      if (user != null) {
+        await _navigationService.navigateToHomeView();
+      }
+    } catch (e) {
+      _snackbarService.showSnackbar(
+        message: AppStrings.signInError,
+        duration: const Duration(seconds: 3),
+      );
+    } finally {
+      setBusy(false);
+    }
   }
 }

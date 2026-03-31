@@ -1,5 +1,4 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:stacked/stacked.dart';
 import 'package:true_size/core/models/user.dart';
@@ -25,6 +24,7 @@ class AuthService with ListenableServiceMixin {
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
@@ -47,10 +47,8 @@ class AuthService with ListenableServiceMixin {
         await _firestoreService.saveUser(userModel);
         return userModel;
       }
-    } on PlatformException catch (e) {
-      print('Platform exception: ${e.code} - ${e.message}');
-      rethrow;
     } catch (e) {
+      // ignore: avoid_print
       print('Error signing in with Google: $e');
       rethrow;
     }
@@ -62,6 +60,7 @@ class AuthService with ListenableServiceMixin {
       await _googleSignIn.signOut();
       await _auth.signOut();
     } catch (e) {
+      // ignore: avoid_print
       print('Error signing out: $e');
       rethrow;
     }
@@ -69,7 +68,7 @@ class AuthService with ListenableServiceMixin {
 
   Future<TrueUser?> getCurrentUserModel() async {
     if (currentUser != null) {
-      return await _firestoreService.getUser(currentUser!.uid);
+      return _firestoreService.getUser(currentUser!.uid);
     }
     return null;
   }
