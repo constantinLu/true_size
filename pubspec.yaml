@@ -10,39 +10,39 @@ dependencies:
     sdk: flutter
 
   # Stacked Architecture
-  stacked: ^3.4.0
-  stacked_services: ^1.2.0
+  stacked: ^3.4.4
+  stacked_services: ^1.6.0
   sizer: ^3.0.5
 #  stacked_themes: ^0.3.15
-  stacked_hooks: ^0.2.4
+  stacked_hooks: ^0.2.5
   #stacked_themes: ^0.3.15
 
   # Responsive Design
   responsive_builder: ^0.7.0
 
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
-  google_sign_in: ^6.2.1
+  firebase_core: ^4.2.0
+  firebase_auth: ^6.1.4
+  cloud_firestore: ^6.0.3
+  google_sign_in: ^7.2.0
 
 
 
   # UI Components
-  flutter_svg: ^2.0.9
-  cached_network_image: ^3.3.0
-  hugeicons: ^0.0.11
-  flex_color_scheme: ^8.2.0
+  flutter_svg: ^2.2.0
+  cached_network_image: ^3.4.1
+  hugeicons: ^0.0.12
+  flex_color_scheme: ^8.3.0
   google_fonts: ^6.2.1
 
   # State Management & Navigation
-  get_it: ^8.0.2
-  auto_route: ^7.8.4
+  get_it: ^8.2.0
+  auto_route: ^7.9.2
 
   # Utilities
   uuid: ^4.5.1
 
-  intl: ^0.18.1
+  intl: ^0.20.2
 
   # Development
   cupertino_icons: ^1.0.6
@@ -50,10 +50,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  build_runner: ^2.4.7
-  stacked_generator: ^1.5.0
+  build_runner: ^2.10.1
+  stacked_generator: ^1.5.1
   auto_route_generator: ^7.3.2
   flutter_lints: ^5.0.0
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true
