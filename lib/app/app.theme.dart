@@ -1,6 +1,5 @@
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Custom colors from your Material Theme Builder export
@@ -43,10 +42,11 @@ class AppTheme {
   static const Color onSurfaceDark = Color(0xFFE3E2E2);
   static const Color surfaceContainerDark = Color(0xFF1F2020);
 
-  static TextTheme createTextTheme(BuildContext context, String bodyFontString, String displayFontString) {
+  static TextTheme createTextTheme(BuildContext context) {
     TextTheme baseTextTheme = Theme.of(context).textTheme;
-    TextTheme bodyTextTheme = GoogleFonts.getTextTheme(bodyFontString, baseTextTheme);
-    TextTheme displayTextTheme = GoogleFonts.getTextTheme(displayFontString, baseTextTheme);
+
+    TextTheme bodyTextTheme = baseTextTheme.apply(fontFamily: 'Lexend');
+    TextTheme displayTextTheme = baseTextTheme.apply(fontFamily: 'AROneSans');
     TextTheme textTheme = displayTextTheme.copyWith(
       bodyLarge: bodyTextTheme.bodyLarge,
       bodyMedium: bodyTextTheme.bodyMedium,

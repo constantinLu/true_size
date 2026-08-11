@@ -20,19 +20,32 @@ class AuthService with ListenableServiceMixin {
 
   Future<TrueUser?> signInWithGoogle() async {
     try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) return null;
+      print('signInWithGoogle: started');
 
-      final GoogleSignInAuthentication googleAuth =
-          await googleUser.authentication;
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      print('signInWithGoogle: googleUser = $googleUser');
+
+      if (googleUser == null) {
+        print('signInWithGoogle: user cancelled or signIn returned null');
+        return null;
+      }
+
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      print('signInWithGoogle: accessToken null = ${googleAuth.accessToken == null}');
+      print('signInWithGoogle: idToken null = ${googleAuth.idToken == null}');
+
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
 
-      final UserCredential userCredential =
-          await _auth.signInWithCredential(credential);
+      print('signInWithGoogle: Firebase credential created');
+
+      final UserCredential userCredential = await _auth.signInWithCredential(credential);
+
       final User? user = userCredential.user;
+      print('signInWithGoogle: Firebase user = ${user?.uid}');
 
       if (user != null) {
         final userModel = TrueUser(
@@ -45,16 +58,25 @@ class AuthService with ListenableServiceMixin {
         );
 
         await _firestoreService.saveUser(userModel);
+        print('signInWithGoogle: user saved to Firestore');
         return userModel;
       }
-    } on PlatformException catch (e) {
+
+      print('signInWithGoogle: Firebase user is null');
+      return null;
+    } on PlatformException catch (e, st) {
       print('Platform exception: ${e.code} - ${e.message}');
+      print(st);
       rethrow;
-    } catch (e) {
+    } on FirebaseAuthException catch (e, st) {
+      print('FirebaseAuthException: ${e.code} - ${e.message}');
+      print(st);
+      rethrow;
+    } catch (e, st) {
       print('Error signing in with Google: $e');
+      print(st);
       rethrow;
     }
-    return null;
   }
 
   Future<void> signOut() async {
