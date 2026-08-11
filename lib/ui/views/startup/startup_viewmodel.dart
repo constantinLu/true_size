@@ -11,18 +11,16 @@ class StartupViewModel extends BaseViewModel {
   final _authService = locator<AuthService>();
   final _navigationService = locator<NavigationService>();
   final _userService = locator<UserService>();
-  final _firestoreService = FirebaseFirestore.instance;
 
   Future<void> runStartupLogic() async {
     // Add a small delay for splash screen effect
     await Future.delayed(const Duration(seconds: 2));
-    await _navigationService.navigateToLoginView();
     // Check if user is already signed in
-    // if (_authService.isLoggedIn) {
-    //   await _navigationService.navigateToHomeView();
-    // } else {
-    //   await _navigationService.navigateToLoginView();
-    // }
+    if (_authService.isLoggedIn) {
+      await _navigationService.navigateToHomeView();
+    } else {
+      await _navigationService.navigateToLoginView();
+    }
   }
 
 //FORM

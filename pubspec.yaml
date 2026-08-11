@@ -21,9 +21,9 @@ dependencies:
   responsive_builder: ^0.7.0
 
   # Firebase
-  firebase_core: ^2.24.2
-  firebase_auth: ^4.15.3
-  cloud_firestore: ^4.13.6
+  firebase_core: ^2.32.0
+  firebase_auth: ^4.20.0
+  cloud_firestore: ^4.17.5
   google_sign_in: ^6.2.1
 
 
@@ -61,3 +61,36 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/logos/
+
+  fonts:
+    - family: Lexend
+      fonts:
+        - asset: assets/font/Lexend-Thin.ttf
+          weight: 100
+        - asset: assets/font/Lexend-ExtraLight.ttf
+          weight: 200
+        - asset: assets/font/Lexend-Light.ttf
+          weight: 300
+        - asset: assets/font/Lexend-Regular.ttf
+          weight: 400
+        - asset: assets/font/Lexend-Medium.ttf
+          weight: 500
+        - asset: assets/font/Lexend-SemiBold.ttf
+          weight: 600
+        - asset: assets/font/Lexend-Bold.ttf
+          weight: 700
+        - asset: assets/font/Lexend-ExtraBold.ttf
+          weight: 800
+        - asset: assets/font/Lexend-Black.ttf
+          weight: 900
+
+    - family: AROneSans
+      fonts:
+        - asset: assets/font/AROneSans-Regular.ttf
+          weight: 400
+        - asset: assets/font/AROneSans-Medium.ttf
+          weight: 500
+        - asset: assets/font/AROneSans-SemiBold.ttf
+          weight: 600
+        - asset: assets/font/AROneSans-Bold.ttf
+          weight: 700

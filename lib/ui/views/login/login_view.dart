@@ -49,10 +49,7 @@ class LoginView extends StackedView<LoginViewModel> {
                       // Welcome Text
                       const Text(
                         AppStrings.welcomeTitle,
-                        style: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: TextStyle(fontSize: 32, fontWeight: FontWeight.w700),
                         textAlign: TextAlign.center,
                       ),
                       UIHelpers.verticalSpaceMedium,
@@ -93,8 +90,7 @@ class LoginView extends StackedView<LoginViewModel> {
                                   width: 24,
                                   height: 24,
                                 ),
-                          label: const Text(
-                            AppStrings.continueWithGoogle,
+                          label: const Text(AppStrings.continueWithGoogle,
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w600,

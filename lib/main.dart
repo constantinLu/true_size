@@ -1,6 +1,7 @@
 // lib/main.dart (FIXED)
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:sizer/sizer.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -11,7 +12,7 @@ import 'app/app.theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  //GoogleFonts.config.allowRuntimeFetching = false;
   // Initialize Firebase first
   await Firebase.initializeApp();
 
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
     return Sizer(
       builder: (context, orientation, screenType) {
         // Use with Google Fonts package to use downloadable fonts
-        TextTheme textTheme = AppTheme.createTextTheme(context, "Lexend", "AR One Sans");
+        TextTheme textTheme = AppTheme.createTextTheme(context);
         return MaterialApp(
           title: 'TrueSize',
           navigatorKey: StackedService.navigatorKey,
