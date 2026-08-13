@@ -19,8 +19,23 @@ void main() async {
   // Setup Stacked locator with your services
   await setupLocator();
   setupBottomSheetUi();
+  setupSnackbarUi();
 
   runApp(MyApp());
+}
+
+/// Registers a default configuration for the [SnackbarService] so that
+/// `showSnackbar` calls actually render. Without this the service throws when
+/// invoked, which previously swallowed the "group saved" feedback.
+void setupSnackbarUi() {
+  final service = locator<SnackbarService>();
+  service.registerSnackbarConfig(
+    SnackbarConfig(
+      backgroundColor: const Color(0xFF1E1E1E),
+      textColor: Colors.white,
+      borderRadius: 12,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

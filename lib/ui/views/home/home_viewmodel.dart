@@ -161,7 +161,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
 
     if (result == true) {
       _snackbarService.showSnackbar(
-        message: 'Measurement added successfully!',
+        message: 'Group created successfully!',
         duration: const Duration(seconds: 2),
       );
     }

@@ -245,19 +245,23 @@ class AddGroupFormViewModel extends FormViewModel {
   }
 
   Future<void> saveGroup() async {
+    // Guard against double taps creating duplicate groups.
+    if (isBusy) return;
+
     validateForm();
 
     if (!isFormValid) {
       return;
     }
+
+    final currentUser = _authService.currentUser;
+    if (currentUser == null) {
+      _snackbarService.showSnackbar(message: 'User not authenticated');
+      return;
+    }
+
     setBusy(true);
     try {
-      final currentUser = _authService.currentUser;
-      if (currentUser == null) {
-        _snackbarService.showSnackbar(message: 'User not authenticated');
-        return;
-      }
-
       final now = DateTime.now();
       final groupId = const Uuid().v4();
 
@@ -310,12 +314,14 @@ class AddGroupFormViewModel extends FormViewModel {
       // for (final measurement in measurements) {
       //   await _measurementService.insert(measurement);
       // }
+
+      // Close the form and let Home show the success feedback.
+      navigationService.back(result: true);
+    } on DuplicateGroupNameException catch (e) {
       _snackbarService.showSnackbar(
-        message: 'Group created successfully!',
-        duration: const Duration(seconds: 2),
+        message: 'A group named "${e.name}" already exists.',
+        duration: const Duration(seconds: 3),
       );
-      closeForm();
-      navigationService.back();
     } catch (e) {
       _snackbarService.showSnackbar(message: 'Error saving group: $e');
     } finally {

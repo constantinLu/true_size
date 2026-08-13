@@ -17,6 +17,9 @@ class GroupService {
 
   // INSERT
   Future<String> add(Group group) async {
+    if (await _existsByName(group.userId, group.name)) {
+      throw DuplicateGroupNameException(group.name);
+    }
     try {
       final docRef = await _groupsRef.add(group.toFirestore());
       return docRef.id;
@@ -63,6 +66,10 @@ class GroupService {
 
   // UPDATE
   Future<void> update(String groupId, Group group) async {
+    if (await _existsByName(group.userId, group.name,
+        excludeGroupId: groupId)) {
+      throw DuplicateGroupNameException(group.name);
+    }
     try {
       final updateData = group.toFirestore();
       updateData['updatedAt'] = FieldValue.serverTimestamp();
@@ -71,6 +78,22 @@ class GroupService {
     } catch (e) {
       throw GroupServiceException('Failed to update group $groupId: $e');
     }
+  }
+
+  /// Returns true when the user already owns a group with the same name,
+  /// compared case-insensitively and ignoring surrounding whitespace.
+  /// [excludeGroupId] lets an update skip the group being edited.
+  Future<bool> _existsByName(String userId, String name,
+      {String? excludeGroupId}) async {
+    final target = name.trim().toLowerCase();
+    final snapshot =
+        await _groupsRef.where('userId', isEqualTo: userId).get();
+    return snapshot.docs.any((doc) {
+      if (doc.id == excludeGroupId) return false;
+      final data = doc.data() as Map<String, dynamic>;
+      final existing = (data['name'] ?? '').toString().trim().toLowerCase();
+      return existing == target;
+    });
   }
 
   // DELETE
@@ -116,4 +139,16 @@ class GroupServiceException implements Exception {
 
   @override
   String toString() => 'GroupServiceException: $message';
+}
+
+/// Thrown when creating or renaming a group would collide with an existing
+/// group name owned by the same user.
+class DuplicateGroupNameException implements Exception {
+  final String name;
+
+  DuplicateGroupNameException(this.name);
+
+  @override
+  String toString() =>
+      'DuplicateGroupNameException: A group named "$name" already exists.';
 }
