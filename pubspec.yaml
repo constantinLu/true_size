@@ -3,7 +3,7 @@ description: A comprehensive size and measurement tracking app
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.0.0 <4.0.0'
+  sdk: '>=3.7.0 <4.0.0'
 
 dependencies:
   flutter:
@@ -34,6 +34,18 @@ dependencies:
   hugeicons: ^0.0.11
   flex_color_scheme: ^8.2.0
   google_fonts: ^6.2.1
+  lucide_icons_flutter: ^3.1.17
+
+  # Brand logo lookup (logo.dev image API) + attribution link.
+  http: ^1.2.2
+  url_launcher: ^6.3.1
+
+  # Avatar photo picking for the profile screen.
+  image_picker: ^1.2.3
+
+  # App version shown in Settings > About. Pinned to the 8.x line that is
+  # compatible with this project's Firebase (v2 / web ^0.5) constraints.
+  package_info_plus: ^8.0.0
 
   # State Management & Navigation
   get_it: ^8.0.2
@@ -61,8 +73,19 @@ flutter:
     - assets/icons/
     - assets/images/
     - assets/logos/
+    - assets/fonts/
+    - assets/backgrounds/
 
   fonts:
+    - family: Office Code Pro
+      fonts:
+        - asset: assets/fonts/OfficeCodePro-Regular.otf
+          weight: 400
+        - asset: assets/fonts/OfficeCodePro-Medium.otf
+          weight: 500
+        - asset: assets/fonts/OfficeCodePro-Bold.otf
+          weight: 700
+
     - family: Lexend
       fonts:
         - asset: assets/font/Lexend-Thin.ttf

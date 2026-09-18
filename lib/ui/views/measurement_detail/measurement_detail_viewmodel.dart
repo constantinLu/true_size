@@ -2,33 +2,41 @@ import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
+import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
-import '../../../core/utils/helpers.dart';
+import '../../../core/models/measurement.dart';
 import '../../../services/firestore_service.dart';
+import '../../../services/measurement_service.dart';
 
 class GroupDetailViewModel extends BaseViewModel {
   final _firestoreService = locator<FirestoreService>();
+  final _measurementService = locator<MeasurementService>();
   final _navigationService = locator<NavigationService>();
   final _dialogService = locator<DialogService>();
   final _snackbarService = locator<SnackbarService>();
 
   final String groupId;
   Group? _group;
+  List<Measurement> _measurements = [];
 
   GroupDetailViewModel({required this.groupId});
 
   Group? get group => _group;
+  List<Measurement> get measurements => _measurements;
 
   Future<void> initialize() async {
-    await _loadGroup();
+    await _load();
   }
 
-  Future<void> _loadGroup() async {
+  Future<void> _load() async {
     setBusy(true);
     try {
       _group = await _firestoreService.getGroup(groupId);
       if (_group == null) {
-        setError('Measurement not found');
+        setError('Group not found');
+      } else {
+        _measurements = await _measurementService.getByGroupId(groupId)
+          ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       }
     } catch (e) {
       setError(e);
@@ -36,74 +44,49 @@ class GroupDetailViewModel extends BaseViewModel {
     setBusy(false);
   }
 
-  Future<void> refresh() async {
-    await _loadGroup();
-  }
+  Future<void> refresh() => _load();
 
-  String getRelativeTime(DateTime dateTime) {
-    return Helpers.formatRelativeTime(dateTime);
-  }
-
-  String getFormattedDate(DateTime dateTime) {
-    return Helpers.formatDate(dateTime);
-  }
-
-  Future<void> navigateToEdit() async {
-    // final result = await _navigationService.navigateToAddMeasurementView(
-    //   measurementId: measurementId,
-    // );
-    if (true) {
-      await refresh();
+  /// Opens the add-measurement form for this group, then refreshes on return.
+  Future<void> addMeasurement() async {
+    final added = await _navigationService.navigateToAddMeasurementView(groupId: groupId);
+    if (added == true) {
+      await _load();
       _snackbarService.showSnackbar(
-        message: 'Measurement updated successfully!',
+        message: 'Measurement added',
         duration: const Duration(seconds: 2),
       );
     }
   }
 
-  Future<void> onMenuItemSelected(String value) async {
-    switch (value) {
-      case 'edit':
-        await navigateToEdit();
-        break;
-      case 'delete':
-        await _confirmDelete();
-        break;
-    }
-  }
-
-  Future<void> _confirmDelete() async {
+  Future<void> confirmDelete() async {
     final result = await _dialogService.showConfirmationDialog(
-      title: 'Delete Measurement',
-      description: 'Are you sure you want to delete "${_group?.name}"? This action cannot be undone.',
+      title: 'Delete group',
+      description: 'Delete "${_group?.name}" and its measurements? This cannot be undone.',
       confirmationTitle: 'Delete',
       cancelTitle: 'Cancel',
     );
-
     if (result?.confirmed == true) {
-      await _deleteMeasurement();
+      await _delete();
     }
   }
 
-  Future<void> _deleteMeasurement() async {
+  Future<void> _delete() async {
     setBusy(true);
     try {
       await _firestoreService.deleteGroup(groupId);
       _snackbarService.showSnackbar(
-        message: 'Measurement deleted successfully',
+        message: 'Group deleted',
         duration: const Duration(seconds: 2),
       );
       _navigationService.back(result: true);
     } catch (e) {
       _snackbarService.showSnackbar(
-        message: 'Failed to delete measurement. Please try again.',
+        message: 'Failed to delete group. Please try again.',
         duration: const Duration(seconds: 3),
       );
     }
     setBusy(false);
   }
 
-  void navigateBack() {
-    _navigationService.back();
-  }
+  void navigateBack() => _navigationService.back();
 }

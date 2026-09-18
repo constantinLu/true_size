@@ -16,7 +16,9 @@ import '../services/auth_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
+import '../services/logo_service.dart';
 import '../services/measurement_service.dart';
+import '../services/settings_service.dart';
 import '../services/tag_service.dart';
 import '../services/user_service.dart';
 
@@ -41,5 +43,7 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => GroupService());
   locator.registerLazySingleton(() => BrandService());
   locator.registerLazySingleton(() => TagService());
+  locator.registerLazySingleton(() => SettingsService());
+  locator.registerLazySingleton(() => LogoService());
   locator.registerLazySingleton(() => BottomSheetService());
 }

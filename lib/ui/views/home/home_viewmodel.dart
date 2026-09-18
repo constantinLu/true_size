@@ -41,6 +41,22 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
 
   bool get isSearching => _searchQuery.isNotEmpty;
 
+  bool _searching = false;
+  bool get searching => _searching;
+  String get searchQuery => _searchQuery;
+
+  void toggleSearch() {
+    _searching = !_searching;
+    if (!_searching) _searchQuery = '';
+    notifyListeners();
+  }
+
+  int get totalItems => groups.fold(0, (sum, g) => sum + g.measurements.length);
+
+  Future<void> openProfile() async {
+    await _navigationService.navigateToProfileView();
+  }
+
   ViewMode get currentViewMode => _currentViewMode;
 
   String get userInitials {
@@ -168,7 +184,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   }
 
   Future<void> navigateToMeasurementDetail(Group entry) async {
-    final result = await _navigationService.navigateToMeasurementDetailView(measurementId: entry.id);
+    final result = await _navigationService.navigateToGroupDetailView(measurementId: entry.id);
     if (result == true) {
       _snackbarService.showSnackbar(
         message: 'Measurement updated successfully!',

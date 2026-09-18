@@ -1,23 +1,25 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 import 'package:true_size/app/app.router.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../services/auth_service.dart';
-import '../../../services/user_service.dart';
+import '../../../services/settings_service.dart';
 
 class StartupViewModel extends BaseViewModel {
   final _authService = locator<AuthService>();
   final _navigationService = locator<NavigationService>();
-  final _userService = locator<UserService>();
+  final _settingsService = locator<SettingsService>();
 
   Future<void> runStartupLogic() async {
+    // Load persisted appearance settings (theme, primary color, wallpaper)
+    // behind the splash before the first themed screen appears.
+    await _settingsService.init();
     // Add a small delay for splash screen effect
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
     // Check if user is already signed in
     if (_authService.isLoggedIn) {
-      await _navigationService.navigateToHomeView();
+      await _navigationService.navigateToRootView();
     } else {
       await _navigationService.navigateToLoginView();
     }

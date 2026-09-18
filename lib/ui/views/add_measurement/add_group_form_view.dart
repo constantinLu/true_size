@@ -1,151 +1,99 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-import 'package:stacked/stacked_annotations.dart';
 
-import '../../../core/utils/form_validator.dart';
-import '../../common/palette.dart';
-import '../../common/widgets/text_field_widget.dart';
-import 'add_group_form_view.form.dart';
+import '../../../core/constants/app_icons.dart';
+import '../../common/app_widgets.dart';
+import '../../common/form_widgets.dart';
+import '../../theme/app_neutrals.dart';
+import '../../theme/app_typography.dart';
 import 'add_group_form_viewmodel.dart';
-import 'widget/color_picker_widget.dart';
-import 'widget/display_icon_widget.dart';
 
-@FormView(
-  fields: [
-    FormTextField(name: 'groupName', validator: FormValidator.required),
-    FormTextField(name: 'groupDescription', validator: FormValidator.required),
-  ],
-  autoTextFieldValidation: false,
-)
-class AddGroupFormView extends StackedView<AddGroupFormViewModel> with $AddGroupFormView {
+class AddGroupFormView extends StackedView<AddGroupFormViewModel> {
   const AddGroupFormView({super.key});
 
   @override
   Widget builder(BuildContext context, AddGroupFormViewModel viewModel, Widget? child) {
-    return Scaffold(
-      backgroundColor: Palette.backgroundColor,
-      appBar: AppBar(
-        backgroundColor: Palette.backgroundColor,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.close, color: whiteCultured),
-          onPressed: viewModel.closeForm,
+    return AddScaffold(
+      title: 'New group',
+      buttonLabel: 'Create group',
+      busy: viewModel.isBusy,
+      onSubmit: viewModel.canSubmit ? viewModel.submit : null,
+      children: [
+        Center(
+          child: GestureDetector(
+            onTap: () => _pickIcon(context, viewModel),
+            child: IconMedallion(icon: iconForKey(viewModel.iconKey), color: viewModel.color, size: 76, iconSize: 34),
+          ),
         ),
-        title: const Text(
-          'New Group',
-          style: TextStyle(color: whiteCultured, fontSize: 18, fontWeight: FontWeight.w600),
+        const SizedBox(height: 8),
+        Center(
+          child: TextButton(
+            onPressed: () => _pickIcon(context, viewModel),
+            child: Text('Choose icon', style: AppTypography.button.copyWith(color: Theme.of(context).colorScheme.primary)),
+          ),
         ),
-      ),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Selected Icon Display
-                    DisplayIconWidget(context: context, viewModel: viewModel),
-                    const SizedBox(height: 24),
-
-                    // Name Field
-                    TextFieldWidget(
-                      label: 'Name',
-                      controller: groupNameController,
-                      focusNode: groupNameFocusNode,
-                      validationMessage: viewModel.groupNameValidationMessage,
-                    ),
-                    const SizedBox(height: 16),
-
-                    // Description Field
-                    TextFieldWidget(
-                      label: 'Description',
-                      controller: groupDescriptionController,
-                      focusNode: groupDescriptionFocusNode,
-                      validationMessage: viewModel.groupDescriptionValidationMessage,
-                    ),
-                    const SizedBox(height: 24),
-
-                    // Color Picker
-                    ColorPickerWidget(viewModel: viewModel),
-                    const SizedBox(height: 24),
-
-                    // // Measurements text
-                    // const Text(
-                    //   'Measurements',
-                    //   style: TextStyle(
-                    //     color: whiteCultured,
-                    //     fontSize: 16,
-                    //     fontWeight: FontWeight.w500,
-                    //   ),
-                    // ),
-                    // const SizedBox(height: 10),
-                    //
-                    // // Add Measurement Button
-                    // ButtonWidget(viewModel: viewModel),
-                    // const SizedBox(height: 16),
-                    //
-                    // // Measurements List - returns a list
-                    // ...viewModel.measurements.asMap().entries.map((entry) {
-                    //   final index = entry.key;
-                    //   final measurement = entry.value;
-                    //   return MeasurementItemWidget(viewModel: viewModel, measurement: measurement, index: index);
-                    // }),
-                    //
-                    // const SizedBox(height: 16),
-                    //
-                    // // Tags Section
-                    // TagSelectionWidget(viewModel: viewModel),
-                  ],
-                ),
-              ),
-            ),
-
-            // Save Button
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  onPressed: viewModel.saveGroup,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple,
-                    disabledBackgroundColor: Palette.disabledBackgroundColor,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  child: Text(
-                    viewModel.isBusy ? 'Saving...' : 'Save',
-                    style: const TextStyle(
-                      color: whiteCultured,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+        const SizedBox(height: 12),
+        LabeledField(
+          label: 'Name',
+          controller: viewModel.nameController,
+          hint: 'e.g. Shoes, Jeans, Bedding',
+          textCapitalization: TextCapitalization.words,
         ),
-      ),
+        const SizedBox(height: 22),
+        Text('Colour',
+            style: AppTypography.smallMonetary
+                .copyWith(color: context.neutrals.textSecondary, fontWeight: AppTypography.medium)),
+        const SizedBox(height: 12),
+        _ColorSwatches(viewModel),
+      ],
     );
+  }
+
+  Future<void> _pickIcon(BuildContext context, AddGroupFormViewModel vm) async {
+    final res = await showIconPickerSheet(context, selectedKey: vm.iconKey);
+    if (res?.iconKey != null) vm.setIcon(res!.iconKey!);
   }
 
   @override
   AddGroupFormViewModel viewModelBuilder(BuildContext context) => AddGroupFormViewModel();
+}
+
+class _ColorSwatches extends StatelessWidget {
+  const _ColorSwatches(this.vm);
+  final AddGroupFormViewModel vm;
 
   @override
-  void onViewModelReady(AddGroupFormViewModel viewModel) {
-    viewModel.initializeForm();
-    syncFormWithViewModel(viewModel);
+  Widget build(BuildContext context) {
+    const columns = 6;
+    const spacing = 10.0;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = (constraints.maxWidth - spacing * (columns - 1)) / columns;
+        return Wrap(
+          spacing: spacing,
+          runSpacing: spacing,
+          children: [
+            for (final c in vm.colorChoices)
+              GestureDetector(
+                onTap: () => vm.setColor(c),
+                child: Container(
+                  width: size,
+                  height: size,
+                  decoration: BoxDecoration(
+                    color: c,
+                    borderRadius: BorderRadius.circular(14),
+                    border: c.toARGB32() == vm.color.toARGB32()
+                        ? Border.all(color: context.neutrals.textPrimary, width: 3)
+                        : null,
+                  ),
+                  child: c.toARGB32() == vm.color.toARGB32()
+                      ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                      : null,
+                ),
+              ),
+          ],
+        );
+      },
+    );
   }
-
-// @override
-// void onDispose(AddGroupFormViewModel viewModel) {
-//   super.onDispose(viewModel);
-//   disposeForm();
-// }
 }

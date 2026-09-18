@@ -1,6 +1,6 @@
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
-import 'package:true_size/services/navigation_service_extension.dart';
+import 'package:true_size/app/app.router.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../core/constants/app_strings.dart';
@@ -16,7 +16,7 @@ class LoginViewModel extends BaseViewModel {
     try {
       final user = await _authService.signInWithGoogle();
       if (user != null) {
-        await _navigationService.navigateToHomeView();
+        await _navigationService.navigateToRootView();
       }
     } catch (e) {
       _snackbarService.showSnackbar(

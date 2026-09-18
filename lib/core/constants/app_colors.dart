@@ -21,6 +21,58 @@ class AppColors {
   static const Color warning = Color(0xFFF59E0B);
   static const Color error = Color(0xFFEF4444);
 
+  // ----- Wadger-derived accent palette (ported design system) -----
+  // Muted / washed accents so icons, tags and chips read as soft tints rather
+  // than saturated blocks. The brand color that drives buttons and the hero
+  // gradient is chosen by the user (see SettingsService) and read from
+  // Theme.of(context).colorScheme.primary - not from here.
+  static const Color positive = Color(0xFF4B966E); // added / in-stock (darkened for legibility)
+  static const Color negative = Color(0xFFB36273); // removed / destructive (darkened for legibility)
+
+  /// Vivid palette (brighter than [categoryPalette]) used where a swatch must
+  /// read at a glance. Referenced by the ported form widgets.
+  static const List<Color> cardPalette = [
+    Color(0xFF5AC8FA), // light blue
+    Color(0xFF2E6BF6), // blue
+    Color(0xFF7C6CF0), // indigo
+    Color(0xFF9B59B6), // purple
+    Color(0xFFE5342B), // red
+    Color(0xFFFF7A00), // orange
+    Color(0xFFF6C518), // yellow
+    Color(0xFF34C759), // green
+    Color(0xFF14B8A6), // teal
+    Color(0xFFEC6EA0), // pink
+  ];
+
+  /// A broad set of muted, natural hues cycled through when a new group needs a
+  /// colour, so each group's icon medallion gets a soft, desaturated tint.
+  static const List<Color> categoryPalette = [
+    Color(0xFFA8A0E6), // lavender
+    Color(0xFF9198D9), // periwinkle
+    Color(0xFFAD92E2), // lilac
+    Color(0xFFB79BCB), // mauve
+    Color(0xFF7A97DC), // cornflower
+    Color(0xFF6C8AB8), // dusty blue
+    Color(0xFF7FA6C4), // steel
+    Color(0xFF57B4A8), // teal
+    Color(0xFF5CB595), // seafoam
+    Color(0xFF6FB3A6), // aqua
+    Color(0xFF58B182), // green
+    Color(0xFF7DA47A), // sage
+    Color(0xFF93B06E), // moss
+    Color(0xFFB0B36A), // olive
+    Color(0xFFD9AC79), // sand
+    Color(0xFFD2A757), // amber
+    Color(0xFFCBB56A), // gold
+    Color(0xFFD89C6E), // clay
+    Color(0xFFCC8A63), // terracotta
+    Color(0xFFC98F6E), // copper
+    Color(0xFFD37387), // rose
+    Color(0xFFD88DB6), // pink
+    Color(0xFFC97F92), // dusty rose
+    Color(0xFFB98BB0), // orchid
+  ];
+
   // Category colors
   static const Color shoesColor = Color(0xFF10B981);
   static const Color bodyColor = Color(0xFFF59E0B);
