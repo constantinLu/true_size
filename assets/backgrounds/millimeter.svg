@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1920" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#122A18"/>
+      <stop offset="1" stop-color="#07120A"/>
+    </linearGradient>
+    <pattern id="rule" width="1080" height="40" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="0" x2="24" y2="0" stroke="#7FD79A" stroke-opacity="0.16" stroke-width="2"/>
+      <line x1="0" y1="20" x2="14" y2="20" stroke="#7FD79A" stroke-opacity="0.10" stroke-width="2"/>
+    </pattern>
+  </defs>
+  <rect width="1080" height="1920" fill="url(#bg)"/>
+  <rect width="1080" height="1920" fill="url(#rule)"/>
+  <line x1="0" y1="0" x2="0" y2="1920" stroke="#7FD79A" stroke-opacity="0.4" stroke-width="3"/>
+</svg>
