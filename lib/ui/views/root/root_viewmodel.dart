@@ -56,9 +56,6 @@ class RootViewModel extends BaseViewModel {
       case AddOption.item:
         await _addItem(context);
         break;
-      case AddOption.body:
-        await _addBodyMeasurement();
-        break;
       case null:
         break;
     }
@@ -84,19 +81,6 @@ class RootViewModel extends BaseViewModel {
     if (picked != null) {
       await _navigationService.navigateToAddMeasurementView(groupId: picked.id);
     }
-  }
-
-  /// "+ Body measurement" adds to the dedicated body group (created on demand).
-  Future<void> _addBodyMeasurement() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null) return;
-    final groupId = await _groupService.findOrCreate(
-      uid,
-      'Corp',
-      icon: 'user',
-      color: '#D37387',
-    );
-    await _navigationService.navigateToAddMeasurementView(groupId: groupId);
   }
 
   @override

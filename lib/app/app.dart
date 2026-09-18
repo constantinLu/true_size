@@ -2,6 +2,7 @@ import 'package:stacked/stacked_annotations.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../services/auth_service.dart';
+import '../services/body_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
@@ -13,6 +14,7 @@ import '../services/tag_service.dart';
 import '../services/user_service.dart';
 import '../ui/views/add_measurement/add_group_form_view.dart';
 import '../ui/views/add_measurement/add_measurement_view.dart';
+import '../ui/views/body_detail/body_part_detail_view.dart';
 import '../ui/views/item_detail/item_detail_view.dart';
 import '../ui/views/login/login_view.dart';
 import '../ui/views/measurement_detail/measurement_detail_view.dart';
@@ -29,6 +31,7 @@ import '../ui/views/startup/startup_view.dart';
     MaterialRoute(page: AddGroupFormView, path: '/add-group'),
     MaterialRoute(page: AddMeasurementView, path: '/add-measurement'),
     MaterialRoute(page: ItemDetailView, path: '/item'),
+    MaterialRoute(page: BodyPartDetailView, path: '/body-part'),
     MaterialRoute(page: ProfileView, path: '/profile'),
   ],
   dependencies: [
@@ -45,6 +48,7 @@ import '../ui/views/startup/startup_view.dart';
     LazySingleton(classType: SettingsService),
     LazySingleton(classType: LogoService),
     LazySingleton(classType: SearchService),
+    LazySingleton(classType: BodyService),
     //
     LazySingleton(classType: BottomSheetService)
   ],

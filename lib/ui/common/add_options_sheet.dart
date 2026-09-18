@@ -5,7 +5,7 @@ import '../theme/app_neutrals.dart';
 import '../theme/app_typography.dart';
 import 'app_widgets.dart';
 
-enum AddOption { group, item, body }
+enum AddOption { group, item }
 
 /// The sheet shown by the center "+": pick what to create.
 Future<AddOption?> showAddOptionsSheet(BuildContext context) {
@@ -48,8 +48,6 @@ class _AddOptionsSheet extends StatelessWidget {
                 'A category like Shoes, Jeans or Bedding', const Color(0xFF7A97DC)),
             _option(context, AddOption.item, Icons.straighten_rounded, 'Item',
                 'A sized item inside one of your groups', AppColors.positive),
-            _option(context, AddOption.body, Icons.accessibility_new_rounded, 'Body measurement',
-                'A body size (chest, waist, inseam…)', const Color(0xFFD37387)),
           ],
         ),
       ),

@@ -70,33 +70,47 @@ class FloatingTopBar extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(width: 10),
+                          // Search has its own framed box inside the bar.
                           Expanded(
-                            child: TextField(
-                              controller: controller,
-                              onChanged: onChanged,
-                              textInputAction: TextInputAction.search,
-                              style: AppTypography.body.copyWith(color: context.neutrals.textPrimary),
-                              decoration: InputDecoration(
-                                isCollapsed: true,
-                                border: InputBorder.none,
-                                icon: Icon(Icons.search_rounded, size: 20, color: context.neutrals.textSecondary),
-                                hintText: 'Search',
-                                hintStyle: AppTypography.body.copyWith(color: context.neutrals.textFaint),
+                            child: Container(
+                              height: 40,
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              decoration: BoxDecoration(
+                                color: context.neutrals.surfaceHigh.withValues(alpha: 0.9),
+                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(color: context.neutrals.textFaint.withValues(alpha: 0.25)),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.search_rounded, size: 19, color: context.neutrals.textSecondary),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: TextField(
+                                      controller: controller,
+                                      onChanged: onChanged,
+                                      textInputAction: TextInputAction.search,
+                                      style: AppTypography.body.copyWith(color: context.neutrals.textPrimary),
+                                      decoration: InputDecoration(
+                                        isCollapsed: true,
+                                        border: InputBorder.none,
+                                        hintText: 'Search',
+                                        hintStyle: AppTypography.body.copyWith(color: context.neutrals.textFaint),
+                                      ),
+                                    ),
+                                  ),
+                                  if (controller.text.isNotEmpty)
+                                    GestureDetector(
+                                      onTap: () {
+                                        controller.clear();
+                                        onChanged('');
+                                      },
+                                      behavior: HitTestBehavior.opaque,
+                                      child: Icon(Icons.close_rounded, size: 18, color: context.neutrals.textSecondary),
+                                    ),
+                                ],
                               ),
                             ),
                           ),
-                          if (controller.text.isNotEmpty)
-                            GestureDetector(
-                              onTap: () {
-                                controller.clear();
-                                onChanged('');
-                              },
-                              behavior: HitTestBehavior.opaque,
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 6),
-                                child: Icon(Icons.close_rounded, size: 20, color: context.neutrals.textSecondary),
-                              ),
-                            ),
                         ],
                       ),
                     ),
