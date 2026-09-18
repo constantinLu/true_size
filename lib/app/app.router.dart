@@ -7,21 +7,23 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 
-import 'package:flutter/foundation.dart' as _i11;
-import 'package:flutter/material.dart' as _i10;
+import 'package:flutter/foundation.dart' as _i12;
+import 'package:flutter/material.dart' as _i11;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart' as _i1;
-import 'package:stacked_services/stacked_services.dart' as _i13;
-import 'package:true_size/core/models/measurement.dart' as _i12;
+import 'package:stacked_services/stacked_services.dart' as _i14;
+import 'package:true_size/core/models/measurement.dart' as _i13;
 import 'package:true_size/ui/views/add_measurement/add_group_form_view.dart'
     as _i6;
 import 'package:true_size/ui/views/add_measurement/add_measurement_view.dart'
     as _i7;
+import 'package:true_size/ui/views/body_detail/body_part_detail_view.dart'
+    as _i9;
 import 'package:true_size/ui/views/item_detail/item_detail_view.dart' as _i8;
 import 'package:true_size/ui/views/login/login_view.dart' as _i3;
 import 'package:true_size/ui/views/measurement_detail/measurement_detail_view.dart'
     as _i5;
-import 'package:true_size/ui/views/profile/profile_view.dart' as _i9;
+import 'package:true_size/ui/views/profile/profile_view.dart' as _i10;
 import 'package:true_size/ui/views/root/root_view.dart' as _i4;
 import 'package:true_size/ui/views/startup/startup_view.dart' as _i2;
 
@@ -40,6 +42,8 @@ class Routes {
 
   static const itemDetailView = '/item';
 
+  static const bodyPartDetailView = '/body-part';
+
   static const profileView = '/profile';
 
   static const all = <String>{
@@ -50,6 +54,7 @@ class Routes {
     addGroupFormView,
     addMeasurementView,
     itemDetailView,
+    bodyPartDetailView,
     profileView,
   };
 }
@@ -63,7 +68,8 @@ class StackedRouter extends _i1.RouterBase {
     _i1.RouteDef(Routes.addGroupFormView, page: _i6.AddGroupFormView),
     _i1.RouteDef(Routes.addMeasurementView, page: _i7.AddMeasurementView),
     _i1.RouteDef(Routes.itemDetailView, page: _i8.ItemDetailView),
-    _i1.RouteDef(Routes.profileView, page: _i9.ProfileView),
+    _i1.RouteDef(Routes.bodyPartDetailView, page: _i9.BodyPartDetailView),
+    _i1.RouteDef(Routes.profileView, page: _i10.ProfileView),
   ];
 
   final _pagesMap = <Type, _i1.StackedRouteFactory>{
@@ -71,7 +77,7 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<StartupViewArguments>(
         orElse: () => const StartupViewArguments(),
       );
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => _i2.StartupView(key: args.key),
         settings: data,
       );
@@ -80,7 +86,7 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<LoginViewArguments>(
         orElse: () => const LoginViewArguments(),
       );
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => _i3.LoginView(key: args.key),
         settings: data,
       );
@@ -89,14 +95,14 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<RootViewArguments>(
         orElse: () => const RootViewArguments(),
       );
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => _i4.RootView(key: args.key),
         settings: data,
       );
     },
     _i5.GroupDetailView: (data) {
       final args = data.getArgs<GroupDetailViewArguments>(nullOk: false);
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder:
             (context) => _i5.GroupDetailView(
               key: args.key,
@@ -109,14 +115,14 @@ class StackedRouter extends _i1.RouterBase {
       final args = data.getArgs<AddGroupFormViewArguments>(
         orElse: () => const AddGroupFormViewArguments(),
       );
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder: (context) => _i6.AddGroupFormView(key: args.key),
         settings: data,
       );
     },
     _i7.AddMeasurementView: (data) {
       final args = data.getArgs<AddMeasurementViewArguments>(nullOk: false);
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder:
             (context) => _i7.AddMeasurementView(
               key: args.key,
@@ -128,7 +134,7 @@ class StackedRouter extends _i1.RouterBase {
     },
     _i8.ItemDetailView: (data) {
       final args = data.getArgs<ItemDetailViewArguments>(nullOk: false);
-      return _i10.MaterialPageRoute<dynamic>(
+      return _i11.MaterialPageRoute<dynamic>(
         builder:
             (context) => _i8.ItemDetailView(
               key: args.key,
@@ -137,12 +143,21 @@ class StackedRouter extends _i1.RouterBase {
         settings: data,
       );
     },
-    _i9.ProfileView: (data) {
+    _i9.BodyPartDetailView: (data) {
+      final args = data.getArgs<BodyPartDetailViewArguments>(nullOk: false);
+      return _i11.MaterialPageRoute<dynamic>(
+        builder:
+            (context) =>
+                _i9.BodyPartDetailView(key: args.key, partKey: args.partKey),
+        settings: data,
+      );
+    },
+    _i10.ProfileView: (data) {
       final args = data.getArgs<ProfileViewArguments>(
         orElse: () => const ProfileViewArguments(),
       );
-      return _i10.MaterialPageRoute<dynamic>(
-        builder: (context) => _i9.ProfileView(key: args.key),
+      return _i11.MaterialPageRoute<dynamic>(
+        builder: (context) => _i10.ProfileView(key: args.key),
         settings: data,
       );
     },
@@ -158,7 +173,7 @@ class StackedRouter extends _i1.RouterBase {
 class StartupViewArguments {
   const StartupViewArguments({this.key});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -180,7 +195,7 @@ class StartupViewArguments {
 class LoginViewArguments {
   const LoginViewArguments({this.key});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -202,7 +217,7 @@ class LoginViewArguments {
 class RootViewArguments {
   const RootViewArguments({this.key});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -224,7 +239,7 @@ class RootViewArguments {
 class GroupDetailViewArguments {
   const GroupDetailViewArguments({this.key, required this.measurementId});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   final String measurementId;
 
@@ -248,7 +263,7 @@ class GroupDetailViewArguments {
 class AddGroupFormViewArguments {
   const AddGroupFormViewArguments({this.key});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -274,11 +289,11 @@ class AddMeasurementViewArguments {
     this.existing,
   });
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   final String groupId;
 
-  final _i12.Measurement? existing;
+  final _i13.Measurement? existing;
 
   @override
   String toString() {
@@ -302,7 +317,7 @@ class AddMeasurementViewArguments {
 class ItemDetailViewArguments {
   const ItemDetailViewArguments({this.key, required this.measurementId});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   final String measurementId;
 
@@ -323,10 +338,34 @@ class ItemDetailViewArguments {
   }
 }
 
+class BodyPartDetailViewArguments {
+  const BodyPartDetailViewArguments({this.key, required this.partKey});
+
+  final _i12.Key? key;
+
+  final String partKey;
+
+  @override
+  String toString() {
+    return '{"key": "$key", "partKey": "$partKey"}';
+  }
+
+  @override
+  bool operator ==(covariant BodyPartDetailViewArguments other) {
+    if (identical(this, other)) return true;
+    return other.key == key && other.partKey == partKey;
+  }
+
+  @override
+  int get hashCode {
+    return key.hashCode ^ partKey.hashCode;
+  }
+}
+
 class ProfileViewArguments {
   const ProfileViewArguments({this.key});
 
-  final _i11.Key? key;
+  final _i12.Key? key;
 
   @override
   String toString() {
@@ -345,9 +384,9 @@ class ProfileViewArguments {
   }
 }
 
-extension NavigatorStateExtension on _i13.NavigationService {
+extension NavigatorStateExtension on _i14.NavigationService {
   Future<dynamic> navigateToStartupView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -365,7 +404,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToLoginView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -383,7 +422,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToRootView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -401,7 +440,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToGroupDetailView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String measurementId,
     int? routerId,
     bool preventDuplicates = true,
@@ -423,7 +462,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToAddGroupFormView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -441,9 +480,9 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToAddMeasurementView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String groupId,
-    _i12.Measurement? existing,
+    _i13.Measurement? existing,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -465,7 +504,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> navigateToItemDetailView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String measurementId,
     int? routerId,
     bool preventDuplicates = true,
@@ -486,8 +525,27 @@ extension NavigatorStateExtension on _i13.NavigationService {
     );
   }
 
+  Future<dynamic> navigateToBodyPartDetailView({
+    _i12.Key? key,
+    required String partKey,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+    transition,
+  }) async {
+    return navigateTo<dynamic>(
+      Routes.bodyPartDetailView,
+      arguments: BodyPartDetailViewArguments(key: key, partKey: partKey),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
   Future<dynamic> navigateToProfileView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -505,7 +563,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithStartupView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -523,7 +581,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithLoginView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -541,7 +599,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithRootView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -559,7 +617,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithGroupDetailView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String measurementId,
     int? routerId,
     bool preventDuplicates = true,
@@ -581,7 +639,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithAddGroupFormView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -599,9 +657,9 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithAddMeasurementView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String groupId,
-    _i12.Measurement? existing,
+    _i13.Measurement? existing,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,
@@ -623,7 +681,7 @@ extension NavigatorStateExtension on _i13.NavigationService {
   }
 
   Future<dynamic> replaceWithItemDetailView({
-    _i11.Key? key,
+    _i12.Key? key,
     required String measurementId,
     int? routerId,
     bool preventDuplicates = true,
@@ -644,8 +702,27 @@ extension NavigatorStateExtension on _i13.NavigationService {
     );
   }
 
+  Future<dynamic> replaceWithBodyPartDetailView({
+    _i12.Key? key,
+    required String partKey,
+    int? routerId,
+    bool preventDuplicates = true,
+    Map<String, String>? parameters,
+    Widget Function(BuildContext, Animation<double>, Animation<double>, Widget)?
+    transition,
+  }) async {
+    return replaceWith<dynamic>(
+      Routes.bodyPartDetailView,
+      arguments: BodyPartDetailViewArguments(key: key, partKey: partKey),
+      id: routerId,
+      preventDuplicates: preventDuplicates,
+      parameters: parameters,
+      transition: transition,
+    );
+  }
+
   Future<dynamic> replaceWithProfileView({
-    _i11.Key? key,
+    _i12.Key? key,
     int? routerId,
     bool preventDuplicates = true,
     Map<String, String>? parameters,

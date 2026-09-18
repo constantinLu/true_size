@@ -14,6 +14,7 @@ import 'package:stacked_services/src/snackbar/snackbar_service.dart';
 import 'package:stacked_shared/stacked_shared.dart';
 
 import '../services/auth_service.dart';
+import '../services/body_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
@@ -50,5 +51,6 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => SettingsService());
   locator.registerLazySingleton(() => LogoService());
   locator.registerLazySingleton(() => SearchService());
+  locator.registerLazySingleton(() => BodyService());
   locator.registerLazySingleton(() => BottomSheetService());
 }

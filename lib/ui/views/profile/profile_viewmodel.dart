@@ -9,6 +9,7 @@ import 'package:stacked_services/stacked_services.dart';
 import '../../../app/app.locator.dart';
 import '../../../core/constants/background_themes.dart';
 import '../../../core/constants/dates.dart';
+import '../../../core/enums/gender.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
 
@@ -72,6 +73,12 @@ class ProfileViewModel extends BaseViewModel {
 
   List<BackgroundTheme> get backgroundThemes => BackgroundThemes.all;
   BackgroundTheme get backgroundTheme => _settings.backgroundTheme;
+
+  Gender get gender => _settings.gender;
+  void setGender(Gender gender) {
+    _settings.setGender(gender);
+    rebuildUi();
+  }
 
   String _version = '';
   String _build = '';

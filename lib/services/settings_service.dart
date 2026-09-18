@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../core/constants/background_themes.dart';
+import '../core/enums/gender.dart';
 
 /// User-configurable app appearance: theme mode, primary (brand) color and the
 /// optional background wallpaper. Persisted to Firestore (`settings/app`) so the
@@ -37,9 +38,13 @@ class SettingsService extends ChangeNotifier {
   ThemeMode _themeMode = ThemeMode.system;
   Color _primaryColor = defaultPrimary;
   BackgroundTheme _backgroundTheme = BackgroundThemes.none;
+  Gender _gender = Gender.male;
 
   ThemeMode get themeMode => _themeMode;
   Color get primaryColor => _primaryColor;
+
+  /// The body silhouette gender used on the Body-measurements tab.
+  Gender get gender => _gender;
 
   /// The wallpaper shown behind the app, or [BackgroundThemes.none] for the
   /// plain solid look. Persisted on the `settings/app` document.
@@ -59,6 +64,10 @@ class SettingsService extends ChangeNotifier {
         final colorValue = data['primaryColor'];
         if (colorValue is int) _primaryColor = Color(colorValue);
         _backgroundTheme = BackgroundThemes.byId(data['backgroundTheme'] as String?);
+        _gender = Gender.values.firstWhere(
+          (g) => g.name == data['gender'],
+          orElse: () => Gender.male,
+        );
       }
     } catch (_) {
       // Offline / unavailable: keep defaults; the user can still change them.
@@ -84,6 +93,13 @@ class SettingsService extends ChangeNotifier {
     if (theme.id == _backgroundTheme.id) return;
     _backgroundTheme = theme;
     _doc.set({'backgroundTheme': theme.id}, SetOptions(merge: true));
+    notifyListeners();
+  }
+
+  void setGender(Gender gender) {
+    if (gender == _gender) return;
+    _gender = gender;
+    _doc.set({'gender': gender.name}, SetOptions(merge: true));
     notifyListeners();
   }
 }

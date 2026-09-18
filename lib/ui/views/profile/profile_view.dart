@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../core/constants/background_themes.dart';
+import '../../../core/enums/gender.dart';
 import '../../common/app_background.dart';
 import '../../common/app_widgets.dart';
 import '../../theme/app_neutrals.dart';
@@ -24,6 +25,10 @@ class ProfileView extends StackedView<ProfileViewModel> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
                 child: _appearanceCard(context, viewModel),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _bodyCard(context, viewModel),
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
@@ -276,6 +281,56 @@ class ProfileView extends StackedView<ProfileViewModel> {
           ],
         );
       },
+    );
+  }
+
+  Widget _bodyCard(BuildContext context, ProfileViewModel vm) {
+    return SoftCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Body', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text('The silhouette used on the Body-measurements tab',
+              style: AppTypography.smallMonetary.copyWith(color: context.neutrals.textSecondary)),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(color: context.neutrals.surfaceHigh, borderRadius: BorderRadius.circular(14)),
+            child: Row(
+              children: [
+                _genderSegment(context, vm, Gender.male, Icons.male_rounded),
+                _genderSegment(context, vm, Gender.female, Icons.female_rounded),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _genderSegment(BuildContext context, ProfileViewModel vm, Gender gender, IconData icon) {
+    final selected = vm.gender == gender;
+    final primary = Theme.of(context).colorScheme.primary;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => vm.setGender(gender),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          decoration: selected ? BoxDecoration(color: primary, borderRadius: BorderRadius.circular(10)) : null,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 18, color: selected ? Colors.white : context.neutrals.textSecondary),
+              const SizedBox(width: 8),
+              Text(gender.label,
+                  style: AppTypography.button.copyWith(
+                      color: selected ? Colors.white : context.neutrals.textSecondary)),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

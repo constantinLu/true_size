@@ -1,0 +1,141 @@
+name: Release to DEV Play
+
+# Publishes the TrueSize APK + store assets (icon, feature graphic, screenshots)
+# to the DEV Play store (Cloudflare R2). The DEV Play Worker builds its catalog
+# live from apps/<id>/latest.json, so a release appears/updates automatically.
+#
+# Store assets live in ./assets/store (feature.png + screenshots/*.png) and are
+# published alongside the APK. All are optional - the store UI falls back
+# gracefully when any are missing.
+#
+# Required repo secrets:
+#   CLOUDFLARE_API_TOKEN     - token with Workers R2 Storage:Edit
+#   CLOUDFLARE_ACCOUNT_ID    - 8c653364032ead587cfcb15d7f1feceb
+#   ANDROID_KEYSTORE_BASE64  - base64 of the release keystore (for in-place updates)
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+env:
+  APP_ID: truesize
+  APP_NAME: TrueSize
+  DEVELOPER: DevLab
+  CATEGORY: Lifestyle
+  TAGLINE: "Clothing, shoe and body size tracker"
+  ICON_FROM: "#66A5AD"
+  ICON_TO: "#223E42"
+  GLYPH: "T"
+  MIN_ANDROID: "6.0"
+  BUCKET: dev-play
+  ICON_PATH: assets/logos/app_icon.png
+  STORE_DIR: assets/store
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - run: flutter pub get
+
+      # Sign the release APK with our persistent keystore (from the
+      # ANDROID_KEYSTORE_BASE64 secret) so every build has the SAME signature -
+      # otherwise Android refuses to update an already-installed app.
+      - name: Configure Android release signing
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 -d > app/release.keystore
+            {
+              echo "storeFile=release.keystore"
+              echo "storePassword=android"
+              echo "keyPassword=android"
+              echo "keyAlias=androiddebugkey"
+            } > key.properties
+            echo "Release signing configured."
+          else
+            echo "ANDROID_KEYSTORE_BASE64 not set - falling back to the debug key."
+          fi
+
+      - run: flutter build apk --release --dart-define=BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M)
+
+      - name: Collect metadata
+        id: meta
+        run: |
+          VLINE="$(grep -E '^version:' pubspec.yaml | awk '{print $2}')"  # 1.0.0+1
+          VER="${VLINE%%+*}"
+          CODE="${VLINE##*+}"
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          SIZE_MB="$(( ($(stat -c%s "$APK") + 1048575) / 1048576 )) MB"
+          SHA="$(sha256sum "$APK" | cut -d' ' -f1)"
+          echo "ver=$VER"      >> "$GITHUB_OUTPUT"
+          echo "code=$CODE"    >> "$GITHUB_OUTPUT"
+          echo "size=$SIZE_MB"  >> "$GITHUB_OUTPUT"
+          echo "sha=$SHA"       >> "$GITHUB_OUTPUT"
+          echo "key=apps/$APP_ID/releases/$VER/$APP_ID-$VER.apk" >> "$GITHUB_OUTPUT"
+          FEATURE=""
+          [ -f "$STORE_DIR/feature.png" ] && FEATURE="/dl/apps/$APP_ID/feature.png?v=$VER"
+          echo "feature=$FEATURE" >> "$GITHUB_OUTPUT"
+          SHOTS="[]"
+          if ls "$STORE_DIR"/screenshots/*.png >/dev/null 2>&1; then
+            SHOTS="[$(for f in "$STORE_DIR"/screenshots/*.png; do printf '"/dl/apps/%s/screenshots/%s?v=%s",' "$APP_ID" "$(basename "$f")" "$VER"; done | sed 's/,$//')]"
+          fi
+          echo "shots=$SHOTS" >> "$GITHUB_OUTPUT"
+
+      - name: Write latest.json
+        run: |
+          cat > latest.json <<JSON
+          {
+            "id": "$APP_ID",
+            "name": "$APP_NAME",
+            "developer": "$DEVELOPER",
+            "tagline": "$TAGLINE",
+            "category": "$CATEGORY",
+            "version": "${{ steps.meta.outputs.ver }}",
+            "versionCode": ${{ steps.meta.outputs.code }},
+            "size": "${{ steps.meta.outputs.size }}",
+            "updated": "$(date -u +%Y-%m-%d)",
+            "minAndroid": "$MIN_ANDROID",
+            "iconFrom": "$ICON_FROM",
+            "iconTo": "$ICON_TO",
+            "glyph": "$GLYPH",
+            "description": ["TrueSize keeps every size you forget - shoes, jeans, bedding and body measurements - in one calm place.", "Add brands with their logos, track body measurements over time, and never re-measure again."],
+            "sha256": "${{ steps.meta.outputs.sha }}",
+            "downloadUrl": "/dl/apps/$APP_ID/latest.apk",
+            "iconUrl": "/dl/apps/$APP_ID/icon.png?v=${{ steps.meta.outputs.ver }}",
+            "featureUrl": "${{ steps.meta.outputs.feature }}",
+            "screenshotUrls": ${{ steps.meta.outputs.shots }},
+            "featured": true
+          }
+          JSON
+
+      - name: Upload to R2
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        run: |
+          put() { npx --yes wrangler@4 r2 object put "$1" --file "$2" --content-type "$3" --remote; }
+          APK="build/app/outputs/flutter-apk/app-release.apk"
+          put "$BUCKET/${{ steps.meta.outputs.key }}" "$APK" "application/vnd.android.package-archive"
+          # Stable "latest" alias for direct web downloads.
+          put "$BUCKET/apps/$APP_ID/latest.apk" "$APK" "application/vnd.android.package-archive"
+          [ -f "$ICON_PATH" ] && put "$BUCKET/apps/$APP_ID/icon.png" "$ICON_PATH" "image/png"
+          [ -f "$STORE_DIR/feature.png" ] && put "$BUCKET/apps/$APP_ID/feature.png" "$STORE_DIR/feature.png" "image/png"
+          for f in "$STORE_DIR"/screenshots/*.png; do
+            [ -e "$f" ] || continue
+            put "$BUCKET/apps/$APP_ID/screenshots/$(basename "$f")" "$f" "image/png"
+          done
+          put "$BUCKET/apps/$APP_ID/latest.json" "latest.json" "application/json"
