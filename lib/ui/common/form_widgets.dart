@@ -176,8 +176,16 @@ class SelectorField extends StatelessWidget {
                   Icon(icon, size: 18, color: iconColor ?? context.neutrals.textPrimary),
                   const SizedBox(width: 10),
                 ],
-                Text(value, style: AppTypography.body.copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium)),
-                const Spacer(),
+                Expanded(
+                  child: Text(
+                    value,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTypography.body
+                        .copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Icon(Icons.chevron_right_rounded, color: context.neutrals.textSecondary),
               ],
             ),

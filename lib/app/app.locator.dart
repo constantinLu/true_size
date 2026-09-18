@@ -1,4 +1,5 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // StackedLocatorGenerator
@@ -18,6 +19,7 @@ import '../services/firestore_service.dart';
 import '../services/group_service.dart';
 import '../services/logo_service.dart';
 import '../services/measurement_service.dart';
+import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
 import '../services/user_service.dart';
@@ -28,11 +30,13 @@ Future<void> setupLocator({
   String? environment,
   EnvironmentFilter? environmentFilter,
 }) async {
-// Register environments
+  // Register environments
   locator.registerEnvironment(
-      environment: environment, environmentFilter: environmentFilter);
+    environment: environment,
+    environmentFilter: environmentFilter,
+  );
 
-// Register dependencies
+  // Register dependencies
   locator.registerLazySingleton(() => NavigationService());
   locator.registerLazySingleton(() => DialogService());
   locator.registerLazySingleton(() => SnackbarService());
@@ -45,5 +49,6 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => TagService());
   locator.registerLazySingleton(() => SettingsService());
   locator.registerLazySingleton(() => LogoService());
+  locator.registerLazySingleton(() => SearchService());
   locator.registerLazySingleton(() => BottomSheetService());
 }

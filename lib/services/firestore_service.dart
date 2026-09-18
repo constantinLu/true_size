@@ -23,6 +23,21 @@ class FirestoreService {
     return null;
   }
 
+  /// Stores the user's avatar as a base64 string on their `users` document
+  /// (no Storage bucket needed). Pass null to clear it.
+  Future<void> saveAvatar(String userId, String? base64) async {
+    await _firestoreDatabase
+        .collection('users')
+        .doc(userId)
+        .set({'avatar': base64}, SetOptions(merge: true));
+  }
+
+  /// Reads the stored base64 avatar for [userId], or null when none is set.
+  Future<String?> getAvatar(String userId) async {
+    final doc = await _firestoreDatabase.collection('users').doc(userId).get();
+    return doc.data()?['avatar'] as String?;
+  }
+
   // Measurement operations
   Future<String> addGroupWithMeasurement(Group group) async {
     final docRef =
@@ -42,13 +57,17 @@ class FirestoreService {
   }
 
   Stream<List<Group>> getGroups(String userId) {
+    // Sorted client-side to avoid a composite index (userId filter + orderBy).
     return _firestoreDatabase
         .collection('groups')
         .where('userId', isEqualTo: userId)
-        .orderBy('updatedAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => Group.fromFirestore(doc)).toList());
+        .map((snapshot) {
+      final groups =
+          snapshot.docs.map((doc) => Group.fromFirestore(doc)).toList()
+            ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return groups;
+    });
   }
 
   Future<Group?> getGroup(String measurementId) async {

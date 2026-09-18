@@ -37,14 +37,16 @@ class MeasurementService {
 
   Future<List<Measurement>> getByGroupId(String groupId) async {
     try {
-      final querySnapshot = await _measurementsRef
-          .where('groupId', isEqualTo: groupId)
-          .orderBy('createdAt', descending: true)
-          .get();
+      // Sort client-side (newest first) so the query needs no composite index
+      // (a where + orderBy on different fields would otherwise require one).
+      final querySnapshot =
+          await _measurementsRef.where('groupId', isEqualTo: groupId).get();
 
-      return querySnapshot.docs
+      final items = querySnapshot.docs
           .map((doc) => Measurement.fromFirestore(doc))
-          .toList();
+          .toList()
+        ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return items;
     } catch (e) {
       throw MeasurementServiceException(
           'Failed to get measurements by groupId $groupId: $e');
@@ -52,21 +54,7 @@ class MeasurementService {
   }
 
   // GET ALL
-  Future<List<Measurement>> getAll(String groupId) async {
-    try {
-      final querySnapshot = await _measurementsRef
-          .where('groupId', isEqualTo: groupId)
-          .orderBy('createdAt', descending: true)
-          .get();
-
-      return querySnapshot.docs
-          .map((doc) => Measurement.fromFirestore(doc))
-          .toList();
-    } catch (e) {
-      throw MeasurementServiceException(
-          'Failed to get all measurements for group $groupId: $e');
-    }
-  }
+  Future<List<Measurement>> getAll(String groupId) => getByGroupId(groupId);
 
   // UPDATE
   Future<void> update(String measurementId, Measurement measurement) async {

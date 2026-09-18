@@ -3,15 +3,17 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../common/top_bar.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../../theme/color_utils.dart';
+import '../body/body_view.dart';
 import '../items/items_view.dart';
 import '../home/home_view.dart';
 import 'root_viewmodel.dart';
 
-/// App shell: hosts the tabs in an IndexedStack behind a Revolut-style floating
-/// rounded navigation bar with an integrated add action.
+/// App shell: hosts the tabs in an IndexedStack behind a floating top bar
+/// (user chip + search) and a floating bottom navigation with an add action.
 class RootView extends StackedView<RootViewModel> {
   const RootView({super.key});
 
@@ -25,10 +27,21 @@ class RootView extends StackedView<RootViewModel> {
             children: const [
               HomeView(),
               ItemsView(),
+              BodyView(),
             ],
           ),
-          // Fade scrim so scrolling content dissolves into the background
-          // behind the floating nav instead of bleeding around it.
+          // Floating top bar - present on every tab.
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: FloatingTopBar(
+              avatarBytes: viewModel.avatarBytes,
+              onOpenProfile: viewModel.openProfile,
+              controller: viewModel.searchController,
+              onChanged: viewModel.onSearchChanged,
+            ),
+          ),
           Positioned(
             left: 0,
             right: 0,
@@ -58,7 +71,7 @@ class RootView extends StackedView<RootViewModel> {
             child: _FloatingNav(
               index: viewModel.index,
               onTap: viewModel.setIndex,
-              onAdd: viewModel.addGroup,
+              onAdd: () => viewModel.showAddSheet(context),
             ),
           ),
         ],
@@ -69,6 +82,9 @@ class RootView extends StackedView<RootViewModel> {
   @override
   RootViewModel viewModelBuilder(BuildContext context) => RootViewModel();
 }
+
+/// The top inset that tab content should leave clear for the floating top bar.
+double topBarInset(BuildContext context) => MediaQuery.of(context).padding.top + 74;
 
 class _FloatingNav extends StatelessWidget {
   const _FloatingNav({required this.index, required this.onTap, required this.onAdd});
@@ -89,11 +105,7 @@ class _FloatingNav extends StatelessWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(34),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 18,
-                    offset: const Offset(0, 8),
-                  ),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 18, offset: const Offset(0, 8)),
                 ],
               ),
               child: RepaintBoundary(
@@ -116,6 +128,7 @@ class _FloatingNav extends StatelessWidget {
                           children: [
                             _item(context, 0, Icons.grid_view_rounded, 'Groups'),
                             _item(context, 1, Icons.straighten_rounded, 'Items'),
+                            _item(context, 2, Icons.accessibility_new_rounded, 'Body'),
                             Expanded(child: Center(child: _AddButton(onTap: onAdd))),
                           ],
                         ),
@@ -141,9 +154,9 @@ class _FloatingNav extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 23, color: color),
+            Icon(icon, size: 22, color: color),
             const SizedBox(height: 3),
-            Text(label, style: AppTypography.tabLabel.copyWith(fontSize: 10.5, color: color)),
+            Text(label, style: AppTypography.tabLabel.copyWith(fontSize: 10, color: color)),
           ],
         ),
       ),
@@ -170,11 +183,7 @@ class _AddButton extends StatelessWidget {
             shape: BoxShape.circle,
             gradient: brandGradient(primary),
             boxShadow: [
-              BoxShadow(
-                color: primary.withValues(alpha: 0.4),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-              ),
+              BoxShadow(color: primary.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6)),
             ],
           ),
           child: const Icon(Icons.add_rounded, size: 26, color: Colors.white),

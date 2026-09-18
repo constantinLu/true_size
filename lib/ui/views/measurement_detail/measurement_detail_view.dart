@@ -3,7 +3,6 @@ import 'package:stacked/stacked.dart';
 
 import '../../common/app_widgets.dart';
 import '../../common/detail_widgets.dart';
-import '../../common/form_widgets.dart';
 import '../../common/group_widgets.dart';
 import '../../../core/constants/app_icons.dart';
 import '../../theme/app_neutrals.dart';
@@ -44,9 +43,7 @@ class GroupDetailView extends StackedView<GroupDetailViewModel> {
           title: group.name,
           subtitle: group.tags.isEmpty ? null : group.tags.map((t) => '#${t.name}').join('  '),
         ),
-        const SizedBox(height: 22),
-        PrimaryButton(label: 'Add measurement', onTap: viewModel.addMeasurement),
-        const SizedBox(height: 20),
+        const SizedBox(height: 24),
         if (measurements.isEmpty)
           const EmptyState(
             icon: Icons.straighten_rounded,
@@ -55,14 +52,10 @@ class GroupDetailView extends StackedView<GroupDetailViewModel> {
           )
         else ...[
           SectionHeader('Measurements'),
-          MeasurementListCard(measurements, accent: color),
+          MeasurementListCard(measurements, accent: color, onTap: viewModel.openMeasurement),
         ],
         const SizedBox(height: 28),
-        ArchiveDeleteActions(
-          archived: false,
-          onToggleArchive: null,
-          onDelete: viewModel.confirmDelete,
-        ),
+        _GroupActions(onDelete: viewModel.confirmDelete, onAdd: viewModel.addMeasurement),
       ],
     );
   }
@@ -73,4 +66,56 @@ class GroupDetailView extends StackedView<GroupDetailViewModel> {
 
   @override
   void onViewModelReady(GroupDetailViewModel viewModel) => viewModel.initialize();
+}
+
+/// Bottom actions for a group: a small square icon-only delete on the left (a
+/// low accidental-tap target) and a wide "Add measurement" filling the rest.
+class _GroupActions extends StatelessWidget {
+  const _GroupActions({required this.onDelete, required this.onAdd});
+  final VoidCallback onDelete;
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    const danger = Color(0xFFB36273);
+    final primary = Theme.of(context).colorScheme.primary;
+    return Row(
+      children: [
+        // Small square delete.
+        GestureDetector(
+          onTap: onDelete,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 54,
+            height: 54,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: danger, width: 1.5),
+            ),
+            child: const Icon(Icons.delete_outline_rounded, size: 22, color: danger),
+          ),
+        ),
+        const SizedBox(width: 12),
+        // Wide add.
+        Expanded(
+          child: GestureDetector(
+            onTap: onAdd,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 54,
+              decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(14)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.add_rounded, size: 20, color: Colors.white),
+                  const SizedBox(width: 8),
+                  Text('Add measurement', style: AppTypography.button.copyWith(color: Colors.white)),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }

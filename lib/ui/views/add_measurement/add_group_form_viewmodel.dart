@@ -19,6 +19,11 @@ class AddGroupFormViewModel extends BaseViewModel {
 
   final nameController = TextEditingController();
 
+  AddGroupFormViewModel() {
+    // Re-evaluate the submit button as the name changes.
+    nameController.addListener(notifyListeners);
+  }
+
   /// The chosen icon key (a Lucide icon name) and accent colour.
   String iconKey = 'ruler';
   Color color = AppColors.categoryPalette.first;

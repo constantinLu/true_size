@@ -3,22 +3,25 @@ import 'package:stacked/stacked.dart';
 
 import '../../../core/constants/app_icons.dart';
 import '../../../core/enums/unit.dart';
+import '../../../core/models/measurement.dart';
 import '../../common/app_widgets.dart';
 import '../../common/form_widgets.dart';
+import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import 'add_measurement_viewmodel.dart';
 
 class AddMeasurementView extends StackedView<AddMeasurementViewModel> {
-  const AddMeasurementView({super.key, required this.groupId});
+  const AddMeasurementView({super.key, required this.groupId, this.existing});
 
   final String groupId;
+  final Measurement? existing;
 
   @override
   Widget builder(BuildContext context, AddMeasurementViewModel viewModel, Widget? child) {
     final primary = Theme.of(context).colorScheme.primary;
     return AddScaffold(
-      title: 'Add measurement',
-      buttonLabel: 'Add measurement',
+      title: viewModel.isEditing ? 'Edit measurement' : 'Add measurement',
+      buttonLabel: viewModel.isEditing ? 'Save changes' : 'Add measurement',
       busy: viewModel.isBusy,
       onSubmit: viewModel.canSubmit ? viewModel.submit : null,
       children: [
@@ -39,33 +42,21 @@ class AddMeasurementView extends StackedView<AddMeasurementViewModel> {
         LabeledField(
           label: 'Name',
           controller: viewModel.nameController,
-          hint: 'e.g. Air Max 90, Slim jeans, Duvet',
+          hint: 'e.g. Air Max 90, Zara jeans, Duvet',
           textCapitalization: TextCapitalization.words,
         ),
-        const SizedBox(height: 16),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              flex: 3,
-              child: LabeledField(
-                label: 'Size / value',
-                controller: viewModel.valueController,
-                hint: 'e.g. 42 or 200x220',
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              flex: 2,
-              child: SelectorField(
-                label: 'Unit',
-                value: '${viewModel.unit.displayName} (${viewModel.unit.symbol})',
-                onTap: () => _pickUnit(context, viewModel),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 18),
+        Text('Sizes',
+            style: AppTypography.smallMonetary
+                .copyWith(color: context.neutrals.textSecondary, fontWeight: AppTypography.medium)),
+        const SizedBox(height: 10),
+        for (int i = 0; i < viewModel.sizeEntries.length; i++) ...[
+          if (i != 0) const SizedBox(height: 10),
+          _SizeRow(vm: viewModel, index: i),
+        ],
+        const SizedBox(height: 12),
+        _AddSizeButton(onTap: viewModel.addSize),
+        const SizedBox(height: 18),
         LabeledField(
           label: 'Brand (optional)',
           controller: viewModel.brandController,
@@ -88,18 +79,140 @@ class AddMeasurementView extends StackedView<AddMeasurementViewModel> {
     if (res?.iconKey != null) vm.setIcon(res!.iconKey!);
   }
 
-  Future<void> _pickUnit(BuildContext context, AddMeasurementViewModel vm) async {
+  @override
+  AddMeasurementViewModel viewModelBuilder(BuildContext context) =>
+      AddMeasurementViewModel(groupId: groupId, existing: existing);
+}
+
+class _SizeRow extends StatelessWidget {
+  const _SizeRow({required this.vm, required this.index});
+  final AddMeasurementViewModel vm;
+  final int index;
+
+  @override
+  Widget build(BuildContext context) {
+    final entry = vm.sizeEntries[index];
+    final canRemove = vm.sizeEntries.length > 1;
+    return Row(
+      children: [
+        Expanded(
+          flex: 3,
+          child: _PlainField(
+            controller: entry.controller,
+            hint: 'e.g. 42 or 200x220',
+          ),
+        ),
+        const SizedBox(width: 10),
+        Expanded(
+          flex: 2,
+          child: GestureDetector(
+            onTap: () => _pickUnit(context),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
+              decoration: BoxDecoration(
+                color: context.neutrals.surfaceHigh,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      entry.unit.symbol.isEmpty ? entry.unit.displayName : entry.unit.symbol,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: AppTypography.body.copyWith(
+                          color: context.neutrals.textPrimary, fontWeight: AppTypography.medium),
+                    ),
+                  ),
+                  Icon(Icons.expand_more_rounded, size: 20, color: context.neutrals.textSecondary),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (canRemove) ...[
+          const SizedBox(width: 6),
+          GestureDetector(
+            onTap: () => vm.removeSize(index),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Icon(Icons.close_rounded, size: 20, color: context.neutrals.textFaint),
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+
+  Future<void> _pickUnit(BuildContext context) async {
     final picked = await showSelectionSheet<Unit>(
       context,
       title: 'Unit',
       options: vm.units,
-      selected: vm.unit,
-      labelOf: (u) => '${u.displayName} (${u.symbol})',
+      selected: vm.sizeEntries[index].unit,
+      labelOf: (u) => u.symbol.isEmpty ? u.displayName : '${u.displayName} · ${u.symbol}',
     );
-    if (picked != null) vm.setUnit(picked);
+    if (picked != null) vm.setUnit(index, picked);
   }
+}
+
+/// A bare rounded text field (no label) used inside the size rows.
+class _PlainField extends StatelessWidget {
+  const _PlainField({required this.controller, required this.hint});
+  final TextEditingController controller;
+  final String hint;
 
   @override
-  AddMeasurementViewModel viewModelBuilder(BuildContext context) =>
-      AddMeasurementViewModel(groupId: groupId);
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: context.neutrals.surfaceHigh,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: TextField(
+        controller: controller,
+        textCapitalization: TextCapitalization.characters,
+        style: AppTypography.body
+            .copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium),
+        decoration: InputDecoration(
+          isDense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          border: InputBorder.none,
+          hintText: hint,
+          hintStyle: AppTypography.body.copyWith(color: context.neutrals.textFaint),
+        ),
+      ),
+    );
+  }
+}
+
+class _AddSizeButton extends StatelessWidget {
+  const _AddSizeButton({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(color: primary.withValues(alpha: 0.6), width: 1.5),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_rounded, size: 19, color: primary),
+            const SizedBox(width: 8),
+            Text('Add another size', style: AppTypography.button.copyWith(color: primary)),
+          ],
+        ),
+      ),
+    );
+  }
 }

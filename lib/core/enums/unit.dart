@@ -23,7 +23,13 @@ enum Unit {
 
   // Imperial Weight
   lb,
-  oz;
+  oz,
+
+  // Clothing / footwear sizing (European scale) - the default for this app.
+  shoeSize,
+
+  // Generic clothing size (letters like S/M/L or plain numbers) - no symbol.
+  clothing;
 
   // Display name for UI
   String get displayName {
@@ -67,6 +73,11 @@ enum Unit {
         return 'Pounds';
       case Unit.oz:
         return 'Ounces';
+
+      case Unit.shoeSize:
+        return 'Shoe size';
+      case Unit.clothing:
+        return 'Clothing size';
     }
   }
 
@@ -112,6 +123,11 @@ enum Unit {
         return 'lb';
       case Unit.oz:
         return 'oz';
+
+      case Unit.shoeSize:
+        return 'EU';
+      case Unit.clothing:
+        return '';
     }
   }
 
@@ -137,6 +153,10 @@ enum Unit {
       case Unit.lb:
       case Unit.oz:
         return UnitType.weight;
+
+      case Unit.shoeSize:
+      case Unit.clothing:
+        return UnitType.size;
     }
   }
 
@@ -150,6 +170,10 @@ enum Unit {
       case Unit.ml:
       case Unit.kg:
       case Unit.g:
+      // Shoe/clothing sizes have no metric/imperial split; grouped with metric
+      // so the metric-only picker keeps them.
+      case Unit.shoeSize:
+      case Unit.clothing:
         return UnitSystem.metric;
 
       case Unit.inch:
@@ -193,7 +217,8 @@ enum Unit {
 enum UnitType {
   length,
   volume,
-  weight;
+  weight,
+  size;
 
   String get displayName {
     switch (this) {
@@ -203,6 +228,8 @@ enum UnitType {
         return 'Volume';
       case UnitType.weight:
         return 'Weight';
+      case UnitType.size:
+        return 'Size';
     }
   }
 }
@@ -236,34 +263,4 @@ extension UnitFilters on List<Unit> {
   List<Unit> get weightUnits => byType(UnitType.weight);
   List<Unit> get metricUnits => bySystem(UnitSystem.metric);
   List<Unit> get imperialUnits => bySystem(UnitSystem.imperial);
-}
-
-// Usage examples
-void main() {
-  // Basic usage
-  Unit unit = Unit.cm;
-  print('Unit: ${unit.displayName}'); // Unit: Centimeters
-  print('Symbol: ${unit.symbol}'); // Symbol: cm
-  print('System: ${unit.system.displayName}'); // System: Metric
-  print('Type: ${unit.type.displayName}'); // Type: Length
-
-  // Format value
-  print('Formatted: ${unit.formatValue(150.5)}'); // Formatted: 150.5 cm
-
-  // Get units by category
-  List<Unit> lengthUnits = Unit.values.lengthUnits;
-  print('Length units: ${lengthUnits.map((u) => u.symbol).join(', ')}');
-  // Length units: m, cm, mm, in, ft, yd
-
-  List<Unit> metricUnits = Unit.values.metricUnits;
-  print('Metric units: ${metricUnits.map((u) => u.symbol).join(', ')}');
-  // Metric units: m, cm, mm, L, mL, kg, g
-
-  // Parse from string
-  Unit? parsed = Unit.fromString('cm');
-  print('Parsed: ${parsed?.displayName}'); // Parsed: Centimeters
-
-  // Check system
-  print('Is metric: ${unit.isMetric}'); // Is metric: true
-  print('Is imperial: ${unit.isImperial}'); // Is imperial: false
 }

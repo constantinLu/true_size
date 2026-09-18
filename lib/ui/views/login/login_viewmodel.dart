@@ -16,6 +16,7 @@ class LoginViewModel extends BaseViewModel {
     try {
       final user = await _authService.signInWithGoogle();
       if (user != null) {
+        await _authService.loadAvatar();
         await _navigationService.navigateToRootView();
       }
     } catch (e) {

@@ -76,7 +76,7 @@ class AvatarCircle extends StatelessWidget {
               width: size,
               height: size,
               gaplessPlayback: true,
-              errorBuilder: (_, _, _) => Center(child: fallback),
+              errorBuilder: (_, __, ___) => Center(child: fallback),
             )
           : Center(child: fallback),
     );
@@ -128,7 +128,7 @@ class EntryAvatar extends StatelessWidget {
               fit: BoxFit.cover,
               width: size,
               height: size,
-              errorBuilder: (_, _, _) => Center(child: fallback),
+              errorBuilder: (_, __, ___) => Center(child: fallback),
               loadingBuilder: (context, child, progress) =>
                   progress == null ? child : Center(child: fallback),
             )

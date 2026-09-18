@@ -132,14 +132,24 @@ class MeasurementTile extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(m.value,
-                      style: AppTypography.transactionAmount.copyWith(color: context.neutrals.textPrimary)),
-                  const SizedBox(height: 2),
-                  Text(m.unit.name, style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
-                ],
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 150),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    for (final s in m.sizes)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(
+                          s.unit.symbol.isEmpty ? s.value : '${s.value} ${s.unit.symbol}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: AppTypography.transactionAmount.copyWith(color: context.neutrals.textPrimary),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ],
           ),

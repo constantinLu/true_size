@@ -1,10 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../core/constants/background_themes.dart';
+import '../../../core/constants/dates.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
 
@@ -13,8 +17,10 @@ class ProfileViewModel extends BaseViewModel {
   final _auth = locator<AuthService>();
   final _navigationService = locator<NavigationService>();
   final _dialogService = locator<DialogService>();
+  final _imagePicker = ImagePicker();
 
   ProfileViewModel() {
+    _auth.addListener(rebuildUi);
     _loadVersion();
   }
 
@@ -26,6 +32,40 @@ class ProfileViewModel extends BaseViewModel {
   String get email => _auth.currentUser?.email ?? '';
   String? get photoUrl => _auth.currentUser?.photoURL;
 
+  /// The uploaded avatar bytes (null when using the Google photo / icon).
+  Uint8List? get avatarBytes => _auth.avatarBytes;
+  bool get hasAvatar => _auth.avatarBytes != null;
+
+  bool _uploadingAvatar = false;
+  bool get uploadingAvatar => _uploadingAvatar;
+
+  /// Picks an image from the gallery, downscales it and stores it (base64) on
+  /// the user's Firestore document. The top-bar chip updates automatically.
+  Future<void> pickAndUploadAvatar() async {
+    if (_uploadingAvatar) return;
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 512,
+      maxHeight: 512,
+      imageQuality: 85,
+    );
+    if (picked == null) return;
+    final bytes = await picked.readAsBytes();
+    _uploadingAvatar = true;
+    rebuildUi();
+    try {
+      await _auth.uploadAvatar(bytes);
+    } finally {
+      _uploadingAvatar = false;
+      rebuildUi();
+    }
+  }
+
+  Future<void> removeAvatar() async {
+    await _auth.removeAvatar();
+    rebuildUi();
+  }
+
   ThemeMode get themeMode => _settings.themeMode;
   Color get primaryColor => _settings.primaryColor;
   List<Color> get colorChoices => SettingsService.primaryChoices;
@@ -34,12 +74,28 @@ class ProfileViewModel extends BaseViewModel {
   BackgroundTheme get backgroundTheme => _settings.backgroundTheme;
 
   String _version = '';
-  String get versionLabel => _version.isEmpty ? '-' : 'v$_version';
+  String _build = '';
+  String get versionLabel {
+    if (_version.isEmpty) return '-';
+    return _build.isEmpty ? 'v$_version' : 'v$_version build $_build';
+  }
+
+  /// The build date/time (date + hour:minute). Injected at build time with
+  /// `--dart-define=BUILD_TIME=<ISO8601>`; falls back to the current time so a
+  /// dev build still shows a real timestamp.
+  final DateTime _buildTime = _resolveBuildTime();
+  String get buildDateLabel => formatDateTime(_buildTime);
+
+  static DateTime _resolveBuildTime() {
+    const raw = String.fromEnvironment('BUILD_TIME');
+    return DateTime.tryParse(raw) ?? DateTime.now();
+  }
 
   Future<void> _loadVersion() async {
     try {
       final info = await PackageInfo.fromPlatform();
       _version = info.version;
+      _build = info.buildNumber;
       rebuildUi();
     } catch (_) {
       // Version is best-effort; leave the placeholder if it can't be read.
@@ -75,4 +131,10 @@ class ProfileViewModel extends BaseViewModel {
   }
 
   void close() => _navigationService.back();
+
+  @override
+  void dispose() {
+    _auth.removeListener(rebuildUi);
+    super.dispose();
+  }
 }

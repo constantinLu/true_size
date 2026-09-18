@@ -58,6 +58,12 @@ class GroupDetailViewModel extends BaseViewModel {
     }
   }
 
+  /// Opens a measurement's detail (edit / delete), refreshing on return.
+  Future<void> openMeasurement(Measurement measurement) async {
+    await _navigationService.navigateToItemDetailView(measurementId: measurement.id);
+    await _load();
+  }
+
   Future<void> confirmDelete() async {
     final result = await _dialogService.showConfirmationDialog(
       title: 'Delete group',

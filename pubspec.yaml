@@ -21,19 +21,17 @@ dependencies:
   responsive_builder: ^0.7.0
 
   # Firebase
-  firebase_core: ^2.32.0
-  firebase_auth: ^4.20.0
-  cloud_firestore: ^4.17.5
-  google_sign_in: ^6.2.1
+  firebase_core: ^4.15.0
+  firebase_auth: ^6.7.0
+  cloud_firestore: ^6.10.0
+  google_sign_in: ^7.2.0
 
 
 
   # UI Components
   flutter_svg: ^2.0.9
-  cached_network_image: ^3.3.0
-  hugeicons: ^0.0.11
-  flex_color_scheme: ^8.2.0
-  google_fonts: ^6.2.1
+  cached_network_image: ^4.0.0
+  google_fonts: ^8.2.1
   lucide_icons_flutter: ^3.1.17
 
   # Brand logo lookup (logo.dev image API) + attribution link.
@@ -43,18 +41,17 @@ dependencies:
   # Avatar photo picking for the profile screen.
   image_picker: ^1.2.3
 
-  # App version shown in Settings > About. Pinned to the 8.x line that is
-  # compatible with this project's Firebase (v2 / web ^0.5) constraints.
-  package_info_plus: ^8.0.0
+  # App version shown in Settings > About.
+  package_info_plus: ^10.2.1
 
   # State Management & Navigation
   get_it: ^8.0.2
-  auto_route: ^7.8.4
+  auto_route: ^11.1.0
 
   # Utilities
   uuid: ^4.5.1
 
-  intl: ^0.18.1
+  intl: ^0.20.3
 
   # Development
   cupertino_icons: ^1.0.6
@@ -63,9 +60,23 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   build_runner: ^2.4.7
-  stacked_generator: ^1.5.0
-  auto_route_generator: ^7.3.2
-  flutter_lints: ^5.0.0
+  stacked_generator: ^2.0.4
+  auto_route_generator: ^10.6.0
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+# App launcher icon (Android app-drawer / home-screen). Generated from the
+# TrueSize logo with `dart run flutter_launcher_icons`.
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/logos/app_icon.png"
+  # The full logo lives on the background layer so it fills the whole icon edge
+  # to edge (the foreground layer is inset by the launcher, which is what made
+  # it look like a smaller circle on a coloured disc). Foreground is empty.
+  adaptive_icon_background: "assets/logos/app_icon.png"
+  adaptive_icon_foreground: "assets/logos/app_icon_transparent.png"
+  min_sdk_android: 21
 
 flutter:
   uses-material-design: true

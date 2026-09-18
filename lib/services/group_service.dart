@@ -28,6 +28,33 @@ class GroupService {
     }
   }
 
+  /// Returns the id of the user's group named [name] (case-insensitive),
+  /// creating it with [icon]/[color] when it doesn't exist yet. Used by the
+  /// global "+ Body measurement" action.
+  Future<String> findOrCreate(String userId, String name,
+      {required String icon, required String color}) async {
+    final snapshot = await _groupsRef.where('userId', isEqualTo: userId).get();
+    for (final doc in snapshot.docs) {
+      final data = doc.data() as Map<String, dynamic>;
+      if ((data['name'] ?? '').toString().trim().toLowerCase() == name.trim().toLowerCase()) {
+        return doc.id;
+      }
+    }
+    final now = DateTime.now();
+    final ref = await _groupsRef.add(Group(
+      id: '',
+      name: name,
+      icon: icon,
+      color: color,
+      measurements: const [],
+      tags: const [],
+      userId: userId,
+      createdAt: now,
+      updatedAt: now,
+    ).toFirestore());
+    return ref.id;
+  }
+
   // GET
   Future<Group?> get(String groupId) async {
     try {
@@ -41,13 +68,30 @@ class GroupService {
     }
   }
 
+  // WATCH ALL - a live stream of the user's groups, each with its measurements
+  // and tags loaded. Emits a fresh list whenever the groups collection changes.
+  Stream<List<Group>> watchAll(String userId) {
+    // No orderBy on the query (that would need a composite index alongside the
+    // userId filter); groups are sorted client-side by updatedAt instead.
+    return _groupsRef
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .asyncMap((snapshot) async {
+      final groups = <Group>[];
+      for (final doc in snapshot.docs) {
+        final group = await _loadGroupWithRelations(doc);
+        if (group != null) groups.add(group);
+      }
+      groups.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+      return groups;
+    });
+  }
+
   // GET ALL
   Future<List<Group>> getAll(String userId) async {
     try {
-      final querySnapshot = await _groupsRef
-          .where('userId', isEqualTo: userId)
-          .orderBy('updatedAt', descending: true)
-          .get();
+      final querySnapshot =
+          await _groupsRef.where('userId', isEqualTo: userId).get();
 
       final groups = <Group>[];
 
@@ -57,6 +101,7 @@ class GroupService {
           groups.add(group);
         }
       }
+      groups.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
       return groups;
     } catch (e) {
       throw GroupServiceException(
@@ -94,6 +139,18 @@ class GroupService {
       final existing = (data['name'] ?? '').toString().trim().toLowerCase();
       return existing == target;
     });
+  }
+
+  /// Bumps a group's updatedAt so streams watching the groups collection
+  /// (home cards, items list) re-fire after a measurement is added/removed -
+  /// measurements live in their own collection, so they don't otherwise notify
+  /// the group listeners.
+  Future<void> touch(String groupId) async {
+    try {
+      await _groupsRef.doc(groupId).update({'updatedAt': FieldValue.serverTimestamp()});
+    } catch (_) {
+      // Best-effort freshness signal; never block the caller on it.
+    }
   }
 
   // DELETE

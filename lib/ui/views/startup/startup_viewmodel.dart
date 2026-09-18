@@ -3,6 +3,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:true_size/app/app.router.dart';
 
 import '../../../app/app.locator.dart';
+import '../../../core/seed/seed_data.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
 
@@ -11,14 +12,24 @@ class StartupViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
   final _settingsService = locator<SettingsService>();
 
+  /// One-off data seeding: build with `--dart-define=SEED=true` to wipe and
+  /// re-seed the owner's catalogue, then run again without the flag.
+  static const bool _seedOnStartup = bool.fromEnvironment('SEED');
+
   Future<void> runStartupLogic() async {
     // Load persisted appearance settings (theme, primary color, wallpaper)
     // behind the splash before the first themed screen appears.
     await _settingsService.init();
+
+    if (_seedOnStartup && _authService.isLoggedIn) {
+      await runSeed(_authService.currentUser!.uid);
+    }
+
     // Add a small delay for splash screen effect
     await Future.delayed(const Duration(seconds: 1));
     // Check if user is already signed in
     if (_authService.isLoggedIn) {
+      await _authService.loadAvatar();
       await _navigationService.navigateToRootView();
     } else {
       await _navigationService.navigateToLoginView();

@@ -76,20 +76,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
                 ),
               ),
               const SizedBox(height: 8),
-              Container(
-                width: 88,
-                height: 88,
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.2),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
-                ),
-                child: (photo != null && photo.isNotEmpty)
-                    ? Image.network(photo, fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Colors.white, size: 44))
-                    : const Icon(Icons.person_rounded, color: Colors.white, size: 44),
-              ),
+              _avatar(context, vm, photo),
               const SizedBox(height: 14),
               Text(vm.displayName, style: AppTypography.sectionHeading.copyWith(color: Colors.white)),
               if (vm.email.isNotEmpty) ...[
@@ -101,6 +88,100 @@ class ProfileView extends StackedView<ProfileViewModel> {
         ),
       ),
     );
+  }
+
+  Widget _avatar(BuildContext context, ProfileViewModel vm, String? photo) {
+    final primary = Theme.of(context).colorScheme.primary;
+    final bytes = vm.avatarBytes;
+    Widget image;
+    if (bytes != null) {
+      image = Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true);
+    } else if (photo != null && photo.isNotEmpty) {
+      image = Image.network(photo, fit: BoxFit.cover,
+          errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Colors.white, size: 44));
+    } else {
+      image = const Icon(Icons.person_rounded, color: Colors.white, size: 44);
+    }
+    return GestureDetector(
+      onTap: vm.uploadingAvatar ? null : () => _editAvatar(context, vm),
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: [
+          Container(
+            width: 88,
+            height: 88,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: 0.2),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.4), width: 2),
+            ),
+            child: Center(child: image),
+          ),
+          if (vm.uploadingAvatar)
+            Positioned.fill(
+              child: Container(
+                decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.35)),
+                child: const Center(
+                  child: SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+                ),
+              ),
+            ),
+          Positioned(
+            right: 0,
+            bottom: 0,
+            child: Container(
+              width: 28,
+              height: 28,
+              decoration: BoxDecoration(shape: BoxShape.circle, color: primary, border: Border.all(color: Colors.white, width: 2)),
+              child: const Icon(Icons.camera_alt_rounded, size: 14, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _editAvatar(BuildContext context, ProfileViewModel vm) async {
+    if (!vm.hasAvatar) {
+      await vm.pickAndUploadAvatar();
+      return;
+    }
+    final action = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: context.neutrals.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+      builder: (ctx) => SafeArea(
+        top: false,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(width: 44, height: 4,
+                decoration: BoxDecoration(color: ctx.neutrals.surfaceHigh, borderRadius: BorderRadius.circular(100))),
+            const SizedBox(height: 8),
+            ListTile(
+              leading: Icon(Icons.photo_library_rounded, color: ctx.neutrals.textPrimary),
+              title: Text('Change photo',
+                  style: AppTypography.body.copyWith(color: ctx.neutrals.textPrimary, fontWeight: AppTypography.medium)),
+              onTap: () => Navigator.pop(ctx, 'change'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete_outline_rounded, color: Color(0xFFB36273)),
+              title: Text('Remove photo',
+                  style: AppTypography.body.copyWith(color: const Color(0xFFB36273), fontWeight: AppTypography.medium)),
+              onTap: () => Navigator.pop(ctx, 'remove'),
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+    if (action == 'change') {
+      await vm.pickAndUploadAvatar();
+    } else if (action == 'remove') {
+      await vm.removeAvatar();
+    }
   }
 
   Widget _appearanceCard(BuildContext context, ProfileViewModel vm) {
@@ -291,18 +372,29 @@ class ProfileView extends StackedView<ProfileViewModel> {
         children: [
           Text('About', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 16),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-            decoration: BoxDecoration(color: context.neutrals.surfaceHigh, borderRadius: BorderRadius.circular(14)),
-            child: Row(
-              children: [
-                Text('Version', style: AppTypography.body.copyWith(color: context.neutrals.textSecondary)),
-                const Spacer(),
-                Text(vm.versionLabel,
-                    style: AppTypography.body
-                        .copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium)),
-              ],
-            ),
+          _infoRow(context, 'Version', vm.versionLabel),
+          const SizedBox(height: 10),
+          _infoRow(context, 'Build date', vm.buildDateLabel),
+        ],
+      ),
+    );
+  }
+
+  Widget _infoRow(BuildContext context, String label, String value) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+      decoration: BoxDecoration(color: context.neutrals.surfaceHigh, borderRadius: BorderRadius.circular(14)),
+      child: Row(
+        children: [
+          Text(label, style: AppTypography.body.copyWith(color: context.neutrals.textSecondary)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(value,
+                textAlign: TextAlign.right,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: AppTypography.body
+                    .copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium)),
           ),
         ],
       ),
