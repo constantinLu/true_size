@@ -24,6 +24,7 @@ import '../services/measurement_service.dart';
 import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
+import '../services/update_service.dart';
 import '../services/user_service.dart';
 
 final locator = StackedLocator.instance;
@@ -54,5 +55,6 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => SearchService());
   locator.registerLazySingleton(() => BodyService());
   locator.registerLazySingleton(() => LocalDeletionService());
+  locator.registerLazySingleton(() => UpdateService());
   locator.registerLazySingleton(() => BottomSheetService());
 }

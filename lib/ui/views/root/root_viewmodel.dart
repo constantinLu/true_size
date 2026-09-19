@@ -11,21 +11,48 @@ import '../../../core/models/group.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
 import '../../../services/search_service.dart';
+import '../../../services/update_service.dart';
 import '../../common/add_options_sheet.dart';
 import '../../common/form_widgets.dart';
 
 /// Owns the tab state, the shared top-bar search field, the avatar chip and the
 /// three-way "add" action for the shell.
-class RootViewModel extends BaseViewModel {
+class RootViewModel extends BaseViewModel with WidgetsBindingObserver {
   final _navigationService = locator<NavigationService>();
   final _auth = locator<AuthService>();
   final _groupService = locator<GroupService>();
   final _search = locator<SearchService>();
+  final _updateService = locator<UpdateService>();
 
   final searchController = TextEditingController();
 
   RootViewModel() {
     _auth.addListener(notifyListeners);
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _checkForUpdate();
+    }
+  }
+
+  bool _promptingUpdate = false;
+
+  /// A new APK may have been deployed while the app was backgrounded. On resume,
+  /// re-check the version manifest and, if the store is ahead, drop the user onto
+  /// the forced-update screen with the stack cleared so there's no way back into
+  /// the stale build. Guarded so overlapping resumes don't push it twice.
+  Future<void> _checkForUpdate() async {
+    if (_promptingUpdate) return;
+    final update = await _updateService.check();
+    if (update == null) return;
+    _promptingUpdate = true;
+    await _navigationService.clearStackAndShow(
+      Routes.updateRequiredView,
+      arguments: UpdateRequiredViewArguments(info: update),
+    );
   }
 
   int _index = 0;
@@ -87,6 +114,7 @@ class RootViewModel extends BaseViewModel {
   @override
   void dispose() {
     _auth.removeListener(notifyListeners);
+    WidgetsBinding.instance.removeObserver(this);
     searchController.dispose();
     super.dispose();
   }

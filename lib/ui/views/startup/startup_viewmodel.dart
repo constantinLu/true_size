@@ -6,11 +6,13 @@ import '../../../app/app.locator.dart';
 import '../../../core/seed/seed_data.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
+import '../../../services/update_service.dart';
 
 class StartupViewModel extends BaseViewModel {
   final _authService = locator<AuthService>();
   final _navigationService = locator<NavigationService>();
   final _settingsService = locator<SettingsService>();
+  final _updateService = locator<UpdateService>();
 
   /// One-off data seeding: build with `--dart-define=SEED=true` to wipe and
   /// re-seed the owner's catalogue, then run again without the flag.
@@ -20,6 +22,16 @@ class StartupViewModel extends BaseViewModel {
     // Load persisted appearance settings (theme, primary color, wallpaper)
     // behind the splash before the first themed screen appears.
     await _settingsService.init();
+
+    // Forced-update gate (Android APK only): if the store's build is newer than
+    // this one, send the user to the blocking update screen instead of the app.
+    // No-op on web/iOS and fails open on any error, so a slow or unreachable
+    // manifest never strands the user on the splash.
+    final update = await _updateService.check();
+    if (update != null) {
+      await _navigationService.navigateToUpdateRequiredView(info: update);
+      return;
+    }
 
     if (_seedOnStartup && _authService.isLoggedIn) {
       await runSeed(_authService.currentUser!.uid);
