@@ -37,6 +37,7 @@ class RootView extends StackedView<RootViewModel> {
             right: 0,
             child: FloatingTopBar(
               avatarBytes: viewModel.avatarBytes,
+              photoUrl: viewModel.photoUrl,
               onOpenProfile: viewModel.openProfile,
               controller: viewModel.searchController,
               onChanged: viewModel.onSearchChanged,

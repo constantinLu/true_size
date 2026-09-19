@@ -12,12 +12,12 @@ import '../../../core/constants/dates.dart';
 import '../../../core/enums/gender.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
+import '../../common/confirm_sheet.dart';
 
 class ProfileViewModel extends BaseViewModel {
   final _settings = locator<SettingsService>();
   final _auth = locator<AuthService>();
   final _navigationService = locator<NavigationService>();
-  final _dialogService = locator<DialogService>();
   final _imagePicker = ImagePicker();
 
   ProfileViewModel() {
@@ -130,14 +130,16 @@ class ProfileViewModel extends BaseViewModel {
     rebuildUi();
   }
 
-  Future<void> signOut() async {
-    final result = await _dialogService.showConfirmationDialog(
+  Future<void> signOut(BuildContext context) async {
+    final confirmed = await showConfirmSheet(
+      context,
       title: 'Sign out',
-      description: 'Are you sure you want to sign out?',
-      confirmationTitle: 'Sign out',
-      cancelTitle: 'Cancel',
+      message: 'Are you sure you want to sign out?',
+      confirmLabel: 'Sign out',
+      danger: true,
+      icon: Icons.logout_rounded,
     );
-    if (result?.confirmed == true) {
+    if (confirmed) {
       await _auth.signOut();
       await _navigationService.clearStackAndShow('/login');
     }

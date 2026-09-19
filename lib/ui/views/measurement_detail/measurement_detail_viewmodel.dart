@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -6,13 +7,15 @@ import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
 import '../../../services/firestore_service.dart';
+import '../../../services/local_deletion_service.dart';
 import '../../../services/measurement_service.dart';
+import '../../common/confirm_sheet.dart';
 
 class GroupDetailViewModel extends BaseViewModel {
   final _firestoreService = locator<FirestoreService>();
   final _measurementService = locator<MeasurementService>();
   final _navigationService = locator<NavigationService>();
-  final _dialogService = locator<DialogService>();
+  final _deletions = locator<LocalDeletionService>();
   final _snackbarService = locator<SnackbarService>();
 
   final String groupId;
@@ -64,34 +67,31 @@ class GroupDetailViewModel extends BaseViewModel {
     await _load();
   }
 
-  Future<void> confirmDelete() async {
-    final result = await _dialogService.showConfirmationDialog(
+  Future<void> confirmDelete(BuildContext context) async {
+    final confirmed = await showConfirmSheet(
+      context,
       title: 'Delete group',
-      description: 'Delete "${_group?.name}" and its measurements? This cannot be undone.',
-      confirmationTitle: 'Delete',
-      cancelTitle: 'Cancel',
+      message: 'Delete "${_group?.name}" and its measurements? This cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true,
+      icon: Icons.delete_outline_rounded,
     );
-    if (result?.confirmed == true) {
-      await _delete();
-    }
-  }
+    if (!confirmed) return;
 
-  Future<void> _delete() async {
-    setBusy(true);
+    // Optimistic: hide the group everywhere and return to the main tab, then
+    // delete on Firestore in the background.
+    _deletions.hideGroup(groupId);
+    await _navigationService.clearStackAndShow(Routes.rootView);
+
     try {
       await _firestoreService.deleteGroup(groupId);
-      _snackbarService.showSnackbar(
-        message: 'Group deleted',
-        duration: const Duration(seconds: 2),
-      );
-      _navigationService.back(result: true);
     } catch (e) {
+      _deletions.unhideGroup(groupId);
       _snackbarService.showSnackbar(
         message: 'Failed to delete group. Please try again.',
         duration: const Duration(seconds: 3),
       );
     }
-    setBusy(false);
   }
 
   void navigateBack() => _navigationService.back();

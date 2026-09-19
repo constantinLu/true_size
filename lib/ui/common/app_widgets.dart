@@ -35,6 +35,7 @@ class AvatarCircle extends StatelessWidget {
   const AvatarCircle({
     super.key,
     this.imageBytes,
+    this.photoUrl,
     required this.size,
     required this.iconSize,
     this.backgroundColor,
@@ -43,6 +44,10 @@ class AvatarCircle extends StatelessWidget {
   });
 
   final Uint8List? imageBytes;
+
+  /// Remote fallback (e.g. the Google account photo) shown when no uploaded
+  /// [imageBytes] are present. Keeps the chip in sync with the profile screen.
+  final String? photoUrl;
   final double size;
   final double iconSize;
   final Color? backgroundColor;
@@ -58,6 +63,28 @@ class AvatarCircle extends StatelessWidget {
       color: Colors.white,
     );
     final bytes = imageBytes;
+    final url = photoUrl;
+    Widget child;
+    if (bytes != null && bytes.isNotEmpty) {
+      child = Image.memory(
+        bytes,
+        fit: BoxFit.cover,
+        width: size,
+        height: size,
+        gaplessPlayback: true,
+        errorBuilder: (_, __, ___) => Center(child: fallback),
+      );
+    } else if (url != null && url.isNotEmpty) {
+      child = Image.network(
+        url,
+        fit: BoxFit.cover,
+        width: size,
+        height: size,
+        errorBuilder: (_, __, ___) => Center(child: fallback),
+      );
+    } else {
+      child = Center(child: fallback);
+    }
     return Container(
       width: size,
       height: size,
@@ -69,16 +96,7 @@ class AvatarCircle extends StatelessWidget {
             ? Border.all(color: borderColor!, width: borderWidth)
             : null,
       ),
-      child: bytes != null && bytes.isNotEmpty
-          ? Image.memory(
-              bytes,
-              fit: BoxFit.cover,
-              width: size,
-              height: size,
-              gaplessPlayback: true,
-              errorBuilder: (_, __, ___) => Center(child: fallback),
-            )
-          : Center(child: fallback),
+      child: child,
     );
   }
 }

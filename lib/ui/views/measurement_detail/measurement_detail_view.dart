@@ -55,7 +55,7 @@ class GroupDetailView extends StackedView<GroupDetailViewModel> {
           MeasurementListCard(measurements, accent: color, onTap: viewModel.openMeasurement),
         ],
         const SizedBox(height: 28),
-        _GroupActions(onDelete: viewModel.confirmDelete, onAdd: viewModel.addMeasurement),
+        _GroupActions(onDelete: () => viewModel.confirmDelete(context), onAdd: viewModel.addMeasurement),
       ],
     );
   }

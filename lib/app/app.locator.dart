@@ -18,11 +18,13 @@ import '../services/body_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
+import '../services/local_deletion_service.dart';
 import '../services/logo_service.dart';
 import '../services/measurement_service.dart';
 import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
+import '../services/update_service.dart';
 import '../services/user_service.dart';
 
 final locator = StackedLocator.instance;
@@ -52,5 +54,7 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => LogoService());
   locator.registerLazySingleton(() => SearchService());
   locator.registerLazySingleton(() => BodyService());
+  locator.registerLazySingleton(() => LocalDeletionService());
+  locator.registerLazySingleton(() => UpdateService());
   locator.registerLazySingleton(() => BottomSheetService());
 }

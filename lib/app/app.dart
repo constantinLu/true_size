@@ -6,11 +6,13 @@ import '../services/body_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
+import '../services/local_deletion_service.dart';
 import '../services/logo_service.dart';
 import '../services/measurement_service.dart';
 import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
+import '../services/update_service.dart';
 import '../services/user_service.dart';
 import '../ui/views/add_measurement/add_group_form_view.dart';
 import '../ui/views/add_measurement/add_measurement_view.dart';
@@ -22,12 +24,14 @@ import '../ui/views/measurement_detail/measurement_detail_view.dart';
 import '../ui/views/profile/profile_view.dart';
 import '../ui/views/root/root_view.dart';
 import '../ui/views/startup/startup_view.dart';
+import '../ui/views/update_required/update_required_view.dart';
 
 @StackedApp(
   routes: [
     MaterialRoute(page: StartupView, path: '/', initial: true),
     MaterialRoute(page: LoginView, path: '/login'),
     MaterialRoute(page: LockView, path: '/lock'),
+    MaterialRoute(page: UpdateRequiredView, path: '/update-required'),
     MaterialRoute(page: RootView, path: '/root'),
     MaterialRoute(page: GroupDetailView, path: '/measurement'),
     MaterialRoute(page: AddGroupFormView, path: '/add-group'),
@@ -51,6 +55,8 @@ import '../ui/views/startup/startup_view.dart';
     LazySingleton(classType: LogoService),
     LazySingleton(classType: SearchService),
     LazySingleton(classType: BodyService),
+    LazySingleton(classType: LocalDeletionService),
+    LazySingleton(classType: UpdateService),
     //
     LazySingleton(classType: BottomSheetService)
   ],

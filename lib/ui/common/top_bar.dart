@@ -14,12 +14,14 @@ class FloatingTopBar extends StatelessWidget {
   const FloatingTopBar({
     super.key,
     required this.avatarBytes,
+    this.photoUrl,
     required this.onOpenProfile,
     required this.controller,
     required this.onChanged,
   });
 
   final Uint8List? avatarBytes;
+  final String? photoUrl;
   final VoidCallback onOpenProfile;
   final TextEditingController controller;
   final ValueChanged<String> onChanged;
@@ -63,6 +65,7 @@ class FloatingTopBar extends StatelessWidget {
                             onTap: onOpenProfile,
                             child: AvatarCircle(
                               imageBytes: avatarBytes,
+                              photoUrl: photoUrl,
                               size: 40,
                               iconSize: 22,
                               backgroundColor: context.neutrals.surfaceHigh,

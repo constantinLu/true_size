@@ -107,7 +107,7 @@ jobs:
             "version": "${{ steps.meta.outputs.ver }}",
             "versionCode": ${{ steps.meta.outputs.code }},
             "size": "${{ steps.meta.outputs.size }}",
-            "updated": "$(date -u +%Y-%m-%d)",
+            "updated": "$(TZ=Europe/Bucharest date +'%Y-%m-%d %H:%M')",
             "minAndroid": "$MIN_ANDROID",
             "iconFrom": "$ICON_FROM",
             "iconTo": "$ICON_TO",

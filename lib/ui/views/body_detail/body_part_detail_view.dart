@@ -74,7 +74,7 @@ class _Timeline extends StatelessWidget {
   final List<BodyEntry> entries;
   final String unit;
   final Color accent;
-  final void Function(BodyEntry) onDelete;
+  final void Function(BuildContext, BodyEntry) onDelete;
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +89,7 @@ class _Timeline extends StatelessWidget {
               accent: accent,
               isFirst: i == 0,
               isLast: i == entries.length - 1,
-              onDelete: () => onDelete(entries[i]),
+              onDelete: () => onDelete(context, entries[i]),
             ),
         ],
       ),

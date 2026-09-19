@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -6,13 +7,15 @@ import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
 import '../../../services/group_service.dart';
+import '../../../services/local_deletion_service.dart';
 import '../../../services/measurement_service.dart';
+import '../../common/confirm_sheet.dart';
 
 class ItemDetailViewModel extends BaseViewModel {
   final _measurementService = locator<MeasurementService>();
   final _groupService = locator<GroupService>();
   final _navigationService = locator<NavigationService>();
-  final _dialogService = locator<DialogService>();
+  final _deletions = locator<LocalDeletionService>();
   final _snackbarService = locator<SnackbarService>();
 
   final String measurementId;
@@ -50,26 +53,31 @@ class ItemDetailViewModel extends BaseViewModel {
     if (saved == true) await _load();
   }
 
-  Future<void> confirmDelete() async {
+  Future<void> confirmDelete(BuildContext context) async {
     final m = _measurement;
     if (m == null) return;
-    final result = await _dialogService.showConfirmationDialog(
+    final confirmed = await showConfirmSheet(
+      context,
       title: 'Delete measurement',
-      description: 'Delete "${m.name}"? This cannot be undone.',
-      confirmationTitle: 'Delete',
-      cancelTitle: 'Cancel',
+      message: 'Delete "${m.name}"? This cannot be undone.',
+      confirmLabel: 'Delete',
+      danger: true,
+      icon: Icons.delete_outline_rounded,
     );
-    if (result?.confirmed != true) return;
-    setBusy(true);
+    if (!confirmed) return;
+
+    // Optimistic: hide it from every list immediately and jump to the main tab,
+    // then let Firestore catch up in the background.
+    _deletions.hideMeasurement(m.id);
+    await _navigationService.clearStackAndShow(Routes.rootView);
+
     try {
       await _measurementService.delete(m.id);
       await _groupService.touch(m.groupId);
-      _snackbarService.showSnackbar(message: 'Measurement deleted', duration: const Duration(seconds: 2));
-      _navigationService.back(result: true);
     } catch (e) {
+      _deletions.unhideMeasurement(m.id);
       _snackbarService.showSnackbar(message: 'Failed to delete. Please try again.');
     }
-    setBusy(false);
   }
 
   void back() => _navigationService.back();

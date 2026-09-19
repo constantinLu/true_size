@@ -1,6 +1,6 @@
 name: true_size
 description: A comprehensive size and measurement tracking app
-version: 1.0.1+2
+version: 1.0.3+4
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -46,6 +46,10 @@ dependencies:
 
   # App version shown in Settings > About.
   package_info_plus: ^10.2.1
+
+  # Forced self-update for the sideloaded APK (downloads + installs latest.apk
+  # from the DEV Play store when a newer build is published).
+  ota_update: ^7.1.0
 
   # State Management & Navigation
   get_it: ^8.0.2
