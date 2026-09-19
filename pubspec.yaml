@@ -1,6 +1,6 @@
 name: true_size
 description: A comprehensive size and measurement tracking app
-version: 1.0.0+1
+version: 1.0.1+2
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -40,6 +40,9 @@ dependencies:
 
   # Avatar photo picking for the profile screen.
   image_picker: ^1.2.3
+
+  # Biometric (fingerprint / face) unlock when the user is already logged in.
+  local_auth: ^3.0.2
 
   # App version shown in Settings > About.
   package_info_plus: ^10.2.1

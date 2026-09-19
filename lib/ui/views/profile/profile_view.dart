@@ -36,6 +36,10 @@ class ProfileView extends StackedView<ProfileViewModel> {
               ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                child: _securityCard(context, viewModel),
+              ),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                 child: _aboutCard(context, viewModel),
               ),
               Padding(
@@ -414,6 +418,38 @@ class ProfileView extends StackedView<ProfileViewModel> {
                 fontWeight: selected ? AppTypography.medium : null,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _securityCard(BuildContext context, ProfileViewModel vm) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return SoftCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Security', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text('Require a fingerprint / face unlock when you open the app',
+              style: AppTypography.smallMonetary.copyWith(color: context.neutrals.textSecondary)),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(Icons.fingerprint_rounded, size: 22, color: context.neutrals.textPrimary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text('Fingerprint unlock',
+                    style: AppTypography.body
+                        .copyWith(color: context.neutrals.textPrimary, fontWeight: AppTypography.medium)),
+              ),
+              Switch(
+                value: vm.biometricLock,
+                activeThumbColor: primary,
+                onChanged: vm.setBiometricLock,
+              ),
+            ],
           ),
         ],
       ),

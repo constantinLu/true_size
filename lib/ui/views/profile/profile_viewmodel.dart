@@ -80,6 +80,12 @@ class ProfileViewModel extends BaseViewModel {
     rebuildUi();
   }
 
+  bool get biometricLock => _settings.biometricLock;
+  void setBiometricLock(bool value) {
+    _settings.setBiometricLock(value);
+    rebuildUi();
+  }
+
   String _version = '';
   String _build = '';
   String get versionLabel {

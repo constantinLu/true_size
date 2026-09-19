@@ -141,3 +141,6 @@ app.*.symbols
 # Freezed classes
 **/*.freezed.dart
 /lib/infra/setup/injection.config.dart
+
+# Wrangler (Cloudflare) local cache
+.wrangler/

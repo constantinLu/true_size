@@ -16,6 +16,7 @@ import '../ui/views/add_measurement/add_group_form_view.dart';
 import '../ui/views/add_measurement/add_measurement_view.dart';
 import '../ui/views/body_detail/body_part_detail_view.dart';
 import '../ui/views/item_detail/item_detail_view.dart';
+import '../ui/views/lock/lock_view.dart';
 import '../ui/views/login/login_view.dart';
 import '../ui/views/measurement_detail/measurement_detail_view.dart';
 import '../ui/views/profile/profile_view.dart';
@@ -26,6 +27,7 @@ import '../ui/views/startup/startup_view.dart';
   routes: [
     MaterialRoute(page: StartupView, path: '/', initial: true),
     MaterialRoute(page: LoginView, path: '/login'),
+    MaterialRoute(page: LockView, path: '/lock'),
     MaterialRoute(page: RootView, path: '/root'),
     MaterialRoute(page: GroupDetailView, path: '/measurement'),
     MaterialRoute(page: AddGroupFormView, path: '/add-group'),

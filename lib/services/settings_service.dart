@@ -39,9 +39,15 @@ class SettingsService extends ChangeNotifier {
   Color _primaryColor = defaultPrimary;
   BackgroundTheme _backgroundTheme = BackgroundThemes.none;
   Gender _gender = Gender.male;
+  bool _biometricLock = true;
 
   ThemeMode get themeMode => _themeMode;
   Color get primaryColor => _primaryColor;
+
+  /// Whether to require a fingerprint/face unlock on open when already logged in.
+  /// On by default, but only actually locks when the device has enrolled
+  /// biometrics (see AuthService.canUseBiometrics), so it never locks anyone out.
+  bool get biometricLock => _biometricLock;
 
   /// The body silhouette gender used on the Body-measurements tab.
   Gender get gender => _gender;
@@ -68,6 +74,7 @@ class SettingsService extends ChangeNotifier {
           (g) => g.name == data['gender'],
           orElse: () => Gender.male,
         );
+        _biometricLock = data['biometricLock'] as bool? ?? true;
       }
     } catch (_) {
       // Offline / unavailable: keep defaults; the user can still change them.
@@ -100,6 +107,13 @@ class SettingsService extends ChangeNotifier {
     if (gender == _gender) return;
     _gender = gender;
     _doc.set({'gender': gender.name}, SetOptions(merge: true));
+    notifyListeners();
+  }
+
+  void setBiometricLock(bool enabled) {
+    if (enabled == _biometricLock) return;
+    _biometricLock = enabled;
+    _doc.set({'biometricLock': enabled}, SetOptions(merge: true));
     notifyListeners();
   }
 }
