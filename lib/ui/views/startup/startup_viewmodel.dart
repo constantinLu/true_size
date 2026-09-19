@@ -30,7 +30,12 @@ class StartupViewModel extends BaseViewModel {
     // Check if user is already signed in
     if (_authService.isLoggedIn) {
       await _authService.loadAvatar();
-      await _navigationService.navigateToRootView();
+      // Gate behind a biometric lock when enabled and the device supports it.
+      if (_settingsService.biometricLock && await _authService.canUseBiometrics()) {
+        await _navigationService.navigateToLockView();
+      } else {
+        await _navigationService.navigateToRootView();
+      }
     } else {
       await _navigationService.navigateToLoginView();
     }

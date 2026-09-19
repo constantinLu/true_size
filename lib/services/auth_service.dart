@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:stacked/stacked.dart';
 import 'package:true_size/core/models/user.dart';
 
@@ -12,6 +13,40 @@ import 'firestore_service.dart';
 class AuthService with ListenableServiceMixin {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirestoreService _firestoreService = locator<FirestoreService>();
+  final LocalAuthentication _localAuth = LocalAuthentication();
+
+  // ----- Biometric lock (session) -----
+
+  /// Cleared each launch; set once the user passes the lock screen so we don't
+  /// prompt again within the same session.
+  bool _unlocked = false;
+  bool get isUnlocked => _unlocked;
+  void markUnlocked() => _unlocked = true;
+
+  /// Whether this device has usable, enrolled biometrics (fingerprint / face).
+  Future<bool> canUseBiometrics() async {
+    try {
+      if (!await _localAuth.isDeviceSupported()) return false;
+      if (!await _localAuth.canCheckBiometrics) return false;
+      final enrolled = await _localAuth.getAvailableBiometrics();
+      return enrolled.isNotEmpty;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Prompts the OS biometric sheet. Returns true only on a successful scan.
+  Future<bool> authenticateBiometric() async {
+    try {
+      return await _localAuth.authenticate(
+        localizedReason: 'Unlock TrueSize',
+        biometricOnly: true,
+        persistAcrossBackgrounding: true,
+      );
+    } catch (_) {
+      return false;
+    }
+  }
 
   /// The user's uploaded avatar bytes (null when none set). Stored base64 on the
   /// Firestore `users` doc; shown in the top bar chip and profile screen.
@@ -111,6 +146,7 @@ class AuthService with ListenableServiceMixin {
     await GoogleSignIn.instance.signOut();
     await _auth.signOut();
     _avatarBytes = null;
+    _unlocked = false;
     notifyListeners();
   }
 
