@@ -9,7 +9,7 @@ name: Release to DEV Play
 # gracefully when any are missing.
 #
 # Required repo secrets:
-#   CLOUDFLARE_API_TOKEN     - token with Workers R2 Storage:Edit
+#   CLOUDFLARE_WORKER_TOKEN  - token with Workers R2 Storage:Edit
 #   CLOUDFLARE_ACCOUNT_ID    - 8c653364032ead587cfcb15d7f1feceb
 #   ANDROID_KEYSTORE_BASE64  - base64 of the release keystore (for in-place updates)
 
@@ -124,9 +124,12 @@ jobs:
 
       - name: Upload to R2
         env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_WORKER_TOKEN: ${{ secrets.CLOUDFLARE_WORKER_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
+          # wrangler authenticates via the CLOUDFLARE_API_TOKEN env var specifically; alias our
+          # consistently-named CLOUDFLARE_WORKER_TOKEN to the name wrangler expects.
+          export CLOUDFLARE_API_TOKEN="$CLOUDFLARE_WORKER_TOKEN"
           put() { npx --yes wrangler@4 r2 object put "$1" --file "$2" --content-type "$3" --remote; }
           APK="build/app/outputs/flutter-apk/app-release.apk"
           put "$BUCKET/${{ steps.meta.outputs.key }}" "$APK" "application/vnd.android.package-archive"
