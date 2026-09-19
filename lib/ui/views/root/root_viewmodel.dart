@@ -32,6 +32,7 @@ class RootViewModel extends BaseViewModel {
   int get index => _index;
 
   Uint8List? get avatarBytes => _auth.avatarBytes;
+  String? get photoUrl => _auth.currentUser?.photoURL;
 
   void setIndex(int value) {
     if (value == _index) return;

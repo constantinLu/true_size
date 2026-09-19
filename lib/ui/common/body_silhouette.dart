@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../core/enums/gender.dart';
 import '../../core/models/body_part.dart';
-import '../theme/app_neutrals.dart';
 
 /// Renders the gendered body silhouette with optional part markers. Used on the
 /// Body tab header and the body-part detail hero.
@@ -21,26 +19,21 @@ class BodySilhouette extends StatelessWidget {
   final List<BodyPart> markers;
   final String? highlightKey;
 
-  static const double _aspect = 200 / 420; // svg viewBox ratio
-
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    final width = height * _aspect;
+    final width = height * gender.silhouetteAspect;
     return SizedBox(
       width: width,
       height: height,
       child: Stack(
         clipBehavior: Clip.none,
         children: [
-          SvgPicture.asset(
+          Image.asset(
             gender.silhouetteAsset,
             width: width,
             height: height,
-            colorFilter: ColorFilter.mode(
-              context.neutrals.textFaint.withValues(alpha: 0.30),
-              BlendMode.srcIn,
-            ),
+            fit: BoxFit.contain,
           ),
           for (final p in markers)
             Align(

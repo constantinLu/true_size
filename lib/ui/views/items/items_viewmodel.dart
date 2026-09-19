@@ -7,6 +7,7 @@ import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
+import '../../../services/local_deletion_service.dart';
 import '../../../services/search_service.dart';
 
 /// A measurement paired with the group it belongs to, for the flat "Items" list.
@@ -21,20 +22,29 @@ class ItemsViewModel extends StreamViewModel<List<GroupedMeasurement>> {
   final _groupService = locator<GroupService>();
   final _navigationService = locator<NavigationService>();
   final _searchService = locator<SearchService>();
+  final _deletions = locator<LocalDeletionService>();
 
   ItemsViewModel() {
     _searchService.addListener(notifyListeners);
+    _deletions.addListener(notifyListeners);
   }
 
   List<GroupedMeasurement> _all = const [];
 
   bool get isSearching => _searchService.isActive;
 
+  /// All items, with optimistically-deleted items/groups removed.
+  List<GroupedMeasurement> get _visible => _all
+      .where((gm) =>
+          !_deletions.isMeasurementHidden(gm.measurement.id) &&
+          !_deletions.isGroupHidden(gm.group.id))
+      .toList();
+
   /// All items filtered by the shared search query.
   List<GroupedMeasurement> get items {
     final q = _searchService.query.trim().toLowerCase();
-    if (q.isEmpty) return _all;
-    return _all.where((gm) {
+    if (q.isEmpty) return _visible;
+    return _visible.where((gm) {
       final m = gm.measurement;
       return m.name.toLowerCase().contains(q) ||
           m.brandName.toLowerCase().contains(q) ||
@@ -69,6 +79,7 @@ class ItemsViewModel extends StreamViewModel<List<GroupedMeasurement>> {
   @override
   void dispose() {
     _searchService.removeListener(notifyListeners);
+    _deletions.removeListener(notifyListeners);
     super.dispose();
   }
 }

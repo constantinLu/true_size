@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
 
@@ -8,13 +9,13 @@ import '../../../core/models/body_part.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/body_service.dart';
 import '../../../services/settings_service.dart';
+import '../../common/confirm_sheet.dart';
 
 class BodyPartDetailViewModel extends BaseViewModel {
   final _auth = locator<AuthService>();
   final _bodyService = locator<BodyService>();
   final _settings = locator<SettingsService>();
   final _navigationService = locator<NavigationService>();
-  final _dialogService = locator<DialogService>();
 
   final String partKey;
   BodyPartDetailViewModel({required this.partKey});
@@ -38,18 +39,29 @@ class BodyPartDetailViewModel extends BaseViewModel {
     setBusy(false);
   }
 
-  Future<void> deleteEntry(BodyEntry entry) async {
-    final result = await _dialogService.showConfirmationDialog(
+  Future<void> deleteEntry(BuildContext context, BodyEntry entry) async {
+    final confirmed = await showConfirmSheet(
+      context,
       title: 'Delete entry',
-      description: 'Remove this snapshot from the history?',
-      confirmationTitle: 'Delete',
-      cancelTitle: 'Cancel',
+      message: 'Remove this snapshot from the history?',
+      confirmLabel: 'Delete',
+      danger: true,
+      icon: Icons.delete_outline_rounded,
     );
-    if (result?.confirmed != true) return;
+    if (!confirmed) return;
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
-    await _bodyService.deleteEntry(uid, partKey, entry);
-    await _load();
+
+    // Optimistic: drop it from the timeline immediately, then persist.
+    final previous = _entries;
+    _entries = _entries.where((e) => e != entry).toList();
+    notifyListeners();
+    try {
+      await _bodyService.deleteEntry(uid, partKey, entry);
+    } catch (_) {
+      _entries = previous;
+      notifyListeners();
+    }
   }
 
   void back() => _navigationService.back();

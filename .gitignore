@@ -144,3 +144,6 @@ app.*.symbols
 
 # Wrangler (Cloudflare) local cache
 .wrangler/
+
+# DEV Play store manifest (generated at publish time)
+latest.json

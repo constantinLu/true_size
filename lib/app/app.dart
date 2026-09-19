@@ -6,6 +6,7 @@ import '../services/body_service.dart';
 import '../services/brand_service.dart';
 import '../services/firestore_service.dart';
 import '../services/group_service.dart';
+import '../services/local_deletion_service.dart';
 import '../services/logo_service.dart';
 import '../services/measurement_service.dart';
 import '../services/search_service.dart';
@@ -51,6 +52,7 @@ import '../ui/views/startup/startup_view.dart';
     LazySingleton(classType: LogoService),
     LazySingleton(classType: SearchService),
     LazySingleton(classType: BodyService),
+    LazySingleton(classType: LocalDeletionService),
     //
     LazySingleton(classType: BottomSheetService)
   ],

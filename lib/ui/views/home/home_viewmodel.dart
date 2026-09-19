@@ -6,6 +6,7 @@ import '../../../app/app.locator.dart';
 import '../../../core/models/group.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
+import '../../../services/local_deletion_service.dart';
 import '../../../services/search_service.dart';
 
 class HomeViewModel extends StreamViewModel<List<Group>> {
@@ -13,12 +14,25 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   final _groupService = locator<GroupService>();
   final _navigationService = locator<NavigationService>();
   final _searchService = locator<SearchService>();
+  final _deletions = locator<LocalDeletionService>();
 
   HomeViewModel() {
     _searchService.addListener(notifyListeners);
+    _deletions.addListener(notifyListeners);
   }
 
-  List<Group> groups = [];
+  /// Groups with any optimistically-deleted groups removed and any
+  /// optimistically-deleted items stripped from each group (so card counts stay
+  /// correct the instant a delete happens).
+  List<Group> get groups => _groups
+      .where((g) => !_deletions.isGroupHidden(g.id))
+      .map((g) => g.measurements.any((m) => _deletions.isMeasurementHidden(m.id))
+          ? g.copyWith(
+              measurements:
+                  g.measurements.where((m) => !_deletions.isMeasurementHidden(m.id)).toList())
+          : g)
+      .toList();
+  List<Group> _groups = [];
 
   /// Groups filtered by the shared search query (matches the group name, its
   /// tags, and its items' names / brands / sizes).
@@ -47,7 +61,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
 
   @override
   void onData(List<Group>? data) {
-    groups = data ?? [];
+    _groups = data ?? [];
     notifyListeners();
   }
 
@@ -58,6 +72,7 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   @override
   void dispose() {
     _searchService.removeListener(notifyListeners);
+    _deletions.removeListener(notifyListeners);
     super.dispose();
   }
 }

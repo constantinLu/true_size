@@ -495,7 +495,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
   Widget _signOutButton(BuildContext context, ProfileViewModel vm) {
     const danger = Color(0xFFB36273);
     return GestureDetector(
-      onTap: vm.signOut,
+      onTap: () => vm.signOut(context),
       behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,

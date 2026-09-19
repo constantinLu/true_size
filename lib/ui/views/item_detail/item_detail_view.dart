@@ -68,7 +68,7 @@ class ItemDetailView extends StackedView<ItemDetailViewModel> {
           ),
         ],
         const SizedBox(height: 28),
-        _DeleteButton(onTap: viewModel.confirmDelete),
+        _DeleteButton(onTap: () => viewModel.confirmDelete(context)),
       ],
     );
   }
