@@ -1,22 +1,34 @@
 name: Release to DEV Play
 
-# Publishes the TrueSize APK + store assets (icon, feature graphic, screenshots)
-# to the DEV Play store (Cloudflare R2). The DEV Play Worker builds its catalog
-# live from apps/<id>/latest.json, so a release appears/updates automatically.
+# Auto-publishes the TrueSize APK + store assets (icon, feature graphic,
+# screenshots) to the DEV Play store (Cloudflare R2) on every merge to master,
+# but ONLY when the marketing version in pubspec.yaml was bumped (i.e. there's
+# no `v<version>` tag yet). The DEV Play Worker builds its catalog live from
+# apps/<id>/latest.json, so a release appears/updates automatically.
+#
+# To cut a release: bump `version: 1.0.x+N` in pubspec.yaml (both the marketing
+# version AND the build number N - N becomes the store versionCode the forced
+# updater compares) and merge to master. Merges without a version bump are
+# skipped (the tag already exists).
 #
 # Store assets live in ./assets/store (feature.png + screenshots/*.png) and are
 # published alongside the APK. All are optional - the store UI falls back
 # gracefully when any are missing.
 #
 # Required repo secrets:
-#   CLOUDFLARE_API_TOKEN     - token with Workers R2 Storage:Edit
+#   CLOUDFLARE_API_TOKEN     - token with **Workers R2 Storage: Edit** (plus
+#                              Account Settings:Read). Without R2 Edit the upload
+#                              step 403s (code 10000).
 #   CLOUDFLARE_ACCOUNT_ID    - 8c653364032ead587cfcb15d7f1feceb
 #   ANDROID_KEYSTORE_BASE64  - base64 of the release keystore (for in-place updates)
 
 on:
   push:
-    tags: ["v*"]
+    branches: [master]
   workflow_dispatch:
+
+permissions:
+  contents: write # to push the v<version> tag after a successful release
 
 env:
   APP_ID: truesize
@@ -37,7 +49,32 @@ defaults:
     shell: bash
 
 jobs:
+  # Decide whether this push is a new version worth releasing: true when the
+  # marketing version in pubspec has no matching `v<version>` git tag yet.
+  check-version:
+    runs-on: ubuntu-latest
+    outputs:
+      release: ${{ steps.v.outputs.release }}
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # need all tags to know if this version already shipped
+      - id: v
+        run: |
+          VER=$(grep -E '^version:' pubspec.yaml | sed -E 's/^version:[[:space:]]*([^+]+).*/\1/')
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/v$VER" >/dev/null; then
+            echo "release=false" >> "$GITHUB_OUTPUT"
+            echo "v$VER already released - skipping store release."
+          else
+            echo "release=true" >> "$GITHUB_OUTPUT"
+            echo "New version v$VER - will publish to the store."
+          fi
+
   release:
+    needs: check-version
+    if: needs.check-version.outputs.release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -70,7 +107,7 @@ jobs:
             echo "ANDROID_KEYSTORE_BASE64 not set - falling back to the debug key."
           fi
 
-      - run: flutter build apk --release --dart-define=BUILD_TIME=$(date -u +%Y-%m-%dT%H:%M)
+      - run: flutter build apk --release --dart-define=BUILD_TIME=$(TZ=Europe/Bucharest date +'%Y-%m-%dT%H:%M')
 
       - name: Collect metadata
         id: meta
@@ -139,3 +176,20 @@ jobs:
             put "$BUCKET/apps/$APP_ID/screenshots/$(basename "$f")" "$f" "image/png"
           done
           put "$BUCKET/apps/$APP_ID/latest.json" "latest.json" "application/json"
+
+  # Tag the released marketing version so future pushes of the same version skip.
+  # A GITHUB_TOKEN tag push does not retrigger this workflow (it's gated on
+  # branch pushes anyway), so this can't cause a double release.
+  tag-release:
+    needs: [check-version, release]
+    if: needs.check-version.outputs.release == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Tag v${{ needs.check-version.outputs.version }}
+        run: |
+          VER="${{ needs.check-version.outputs.version }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git tag "v$VER"
+          git push origin "v$VER"
