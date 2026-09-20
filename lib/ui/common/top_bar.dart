@@ -75,44 +75,7 @@ class FloatingTopBar extends StatelessWidget {
                           const SizedBox(width: 10),
                           // Search has its own framed box inside the bar.
                           Expanded(
-                            child: Container(
-                              height: 40,
-                              padding: const EdgeInsets.symmetric(horizontal: 12),
-                              decoration: BoxDecoration(
-                                color: context.neutrals.surfaceHigh.withValues(alpha: 0.9),
-                                borderRadius: BorderRadius.circular(100),
-                                border: Border.all(color: context.neutrals.textFaint.withValues(alpha: 0.25)),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.search_rounded, size: 19, color: context.neutrals.textSecondary),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: TextField(
-                                      controller: controller,
-                                      onChanged: onChanged,
-                                      textInputAction: TextInputAction.search,
-                                      style: AppTypography.body.copyWith(color: context.neutrals.textPrimary),
-                                      decoration: InputDecoration(
-                                        isCollapsed: true,
-                                        border: InputBorder.none,
-                                        hintText: 'Search',
-                                        hintStyle: AppTypography.body.copyWith(color: context.neutrals.textFaint),
-                                      ),
-                                    ),
-                                  ),
-                                  if (controller.text.isNotEmpty)
-                                    GestureDetector(
-                                      onTap: () {
-                                        controller.clear();
-                                        onChanged('');
-                                      },
-                                      behavior: HitTestBehavior.opaque,
-                                      child: Icon(Icons.close_rounded, size: 18, color: context.neutrals.textSecondary),
-                                    ),
-                                ],
-                              ),
-                            ),
+                            child: _SearchBox(controller: controller, onChanged: onChanged),
                           ),
                         ],
                       ),
@@ -122,6 +85,103 @@ class FloatingTopBar extends StatelessWidget {
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The framed search field inside the top bar. On focus it lifts subtly - a
+/// calm primary halo, a brighter border and a ~1.5% grow - as tap feedback.
+class _SearchBox extends StatefulWidget {
+  const _SearchBox({required this.controller, required this.onChanged});
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<_SearchBox> createState() => _SearchBoxState();
+}
+
+class _SearchBoxState extends State<_SearchBox> {
+  final _focus = FocusNode();
+  bool _focused = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focus.addListener(() {
+      if (_focus.hasFocus != _focused) setState(() => _focused = _focus.hasFocus);
+    });
+  }
+
+  @override
+  void dispose() {
+    _focus.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final primary = Theme.of(context).colorScheme.primary;
+    return AnimatedScale(
+      scale: _focused ? 1.015 : 1.0,
+      duration: const Duration(milliseconds: 220),
+      curve: Curves.easeOut,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+        height: 40,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: context.neutrals.surfaceHigh.withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(100),
+          border: Border.all(
+            color: _focused
+                ? primary.withValues(alpha: 0.85)
+                : context.neutrals.textFaint.withValues(alpha: 0.25),
+            width: _focused ? 1.5 : 1,
+          ),
+          boxShadow: _focused
+              ? [
+                  BoxShadow(
+                    color: primary.withValues(alpha: 0.28),
+                    blurRadius: 14,
+                    spreadRadius: 0.5,
+                  ),
+                ]
+              : null,
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.search_rounded,
+                size: 19,
+                color: _focused ? primary : context.neutrals.textSecondary),
+            const SizedBox(width: 8),
+            Expanded(
+              child: TextField(
+                controller: widget.controller,
+                focusNode: _focus,
+                onChanged: widget.onChanged,
+                textInputAction: TextInputAction.search,
+                style: AppTypography.body.copyWith(color: context.neutrals.textPrimary),
+                decoration: InputDecoration(
+                  isCollapsed: true,
+                  border: InputBorder.none,
+                  hintText: 'Search',
+                  hintStyle: AppTypography.body.copyWith(color: context.neutrals.textFaint),
+                ),
+              ),
+            ),
+            if (widget.controller.text.isNotEmpty)
+              GestureDetector(
+                onTap: () {
+                  widget.controller.clear();
+                  widget.onChanged('');
+                },
+                behavior: HitTestBehavior.opaque,
+                child: Icon(Icons.close_rounded, size: 18, color: context.neutrals.textSecondary),
+              ),
+          ],
         ),
       ),
     );

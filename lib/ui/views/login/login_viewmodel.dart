@@ -17,7 +17,8 @@ class LoginViewModel extends BaseViewModel {
       final user = await _authService.signInWithGoogle();
       if (user != null) {
         await _authService.loadAvatar();
-        await _navigationService.navigateToRootView();
+        // Replace the stack so the hardware back button can't return to login.
+        await _navigationService.clearStackAndShow(Routes.rootView);
       }
     } catch (e) {
       _snackbarService.showSnackbar(
