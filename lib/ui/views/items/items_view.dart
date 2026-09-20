@@ -27,7 +27,7 @@ class ItemsView extends StackedView<ItemsViewModel> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('All items',
+                      Text('Measurements',
                           style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
                       const SizedBox(height: 4),
                       Text('Every measurement across your groups',

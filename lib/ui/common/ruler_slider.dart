@@ -161,8 +161,10 @@ class _RulerPainter extends CustomPainter {
     final last = (value + units).ceil();
 
     for (int u = first; u <= last; u++) {
-      if (u < min || u > max) continue;
       final x = center + (u - value) * pxPerUnit;
+      // Ticks beyond the part's range are drawn faint and unlabeled so the tape
+      // always looks continuous instead of ending in empty white.
+      final outOfRange = u < min || u > max;
       final isMajor = u % 10 == 0;
       final isMed = u % 5 == 0;
       final len = isMajor
@@ -170,13 +172,14 @@ class _RulerPainter extends CustomPainter {
           : isMed
               ? 19.0
               : 11.0;
+      final baseAlpha = isMajor ? 0.95 : (isMed ? 0.75 : 0.45);
       final paint = Paint()
-        ..color = ink.withValues(alpha: isMajor ? 0.95 : (isMed ? 0.75 : 0.45))
+        ..color = ink.withValues(alpha: outOfRange ? baseAlpha * 0.3 : baseAlpha)
         ..strokeWidth = isMajor ? 2.0 : 1.3
         ..strokeCap = StrokeCap.round;
       canvas.drawLine(Offset(x, top), Offset(x, top + len), paint);
 
-      if (isMajor) {
+      if (isMajor && !outOfRange) {
         final tp = TextPainter(
           text: TextSpan(
             text: '$u',

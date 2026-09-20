@@ -46,7 +46,8 @@ class StartupViewModel extends BaseViewModel {
       if (_settingsService.biometricLock && await _authService.canUseBiometrics()) {
         await _navigationService.navigateToLockView();
       } else {
-        await _navigationService.navigateToRootView();
+        // Replace the stack so back can't pop into the startup/login screens.
+        await _navigationService.clearStackAndShow(Routes.rootView);
       }
     } else {
       await _navigationService.navigateToLoginView();

@@ -48,6 +48,29 @@ class BodyPartDetailView extends StackedView<BodyPartDetailViewModel> {
           ),
         ),
         const SizedBox(height: 24),
+        SectionHeader('How to measure'),
+        const SizedBox(height: 10),
+        SoftCard(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              IconMedallion(
+                  icon: Icons.straighten_rounded, color: primary, size: 40, iconSize: 20),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Text(
+                    part.howTo,
+                    style: AppTypography.subtitle.copyWith(
+                        color: context.neutrals.textSecondary, height: 1.4),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
         SectionHeader('History'),
         if (entries.isEmpty)
           const EmptyState(

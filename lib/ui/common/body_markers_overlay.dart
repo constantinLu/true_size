@@ -48,9 +48,9 @@ class _BodyMarkersView extends StatelessWidget {
   final List<BodyPart> parts;
   final double? Function(String key) valueOf;
 
-  static const _colW = 84.0;
+  static const _colW = 74.0;
   static const _margin = 6.0;
-  static const _chipH = 44.0;
+  static const _chipH = 52.0;
 
   @override
   Widget build(BuildContext context) {
@@ -64,8 +64,8 @@ class _BodyMarkersView extends StatelessWidget {
               top: 10,
               left: 20,
               child: Text('Your measurements',
-                  style: AppTypography.subtitle
-                      .copyWith(color: Colors.white.withValues(alpha: 0.9))),
+                  style: AppTypography.subtitle.copyWith(
+                      color: Colors.white.withValues(alpha: 0.9), fontSize: 16)),
             ),
             Positioned(
               top: 4,
@@ -225,12 +225,12 @@ class _Callout extends StatelessWidget {
       children: [
         Text(
           part.label,
-          maxLines: 1,
+          maxLines: 2,
           overflow: TextOverflow.ellipsis,
           textAlign: alignEnd ? TextAlign.end : TextAlign.start,
           style: AppTypography.caption.copyWith(
             color: Colors.white.withValues(alpha: 0.6),
-            fontSize: 10,
+            fontSize: 11,
             height: 1.1,
           ),
         ),
@@ -241,7 +241,7 @@ class _Callout extends StatelessWidget {
           style: AppTypography.listItemTitle.copyWith(
             color: value == null ? Colors.white.withValues(alpha: 0.5) : Colors.white,
             fontWeight: AppTypography.semibold,
-            fontSize: 15,
+            fontSize: 17,
             height: 1.1,
           ),
         ),
