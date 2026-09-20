@@ -89,11 +89,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
-    - assets/images/
     - assets/logos/
     - assets/fonts/
     - assets/backgrounds/
-    - assets/body/
+    - assets/body/male/
+    - assets/body/female/
 
   fonts:
     - family: Office Code Pro
