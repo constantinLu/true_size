@@ -2,10 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../core/constants/dates.dart';
+import '../../../core/enums/gender.dart';
 import '../../../core/models/body_measurement.dart';
 import '../../../core/models/body_part.dart';
 import '../../common/app_widgets.dart';
+import '../../common/body_markers_overlay.dart';
 import '../../common/body_silhouette.dart';
+import '../../common/ruler_slider.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../root/root_view.dart';
@@ -37,6 +40,7 @@ class BodyView extends StackedView<BodyViewModel> {
                       child: _BodyPartCard(
                         key: ValueKey(part.key),
                         part: part,
+                        gender: viewModel.gender,
                         latest: viewModel.latestFor(part.key),
                         onSave: (v) => viewModel.save(part, v),
                         onOpen: () => viewModel.openPart(part),
@@ -76,7 +80,15 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Center(
-            child: BodySilhouette(gender: vm.gender, height: 220, markers: vm.parts),
+            child: GestureDetector(
+              onLongPress: () => showBodyMarkers(
+                context: context,
+                gender: vm.gender,
+                parts: vm.parts,
+                valueOf: (key) => vm.latestFor(key)?.value,
+              ),
+              child: BodySilhouette(gender: vm.gender, height: 220, markers: vm.parts),
+            ),
           ),
           const SizedBox(height: 12),
         ],
@@ -89,12 +101,14 @@ class _BodyPartCard extends StatefulWidget {
   const _BodyPartCard({
     super.key,
     required this.part,
+    required this.gender,
     required this.latest,
     required this.onSave,
     required this.onOpen,
   });
 
   final BodyPart part;
+  final Gender gender;
   final BodyEntry? latest;
   final Future<void> Function(double) onSave;
   final VoidCallback onOpen;
@@ -134,7 +148,7 @@ class _BodyPartCardState extends State<_BodyPartCard> {
         children: [
           Row(
             children: [
-              IconMedallion(icon: part.icon, color: primary, size: 44, iconSize: 22),
+              _BodyPartChip(gender: widget.gender, part: part),
               const SizedBox(width: 14),
               Expanded(
                 child: Column(
@@ -177,36 +191,40 @@ class _BodyPartCardState extends State<_BodyPartCard> {
               _RoundIconButton(icon: Icons.timeline_rounded, onTap: widget.onOpen),
             ],
           ),
-          const SizedBox(height: 6),
-          SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 4,
-              activeTrackColor: primary,
-              inactiveTrackColor: context.neutrals.surfaceHigh,
-              thumbColor: primary,
-              overlayColor: primary.withValues(alpha: 0.15),
-              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 9),
-            ),
-            child: Slider(
-              min: part.min,
-              max: part.max,
-              value: _current,
-              onChanged: (v) => setState(() => _pending = v),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 6),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text('${fmtBody(part.min)} ${part.unit}',
-                    style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
-                Text('${fmtBody(part.max)} ${part.unit}',
-                    style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
-              ],
-            ),
+          const SizedBox(height: 10),
+          RulerSlider(
+            value: _current,
+            min: part.min,
+            max: part.max,
+            accent: primary,
+            onChanged: (v) => setState(() => _pending = v),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The circular chip on each body card - the gendered part illustration held
+/// inside a white disc so the black line-art reads on any theme.
+class _BodyPartChip extends StatelessWidget {
+  const _BodyPartChip({required this.gender, required this.part});
+  final Gender gender;
+  final BodyPart part;
+
+  @override
+  Widget build(BuildContext context) {
+    const size = 58.0;
+    // No disc: the illustration sits directly on the card so there's no visible
+    // chip edge or colour seam. The white line-art reads against the dark card.
+    return SizedBox(
+      width: size,
+      height: size,
+      child: Image.asset(
+        gender.partAsset(part.key),
+        fit: BoxFit.contain,
+        filterQuality: FilterQuality.medium,
+        cacheWidth: 160,
       ),
     );
   }

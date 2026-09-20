@@ -37,7 +37,10 @@ class BodySilhouette extends StatelessWidget {
           ),
           for (final p in markers)
             Align(
-              alignment: Alignment(p.markerX * 2 - 1, p.markerY * 2 - 1),
+              alignment: () {
+                final (mx, my) = p.markerFor(gender);
+                return Alignment(mx * 2 - 1, my * 2 - 1);
+              }(),
               child: _Marker(color: primary, active: p.key == highlightKey),
             ),
         ],

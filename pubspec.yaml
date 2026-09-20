@@ -1,6 +1,6 @@
 name: true_size
 description: A comprehensive size and measurement tracking app
-version: 1.0.4+5
+version: 1.0.5+6
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -89,11 +89,11 @@ flutter:
   uses-material-design: true
   assets:
     - assets/icons/
-    - assets/images/
     - assets/logos/
     - assets/fonts/
     - assets/backgrounds/
-    - assets/body/
+    - assets/body/male/
+    - assets/body/female/
 
   fonts:
     - family: Office Code Pro
