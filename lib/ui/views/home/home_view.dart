@@ -48,7 +48,7 @@ class _Heading extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Collections', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
+        Text('Collection', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
         const SizedBox(height: 4),
         Text(
           '${count == 1 ? '1 group' : '$count groups'} · ${vm.totalItems == 1 ? '1 item' : '${vm.totalItems} items'}',

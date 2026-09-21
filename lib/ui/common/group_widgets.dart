@@ -18,8 +18,9 @@ Color groupColor(String raw) {
   return value == null ? const Color(0xFF7A97DC) : Color(value);
 }
 
-/// A group summary card: icon medallion in the group colour, the group name,
-/// a measurement count, and its tags. Shared by the home grid/list.
+/// A group summary card: a flat circle icon chip in the group colour, the group
+/// name, a ruler-marked measurement count, its tags, and a tape-measure tick
+/// strip along the foot. Shared by the home grid/list.
 class GroupCard extends StatelessWidget {
   const GroupCard(this.group, {super.key, required this.onTap});
   final Group group;
@@ -30,49 +31,105 @@ class GroupCard extends StatelessWidget {
     final color = groupColor(group.color);
     final count = group.measurements.length;
     return SoftCard(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       onTap: onTap,
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          IconMedallion(
-            icon: iconForKey(group.icon),
-            color: color,
-            size: 46,
-            iconSize: 22,
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(group.name,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.listItemTitle.copyWith(color: context.neutrals.textPrimary)),
-                const SizedBox(height: 3),
-                Text(
-                  count == 1 ? '1 item' : '$count items',
-                  style: AppTypography.caption.copyWith(color: context.neutrals.textSecondary),
+          Row(
+            children: [
+              IconMedallion(
+                icon: iconForKey(group.icon),
+                color: color,
+                size: 48,
+                iconSize: 24,
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(group.name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTypography.cardTitle.copyWith(color: context.neutrals.textPrimary)),
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.straighten_rounded, size: 15, color: color),
+                        const SizedBox(width: 6),
+                        Text(
+                          count == 1 ? '1 measurement' : '$count measurements',
+                          style: AppTypography.caption.copyWith(color: context.neutrals.textSecondary),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-                if (group.tags.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: [
-                      for (final t in group.tags.take(3)) Pill('#${t.name}', color: color, filled: true),
-                    ],
-                  ),
-                ],
+              ),
+            ],
+          ),
+          if (group.tags.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [
+                for (final t in group.tags.take(3)) Pill('#${t.name}', color: color, filled: true),
               ],
             ),
-          ),
-          const SizedBox(width: 8),
-          Icon(Icons.chevron_right_rounded, color: context.neutrals.textFaint),
+          ],
+          const SizedBox(height: 14),
+          _TapeMeasureStrip(color: color),
         ],
       ),
     );
   }
+}
+
+/// A slim measuring-tape edge - evenly spaced ticks in the group colour, taller
+/// every fifth - that gives each card its tailoring signature.
+class _TapeMeasureStrip extends StatelessWidget {
+  const _TapeMeasureStrip({required this.color});
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 16,
+      width: double.infinity,
+      child: CustomPaint(painter: _TapePainter(color)),
+    );
+  }
+}
+
+class _TapePainter extends CustomPainter {
+  _TapePainter(this.color);
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final base = Paint()
+      ..color = color.withValues(alpha: 0.16)
+      ..strokeWidth = 1.5
+      ..strokeCap = StrokeCap.round;
+    canvas.drawLine(const Offset(0, 1), Offset(size.width, 1), base);
+
+    const step = 9.0;
+    var i = 0;
+    for (double x = 0; x <= size.width + 0.1; x += step, i++) {
+      final major = i % 5 == 0;
+      final len = major ? 12.0 : 6.0;
+      final paint = Paint()
+        ..color = color.withValues(alpha: major ? 0.5 : 0.26)
+        ..strokeWidth = major ? 1.6 : 1.2
+        ..strokeCap = StrokeCap.round;
+      canvas.drawLine(Offset(x, 1), Offset(x, 1 + len), paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_TapePainter old) => old.color != color;
 }
 
 /// A single measurement row: brand logo (or icon) medallion, the item name and

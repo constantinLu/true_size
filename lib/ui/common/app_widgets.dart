@@ -126,31 +126,33 @@ class EntryAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final hasLogo = logoUrl != null && logoUrl!.isNotEmpty;
+    // No brand logo: fall back to the exact same tinted-circle chip used on group
+    // cards ([IconMedallion]) so icon avatars look identical across the app.
+    if (!hasLogo) {
+      return IconMedallion(icon: icon, color: color, size: size, iconSize: iconSize);
+    }
     // Brand logos (often transparent PNGs) sit on white so no accent tint bleeds
-    // through; the icon fallback keeps the tinted [color] disc. The fallback icon
-    // is drawn in [color] over white when a logo is expected so it stays visible.
-    final fallback = Icon(icon, size: iconSize, color: hasLogo ? color : Colors.white);
+    // through; on load/error we show the icon in [color] so it stays visible.
+    final fallback = Icon(icon, size: iconSize, color: color);
     return Container(
       width: size,
       height: size,
       clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: hasLogo ? Colors.white : color,
+      decoration: const BoxDecoration(
+        color: Colors.white,
         shape: BoxShape.circle,
       ),
-      child: hasLogo
-          // Fill the whole circle: cover edge-to-edge (the circle clip rounds
-          // off the corners so it reads as a proper app-icon mark).
-          ? Image.network(
-              logoUrl!,
-              fit: BoxFit.cover,
-              width: size,
-              height: size,
-              errorBuilder: (_, __, ___) => Center(child: fallback),
-              loadingBuilder: (context, child, progress) =>
-                  progress == null ? child : Center(child: fallback),
-            )
-          : Center(child: fallback),
+      // Fill the whole circle: cover edge-to-edge (the circle clip rounds
+      // off the corners so it reads as a proper app-icon mark).
+      child: Image.network(
+        logoUrl!,
+        fit: BoxFit.cover,
+        width: size,
+        height: size,
+        errorBuilder: (_, __, ___) => Center(child: fallback),
+        loadingBuilder: (context, child, progress) =>
+            progress == null ? child : Center(child: fallback),
+      ),
     );
   }
 }
