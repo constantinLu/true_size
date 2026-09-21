@@ -107,7 +107,10 @@ class _BodyMarkersView extends StatelessWidget {
     var imgH = math.min(availH * 0.98, gapW / aspect);
     var imgW = imgH * aspect;
     final imgLeft = innerL + (gapW - imgW) / 2;
-    final imgTop = (availH - imgH) / 2;
+    // Shift the diagram ~20% up from centre and keep every callout inside the
+    // top 80%, leaving the bottom fifth free for components added later.
+    final bottomLimit = availH * 0.80;
+    final imgTop = math.max(8.0, (availH - imgH) / 2 - availH * 0.20);
 
     Offset marker(BodyPart p) {
       final (mx, my) = p.markerFor(gender);
@@ -126,7 +129,7 @@ class _BodyMarkersView extends StatelessWidget {
       double prev = -1e9;
       for (final p in col) {
         var y = math.max(marker(p).dy, prev + step);
-        y = y.clamp(_chipH / 2 + 2, availH - _chipH / 2 - 2);
+        y = y.clamp(_chipH / 2 + 2, bottomLimit - _chipH / 2 - 2);
         prev = y;
         chipY[p.key] = y;
       }
