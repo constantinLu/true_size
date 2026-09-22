@@ -3,6 +3,7 @@ import 'package:stacked_services/stacked_services.dart';
 import 'package:true_size/app/app.router.dart';
 
 import '../../../app/app.locator.dart';
+import '../../../core/enums/list_sort.dart';
 import '../../../core/models/group.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
@@ -35,18 +36,55 @@ class HomeViewModel extends StreamViewModel<List<Group>> {
   List<Group> _groups = [];
 
   /// Groups filtered by the shared search query (matches the group name, its
-  /// tags, and its items' names / brands / sizes).
+  /// tags, and its items' names / brands / sizes), then ordered by the chosen
+  /// sort field and direction.
   List<Group> get filteredGroups {
     final q = _searchService.query.trim().toLowerCase();
-    if (q.isEmpty) return groups;
-    return groups.where((g) {
-      if (g.name.toLowerCase().contains(q)) return true;
-      if (g.tags.any((t) => t.name.toLowerCase().contains(q))) return true;
-      return g.measurements.any((m) =>
-          m.name.toLowerCase().contains(q) ||
-          m.brandName.toLowerCase().contains(q) ||
-          m.sizes.any((s) => s.value.toLowerCase().contains(q)));
-    }).toList();
+    final base = q.isEmpty
+        ? groups
+        : groups.where((g) {
+            if (g.name.toLowerCase().contains(q)) return true;
+            if (g.tags.any((t) => t.name.toLowerCase().contains(q))) return true;
+            return g.measurements.any((m) =>
+                m.name.toLowerCase().contains(q) ||
+                m.brandName.toLowerCase().contains(q) ||
+                m.sizes.any((s) => s.value.toLowerCase().contains(q)));
+          }).toList();
+    return _applySort(base);
+  }
+
+  // --- Ordering (in-memory; defaults to A-Z) --------------------------------
+
+  GroupSort _sort = GroupSort.alphabetical;
+  bool _ascending = true;
+
+  GroupSort get sort => _sort;
+  bool get ascending => _ascending;
+
+  void setSort(GroupSort value) {
+    if (value == _sort) return;
+    _sort = value;
+    notifyListeners();
+  }
+
+  void toggleDirection() {
+    _ascending = !_ascending;
+    notifyListeners();
+  }
+
+  List<Group> _applySort(List<Group> list) {
+    final sorted = [...list];
+    sorted.sort((a, b) {
+      switch (_sort) {
+        case GroupSort.alphabetical:
+          return a.name.toLowerCase().compareTo(b.name.toLowerCase());
+        case GroupSort.measurements:
+          return a.measurements.length.compareTo(b.measurements.length);
+        case GroupSort.date:
+          return a.createdAt.compareTo(b.createdAt);
+      }
+    });
+    return _ascending ? sorted : sorted.reversed.toList();
   }
 
   int get totalItems => groups.fold(0, (sum, g) => sum + g.measurements.length);

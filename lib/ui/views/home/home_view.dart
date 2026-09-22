@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../../core/enums/list_sort.dart';
 import '../../common/app_widgets.dart';
 import '../../common/group_widgets.dart';
 import '../../common/skeleton.dart';
+import '../../common/sort_controls.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../root/root_view.dart';
@@ -46,15 +48,36 @@ class _Heading extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final count = vm.groups.length;
-    return Column(
+    return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Collection', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
-        const SizedBox(height: 4),
-        Text(
-          '${count == 1 ? '1 group' : '$count groups'} · ${vm.totalItems == 1 ? '1 item' : '${vm.totalItems} items'}',
-          style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Collection', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
+              const SizedBox(height: 4),
+              Text(
+                '${count == 1 ? '1 group' : '$count groups'} · ${vm.totalItems == 1 ? '1 item' : '${vm.totalItems} items'}',
+                style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary),
+              ),
+            ],
+          ),
         ),
+        if (vm.groups.isNotEmpty) ...[
+          const SizedBox(width: 12),
+          SortControls<GroupSort>(
+            options: const [
+              SortOption(value: GroupSort.alphabetical, label: 'Alphabetically', icon: Icons.sort_by_alpha_rounded),
+              SortOption(value: GroupSort.measurements, label: 'Measurements', icon: Icons.straighten_rounded),
+              SortOption(value: GroupSort.date, label: 'Date', icon: Icons.schedule_rounded),
+            ],
+            current: vm.sort,
+            ascending: vm.ascending,
+            onOrderChanged: vm.setSort,
+            onToggleDirection: vm.toggleDirection,
+          ),
+        ],
       ],
     );
   }

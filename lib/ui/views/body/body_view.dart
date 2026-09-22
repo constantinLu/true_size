@@ -79,31 +79,46 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final changed = vm.lastChanged;
-    return Padding(
-      padding: EdgeInsets.fromLTRB(16, topBarInset(context) + 4, 16, 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Body Measurements', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
-          const SizedBox(height: 4),
-          Text(
-            changed == null ? 'Track your body measurements over time' : 'Last change: ${formatDateTime(changed)}',
-            style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary),
-          ),
-          const SizedBox(height: 12),
-          Center(
-            child: GestureDetector(
-              onLongPress: () => showBodyMarkers(
-                context: context,
-                gender: vm.gender,
-                parts: vm.parts,
-                valueOf: (key) => vm.latestFor(key)?.value,
-              ),
+    // The whole header is long-pressable (not just the silhouette) so tapping
+    // and holding anywhere in this top area opens the annotated overlay.
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onLongPress: () => showBodyMarkers(
+        context: context,
+        gender: vm.gender,
+        parts: vm.parts,
+        valueOf: (key) => vm.latestFor(key)?.value,
+      ),
+      child: Padding(
+        padding: EdgeInsets.fromLTRB(16, topBarInset(context) + 4, 16, 8),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Body Measurements', style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
+            const SizedBox(height: 4),
+            Text(
+              changed == null ? 'Track your body measurements over time' : 'Last change: ${formatDateTime(changed)}',
+              style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary),
+            ),
+            const SizedBox(height: 12),
+            Center(
               child: BodySilhouette(gender: vm.gender, height: 220, markers: vm.parts),
             ),
-          ),
-          const SizedBox(height: 12),
-        ],
+            const SizedBox(height: 10),
+            Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.touch_app_rounded, size: 14, color: context.neutrals.textFaint),
+                  const SizedBox(width: 6),
+                  Text('Press and hold the body to see every measurement',
+                      style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
       ),
     );
   }

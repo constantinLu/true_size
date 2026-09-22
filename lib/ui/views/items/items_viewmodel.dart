@@ -3,6 +3,7 @@ import 'package:stacked_services/stacked_services.dart';
 
 import '../../../app/app.locator.dart';
 import '../../../app/app.router.dart';
+import '../../../core/enums/list_sort.dart';
 import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
 import '../../../services/auth_service.dart';
@@ -40,17 +41,56 @@ class ItemsViewModel extends StreamViewModel<List<GroupedMeasurement>> {
           !_deletions.isGroupHidden(gm.group.id))
       .toList();
 
-  /// All items filtered by the shared search query.
+  /// All items filtered by the shared search query, then ordered by the chosen
+  /// sort field and direction.
   List<GroupedMeasurement> get items {
     final q = _searchService.query.trim().toLowerCase();
-    if (q.isEmpty) return _visible;
-    return _visible.where((gm) {
-      final m = gm.measurement;
-      return m.name.toLowerCase().contains(q) ||
-          m.brandName.toLowerCase().contains(q) ||
-          gm.group.name.toLowerCase().contains(q) ||
-          m.sizes.any((s) => s.value.toLowerCase().contains(q));
-    }).toList();
+    final base = q.isEmpty
+        ? _visible
+        : _visible.where((gm) {
+            final m = gm.measurement;
+            return m.name.toLowerCase().contains(q) ||
+                m.brandName.toLowerCase().contains(q) ||
+                gm.group.name.toLowerCase().contains(q) ||
+                m.sizes.any((s) => s.value.toLowerCase().contains(q));
+          }).toList();
+    return _applySort(base);
+  }
+
+  // --- Ordering (in-memory; defaults to A-Z) --------------------------------
+
+  ItemSort _sort = ItemSort.alphabetical;
+  bool _ascending = true;
+
+  ItemSort get sort => _sort;
+  bool get ascending => _ascending;
+
+  void setSort(ItemSort value) {
+    if (value == _sort) return;
+    _sort = value;
+    notifyListeners();
+  }
+
+  void toggleDirection() {
+    _ascending = !_ascending;
+    notifyListeners();
+  }
+
+  List<GroupedMeasurement> _applySort(List<GroupedMeasurement> list) {
+    final sorted = [...list];
+    sorted.sort((a, b) {
+      final ma = a.measurement, mb = b.measurement;
+      switch (_sort) {
+        case ItemSort.alphabetical:
+          return ma.name.toLowerCase().compareTo(mb.name.toLowerCase());
+        case ItemSort.date:
+          return ma.createdAt.compareTo(mb.createdAt);
+        case ItemSort.brand:
+          final t = ma.brandName.toLowerCase().compareTo(mb.brandName.toLowerCase());
+          return t != 0 ? t : ma.name.toLowerCase().compareTo(mb.name.toLowerCase());
+      }
+    });
+    return _ascending ? sorted : sorted.reversed.toList();
   }
 
   @override

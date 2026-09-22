@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../../core/enums/list_sort.dart';
 import '../../common/app_widgets.dart';
 import '../../common/group_widgets.dart';
 import '../../common/skeleton.dart';
+import '../../common/sort_controls.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../root/root_view.dart';
@@ -25,14 +27,35 @@ class ItemsView extends StackedView<ItemsViewModel> {
               SliverPadding(
                 padding: EdgeInsets.fromLTRB(16, topBarInset(context) + 8, 16, 8),
                 sliver: SliverToBoxAdapter(
-                  child: Column(
+                  child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Measurements',
-                          style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
-                      const SizedBox(height: 4),
-                      Text('Every measurement across your groups',
-                          style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary)),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Measurements',
+                                style: AppTypography.largePageTitle.copyWith(color: context.neutrals.textPrimary)),
+                            const SizedBox(height: 4),
+                            Text('Every measurement across your groups',
+                                style: AppTypography.subtitle.copyWith(color: context.neutrals.textSecondary)),
+                          ],
+                        ),
+                      ),
+                      if (viewModel.items.isNotEmpty || viewModel.isSearching) ...[
+                        const SizedBox(width: 12),
+                        SortControls<ItemSort>(
+                          options: const [
+                            SortOption(value: ItemSort.alphabetical, label: 'Alphabetically', icon: Icons.sort_by_alpha_rounded),
+                            SortOption(value: ItemSort.date, label: 'Date', icon: Icons.schedule_rounded),
+                            SortOption(value: ItemSort.brand, label: 'Brand', icon: Icons.sell_outlined),
+                          ],
+                          current: viewModel.sort,
+                          ascending: viewModel.ascending,
+                          onOrderChanged: viewModel.setSort,
+                          onToggleDirection: viewModel.toggleDirection,
+                        ),
+                      ],
                     ],
                   ),
                 ),
