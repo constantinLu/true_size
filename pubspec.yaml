@@ -1,6 +1,6 @@
 name: true_size
 description: A comprehensive size and measurement tracking app
-version: 1.0.7+8
+version: 1.0.8+9
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
