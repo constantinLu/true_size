@@ -1,30 +1,46 @@
-// // This is a basic Flutter iconselector test.
-// //
-// // To perform an interaction with a iconselector in your test, use the WidgetTester
-// // utility in the flutter_test package. For example, you can send tap and scroll
-// // gestures. You can also use WidgetTester to find child widgets in the iconselector
-// // tree, read text, and verify that the values of iconselector properties are correct.
-//
-// import 'package:flutter/material.dart';
-// import 'package:flutter_test/flutter_test.dart';
-//
-// import 'package:true_size/main.dart';
-//
-// void main() {
-//   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-//     // Build our app and trigger a frame.
-//     await tester.pumpWidget(const MyApp());
-//
-//     // Verify that our counter starts at 0.
-//     expect(find.text('0'), findsOneWidget);
-//     expect(find.text('1'), findsNothing);
-//
-//     // Tap the '+' icon and trigger a frame.
-//     await tester.tap(find.byIcon(Icons.add));
-//     await tester.pump();
-//
-//     // Verify that our counter has incremented.
-//     expect(find.text('0'), findsNothing);
-//     expect(find.text('1'), findsOneWidget);
-//   });
-// }
+import 'package:flutter_test/flutter_test.dart';
+import 'package:true_size/core/enums/gender.dart';
+import 'package:true_size/core/models/body_part.dart';
+
+void main() {
+  group('BodyPart catalogue', () {
+    test('every part resolves by key and exposes a marker per gender', () {
+      expect(BodyPart.all, isNotEmpty);
+      for (final part in BodyPart.all) {
+        expect(BodyPart.byKey(part.key), same(part));
+        for (final gender in Gender.values) {
+          final (mx, my) = part.markerFor(gender);
+          expect(mx, inInclusiveRange(0.0, 1.0));
+          expect(my, inInclusiveRange(0.0, 1.0));
+        }
+      }
+    });
+
+    test('byKey returns null for an unknown key', () {
+      expect(BodyPart.byKey('not_a_part'), isNull);
+    });
+  });
+
+  group('Hip marker position', () {
+    final hips = BodyPart.byKey('hips')!;
+    final waist = BodyPart.byKey('waist')!;
+    final inseam = BodyPart.byKey('inseam')!;
+
+    // Guards the fix that lifted the hips marker off the groin: it must sit
+    // below the waist and above the inseam/crotch for both silhouettes.
+    test('sits between the waist and the inseam for both genders', () {
+      for (final gender in Gender.values) {
+        final hipY = hips.markerFor(gender).$2;
+        expect(hipY, greaterThan(waist.markerFor(gender).$2),
+            reason: 'hip marker must be below the waist ($gender)');
+        expect(hipY, lessThan(inseam.markerFor(gender).$2),
+            reason: 'hip marker must be above the inseam/crotch ($gender)');
+      }
+    });
+
+    test('is lifted clear of the groin line (y < 0.5)', () {
+      expect(hips.male.$2, lessThan(0.5));
+      expect(hips.female.$2, lessThan(0.5));
+    });
+  });
+}
