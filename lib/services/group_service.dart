@@ -77,13 +77,12 @@ class GroupService {
         .where('userId', isEqualTo: userId)
         .snapshots()
         .asyncMap((snapshot) async {
-      final groups = <Group>[];
-      for (final doc in snapshot.docs) {
-        final group = await _loadGroupWithRelations(doc);
-        if (group != null) groups.add(group);
-      }
-      groups.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      return groups;
+      // Load every group's relations concurrently instead of one after another.
+      // The old serial loop turned N groups into N sequential Firestore
+      // round-trips, which is what made the list slow to appear after sign-in.
+      final loaded = await Future.wait(snapshot.docs.map(_loadGroupWithRelations));
+      return loaded.whereType<Group>().toList()
+        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     });
   }
 
@@ -93,16 +92,11 @@ class GroupService {
       final querySnapshot =
           await _groupsRef.where('userId', isEqualTo: userId).get();
 
-      final groups = <Group>[];
-
-      for (final doc in querySnapshot.docs) {
-        final group = await _loadGroupWithRelations(doc);
-        if (group != null) {
-          groups.add(group);
-        }
-      }
-      groups.sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
-      return groups;
+      // Load relations concurrently (see watchAll).
+      final loaded =
+          await Future.wait(querySnapshot.docs.map(_loadGroupWithRelations));
+      return loaded.whereType<Group>().toList()
+        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
     } catch (e) {
       throw GroupServiceException(
           'Failed to get all groups for user $userId: $e');
@@ -167,11 +161,14 @@ class GroupService {
     try {
       final data = doc.data() as Map<String, dynamic>;
 
-      final measurementIds = List<String>.from(data['measurementIds'] ?? []);
       final tagIds = List<String>.from(data['tagIds'] ?? []);
 
-      final measurements = await _measurementService.getByGroupId(doc.id);
-      final tags = await _tagService.getTagsByIds(tagIds);
+      // Kick off both reads before awaiting either, so a group's measurements
+      // and tags load concurrently rather than one blocking the other.
+      final measurementsFuture = _measurementService.getByGroupId(doc.id);
+      final tagsFuture = _tagService.getTagsByIds(tagIds);
+      final measurements = await measurementsFuture;
+      final tags = await tagsFuture;
       return Group(
         id: doc.id,
         name: data['name'] ?? '',

@@ -3,6 +3,7 @@ import 'package:stacked/stacked.dart';
 
 import '../../common/app_widgets.dart';
 import '../../common/group_widgets.dart';
+import '../../common/skeleton.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../root/root_view.dart';
@@ -65,23 +66,37 @@ class _Groups extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (vm.isBusy && vm.groups.isEmpty) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 60),
-        child: Center(child: CircularProgressIndicator()),
-      );
+    // Until the first data arrives, fill the view with shimmering placeholder
+    // cards (StreamViewModel doesn't set isBusy, so gate on dataReady). The
+    // AnimatedSwitcher crossfades the skeletons into the real cards when they
+    // land, so the data appears to morph in rather than pop after a spinner.
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: _content(context),
+    );
+  }
+
+  Widget _content(BuildContext context) {
+    if (!vm.dataReady) {
+      return const GroupListSkeleton(key: ValueKey('skeleton'));
     }
     final groups = vm.filteredGroups;
     if (groups.isEmpty) {
-      return EmptyState(
-        icon: vm.isSearching ? Icons.search_off_rounded : Icons.grid_view_rounded,
-        title: vm.isSearching ? 'No groups match' : 'No groups yet',
-        subtitle: vm.isSearching
-            ? 'Try a different search.'
-            : 'Create your first group (Shoes, Jeans, Bedding…) with the + button.',
+      return KeyedSubtree(
+        key: const ValueKey('empty'),
+        child: EmptyState(
+          icon: vm.isSearching ? Icons.search_off_rounded : Icons.grid_view_rounded,
+          title: vm.isSearching ? 'No groups match' : 'No groups yet',
+          subtitle: vm.isSearching
+              ? 'Try a different search.'
+              : 'Create your first group (Shoes, Jeans, Bedding…) with the + button.',
+        ),
       );
     }
     return Column(
+      key: const ValueKey('groups'),
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         for (int i = 0; i < groups.length; i++) ...[

@@ -3,6 +3,7 @@ import 'package:stacked/stacked.dart';
 
 import '../../common/app_widgets.dart';
 import '../../common/group_widgets.dart';
+import '../../common/skeleton.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../root/root_view.dart';
@@ -57,23 +58,35 @@ class _Body extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (vm.isBusy) {
-      return const Padding(
-        padding: EdgeInsets.only(top: 60),
-        child: Center(child: CircularProgressIndicator()),
-      );
+    // Shimmering placeholder rows until the first data arrives (StreamViewModel
+    // doesn't set isBusy), crossfading into the real list when it lands.
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 350),
+      switchInCurve: Curves.easeOut,
+      switchOutCurve: Curves.easeIn,
+      child: _content(context),
+    );
+  }
+
+  Widget _content(BuildContext context) {
+    if (!vm.dataReady) {
+      return const MeasurementListSkeleton(key: ValueKey('skeleton'));
     }
     final items = vm.items;
     if (items.isEmpty) {
-      return EmptyState(
-        icon: vm.isSearching ? Icons.search_off_rounded : Icons.straighten_rounded,
-        title: vm.isSearching ? 'No items match' : 'No items yet',
-        subtitle: vm.isSearching
-            ? 'Try a different search.'
-            : 'Open a group and add measurements - shoes, jeans, sheets and more.',
+      return KeyedSubtree(
+        key: const ValueKey('empty'),
+        child: EmptyState(
+          icon: vm.isSearching ? Icons.search_off_rounded : Icons.straighten_rounded,
+          title: vm.isSearching ? 'No items match' : 'No items yet',
+          subtitle: vm.isSearching
+              ? 'Try a different search.'
+              : 'Open a group and add measurements - shoes, jeans, sheets and more.',
+        ),
       );
     }
     return SoftCard(
+      key: const ValueKey('items'),
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(18),
