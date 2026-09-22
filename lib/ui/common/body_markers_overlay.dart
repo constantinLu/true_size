@@ -35,6 +35,13 @@ const _leftKeys = {
   'bicep_left', 'forearm_left', 'thigh_left', 'calf_left',
 };
 
+/// Left/right pairs - shown in the comparison panel, so they get no side
+/// callout (just a dot on the figure).
+const _pairedKeys = {
+  'bicep_left', 'bicep_right', 'forearm_left', 'forearm_right',
+  'thigh_left', 'thigh_right', 'calf_left', 'calf_right',
+};
+
 String _fmt(double v) =>
     v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
 
@@ -104,22 +111,29 @@ class _BodyMarkersView extends StatelessWidget {
     final availH = size.height;
     final aspect = gender.silhouetteAspect;
 
-    var imgH = math.min(availH * 0.98, gapW / aspect);
-    var imgW = imgH * aspect;
+    // Reserve the lower part of the screen for the comparison panel; fit the
+    // figure and its callouts into the region above it.
+    final compTop = availH * 0.58;
+    final bottomLimit = compTop; // callouts stay above the comparison
+    final imgH = math.min(compTop - 8, gapW / aspect);
+    final imgW = imgH * aspect;
     final imgLeft = innerL + (gapW - imgW) / 2;
-    // Shift the diagram ~20% up from centre and keep every callout inside the
-    // top 80%, leaving the bottom fifth free for components added later.
-    final bottomLimit = availH * 0.80;
-    final imgTop = math.max(8.0, (availH - imgH) / 2 - availH * 0.20);
+    final imgTop = math.max(8.0, (compTop - imgH) / 2);
 
     Offset marker(BodyPart p) {
       final (mx, my) = p.markerFor(gender);
       return Offset(imgLeft + mx * imgW, imgTop + my * imgH);
     }
 
-    final left = parts.where((p) => _leftKeys.contains(p.key)).toList()
+    // Paired parts are covered by the comparison panel below, so they don't get
+    // a side callout - only their dot on the figure.
+    final left = parts
+        .where((p) => _leftKeys.contains(p.key) && !_pairedKeys.contains(p.key))
+        .toList()
       ..sort((a, b) => marker(a).dy.compareTo(marker(b).dy));
-    final right = parts.where((p) => !_leftKeys.contains(p.key)).toList()
+    final right = parts
+        .where((p) => !_leftKeys.contains(p.key) && !_pairedKeys.contains(p.key))
+        .toList()
       ..sort((a, b) => marker(a).dy.compareTo(marker(b).dy));
 
     // Push callouts apart vertically so they never overlap within a column.
@@ -184,10 +198,11 @@ class _BodyMarkersView extends StatelessWidget {
             child: _Callout(
                 part: p, value: valueOf(p.key), alignEnd: false, accent: primary),
           ),
-        // Left-vs-right comparison strip in the free space beneath the figure.
+        // Left-vs-right comparison filling the reserved space beneath the figure.
         Positioned(
           left: 0,
           right: 0,
+          top: compTop,
           bottom: 0,
           child: _OverlayComparisons(valueOf: valueOf, accent: primary),
         ),
@@ -289,10 +304,11 @@ class _LeaderPainter extends CustomPainter {
       old.lines != lines || old.color != color;
 }
 
-/// The left-vs-right comparison strip beneath the silhouette in the annotated
-/// overlay. One compact row per paired part (biceps, forearms, thighs, calves)
-/// that has both sides recorded. Drawn straight onto the dark background - no
-/// card - with the larger side a darker tone and the smaller side lighter.
+/// The left-vs-right comparison filling the reserved space beneath the
+/// silhouette in the annotated overlay. One rich block per paired part (biceps,
+/// forearms, thighs, calves) with both sides recorded: a symmetry score, two
+/// bars diverging from a centre spine (larger side darker, smaller lighter), and
+/// a plain-language balance line. Drawn straight onto the dark background.
 class _OverlayComparisons extends StatelessWidget {
   const _OverlayComparisons({required this.valueOf, required this.accent});
   final double? Function(String key) valueOf;
@@ -307,18 +323,17 @@ class _OverlayComparisons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final rows = <_CompareRow>[];
+    final blocks = <Widget>[];
     for (final pair in _pairs) {
       final l = valueOf('${pair.$2}_left');
       final r = valueOf('${pair.$2}_right');
       if (l == null || r == null) continue;
-      rows.add(_CompareRow(label: pair.$1, left: l, right: r, accent: accent));
+      blocks.add(_PairBlock(label: pair.$1, left: l, right: r, accent: accent));
     }
-    if (rows.isEmpty) return const SizedBox.shrink();
+    if (blocks.isEmpty) return const SizedBox.shrink();
     return Padding(
-      padding: const EdgeInsets.fromLTRB(22, 8, 22, 12),
+      padding: const EdgeInsets.fromLTRB(24, 6, 24, 14),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -330,19 +345,22 @@ class _OverlayComparisons extends StatelessWidget {
                       .copyWith(color: Colors.white54, letterSpacing: 1.6)),
             ],
           ),
-          const SizedBox(height: 12),
-          for (int i = 0; i < rows.length; i++) ...[
-            if (i != 0) const SizedBox(height: 10),
-            rows[i],
-          ],
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: blocks,
+            ),
+          ),
         ],
       ),
     );
   }
 }
 
-class _CompareRow extends StatelessWidget {
-  const _CompareRow({
+/// One paired-part comparison: label + symmetry score, the diverging bars with
+/// the two values, and a balance caption.
+class _PairBlock extends StatelessWidget {
+  const _PairBlock({
     required this.label,
     required this.left,
     required this.right,
@@ -356,35 +374,68 @@ class _CompareRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final leftBigger = left >= right;
-    return Row(
+    final maxV = math.max(left, right);
+    final minV = math.min(left, right);
+    final diff = (left - right).abs();
+    final balanced = diff < 0.1;
+    final symmetry = maxV <= 0 ? 100 : (minV / maxV * 100).round();
+    final caption = balanced
+        ? 'Evenly balanced'
+        : '${leftBigger ? 'Left' : 'Right'} is ${_fmt(diff)} cm larger';
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: 62,
-          child: Text(label,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTypography.caption.copyWith(color: Colors.white70)),
+        Row(
+          children: [
+            Text(label,
+                style: AppTypography.subtitle.copyWith(
+                    color: Colors.white, fontWeight: AppTypography.semibold)),
+            const Spacer(),
+            Text('$symmetry% ',
+                style: AppTypography.subtitle.copyWith(
+                    color: accent, fontWeight: AppTypography.semibold)),
+            Text('symmetric',
+                style: AppTypography.caption.copyWith(color: Colors.white54)),
+          ],
         ),
-        SizedBox(
-          width: 30,
-          child: Text(_fmt(left),
-              textAlign: TextAlign.right,
-              style: AppTypography.caption.copyWith(
-                color: leftBigger ? Colors.white : Colors.white54,
-                fontWeight: leftBigger ? AppTypography.semibold : FontWeight.w400,
-              )),
+        const SizedBox(height: 7),
+        Row(
+          children: [
+            SizedBox(
+              width: 42,
+              child: Text(_fmt(left),
+                  textAlign: TextAlign.right,
+                  style: AppTypography.listItemTitle.copyWith(
+                    color: leftBigger ? Colors.white : Colors.white60,
+                    fontWeight: leftBigger ? AppTypography.semibold : FontWeight.w400,
+                  )),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+                child: _MiniDivergingBars(
+                    left: left, right: right, accent: accent, height: 15)),
+            const SizedBox(width: 10),
+            SizedBox(
+              width: 42,
+              child: Text(_fmt(right),
+                  textAlign: TextAlign.left,
+                  style: AppTypography.listItemTitle.copyWith(
+                    color: !leftBigger ? Colors.white : Colors.white60,
+                    fontWeight: !leftBigger ? AppTypography.semibold : FontWeight.w400,
+                  )),
+            ),
+          ],
         ),
-        const SizedBox(width: 8),
-        Expanded(child: _MiniDivergingBars(left: left, right: right, accent: accent)),
-        const SizedBox(width: 8),
-        SizedBox(
-          width: 30,
-          child: Text(_fmt(right),
-              textAlign: TextAlign.left,
-              style: AppTypography.caption.copyWith(
-                color: !leftBigger ? Colors.white : Colors.white54,
-                fontWeight: !leftBigger ? AppTypography.semibold : FontWeight.w400,
-              )),
+        const SizedBox(height: 5),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(balanced ? Icons.check_circle_rounded : Icons.compare_arrows_rounded,
+                size: 12, color: balanced ? const Color(0xFF6FB58C) : Colors.white38),
+            const SizedBox(width: 5),
+            Text(caption,
+                style: AppTypography.caption.copyWith(color: Colors.white54)),
+          ],
         ),
       ],
     );
@@ -394,10 +445,12 @@ class _CompareRow extends StatelessWidget {
 /// Two bars diverging from a centre spine, animating outward on build. The
 /// larger side is a darker gradient of [accent], the smaller side a lighter one.
 class _MiniDivergingBars extends StatelessWidget {
-  const _MiniDivergingBars({required this.left, required this.right, required this.accent});
+  const _MiniDivergingBars(
+      {required this.left, required this.right, required this.accent, this.height = 12});
   final double left;
   final double right;
   final Color accent;
+  final double height;
 
   static Color _shade(Color c, double delta) {
     final hsl = HSLColor.fromColor(c);
@@ -416,7 +469,7 @@ class _MiniDivergingBars extends StatelessWidget {
       curve: Curves.easeOutCubic,
       builder: (context, t, _) {
         return SizedBox(
-          height: 12,
+          height: height,
           child: LayoutBuilder(
             builder: (context, c) {
               final half = c.maxWidth / 2;
