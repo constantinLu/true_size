@@ -88,17 +88,25 @@ class AddMeasurementViewModel extends BaseViewModel {
   /// User-created units, loaded from Firestore on open.
   final List<UnitOption> _customUnits = [];
 
-  /// Built-in units followed by the user's custom ones - the picker options.
-  List<UnitOption> get units => [..._builtinUnits, ..._customUnits];
+  /// Built-in unit ids the user has hidden from their picker.
+  Set<String> _hiddenBuiltins = {};
+
+  /// The picker options: built-ins the user hasn't hidden, then their custom
+  /// units.
+  List<UnitOption> get units => [
+        ..._builtinUnits.where((u) => !_hiddenBuiltins.contains(u.id)),
+        ..._customUnits,
+      ];
 
   Future<void> _loadCustomUnits() async {
     final uid = _authService.currentUser?.uid;
     if (uid == null) return;
     try {
-      final units = await _unitService.getAll(uid);
+      final result = await _unitService.load(uid);
       _customUnits
         ..clear()
-        ..addAll(units.map(UnitOption.fromCustom));
+        ..addAll(result.custom.map(UnitOption.fromCustom));
+      _hiddenBuiltins = result.hiddenBuiltinIds;
       rebuildUi();
     } catch (_) {
       // Non-fatal: built-in units still work if custom ones fail to load.
@@ -122,20 +130,29 @@ class AddMeasurementViewModel extends BaseViewModel {
     }
   }
 
-  /// Deletes a user-created unit. Built-ins can't be deleted. Existing readings
-  /// keep their stored label, so nothing breaks.
+  /// Removes a unit from the picker. Custom units are deleted outright; built-in
+  /// units are hidden (the [Unit] enum can't be edited), so both disappear from
+  /// the picker. Existing readings keep their stored label, so nothing breaks.
   Future<void> deleteUnit(UnitOption unit) async {
-    if (unit.builtIn) return;
+    final uid = _authService.currentUser?.uid;
+    if (uid == null) return;
     try {
-      await _unitService.delete(unit.id);
-      _customUnits.removeWhere((u) => u.id == unit.id);
+      if (unit.builtIn) {
+        await _unitService.hideBuiltin(uid, unit.id);
+        _hiddenBuiltins = {..._hiddenBuiltins, unit.id};
+      } else {
+        await _unitService.delete(unit.id);
+        _customUnits.removeWhere((u) => u.id == unit.id);
+      }
       rebuildUi();
     } catch (e) {
-      _snackbarService.showSnackbar(message: 'Could not delete unit: $e');
+      _snackbarService.showSnackbar(message: 'Could not remove unit: $e');
     }
   }
 
-  bool canDeleteUnit(UnitOption unit) => !unit.builtIn;
+  /// Any unit can be removed from the picker - custom ones are deleted, built-in
+  /// ones are hidden.
+  bool canDeleteUnit(UnitOption unit) => true;
 
   void _attach(SizeEntry e) => e.controller.addListener(notifyListeners);
 
