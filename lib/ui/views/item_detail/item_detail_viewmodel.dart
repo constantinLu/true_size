@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -6,6 +8,7 @@ import '../../../app/app.locator.dart';
 import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/group_service.dart';
 import '../../../services/local_deletion_service.dart';
 import '../../../services/measurement_service.dart';
@@ -16,7 +19,6 @@ class ItemDetailViewModel extends BaseViewModel {
   final _groupService = locator<GroupService>();
   final _navigationService = locator<NavigationService>();
   final _deletions = locator<LocalDeletionService>();
-  final _snackbarService = locator<SnackbarService>();
 
   final String measurementId;
   ItemDetailViewModel({required this.measurementId});
@@ -38,7 +40,7 @@ class ItemDetailViewModel extends BaseViewModel {
       if (gid != null) _group = await _groupService.get(gid);
       if (_measurement == null) setError('Measurement not found');
     } catch (e) {
-      setError(e);
+      setError(cleanErrorMessage(e, fallback: 'Could not load this measurement.'));
     }
     setBusy(false);
   }
@@ -65,18 +67,24 @@ class ItemDetailViewModel extends BaseViewModel {
       icon: Icons.delete_outline_rounded,
     );
     if (!confirmed) return;
+    await deleteMeasurement(m);
+  }
 
-    // Optimistic: hide it from every list immediately and jump to the main tab,
-    // then let Firestore catch up in the background.
+  /// Optimistically hides the measurement and jumps to the main tab, then
+  /// removes it from Firestore. The navigation is intentionally NOT awaited -
+  /// its future never completes (the root route is never popped), which
+  /// previously blocked the Firestore delete from running at all.
+  @visibleForTesting
+  Future<void> deleteMeasurement(Measurement m) async {
     _deletions.hideMeasurement(m.id);
-    await _navigationService.clearStackAndShow(Routes.rootView);
+    unawaited(_navigationService.clearStackAndShow(Routes.rootView));
 
     try {
       await _measurementService.delete(m.id);
       await _groupService.touch(m.groupId);
     } catch (e) {
       _deletions.unhideMeasurement(m.id);
-      _snackbarService.showSnackbar(message: 'Failed to delete. Please try again.');
+      showAppError('Could not delete the measurement. Please try again.');
     }
   }
 

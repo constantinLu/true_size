@@ -9,6 +9,7 @@ import '../../../core/models/brand.dart';
 import '../../../core/models/measurement.dart';
 import '../../../core/models/measurement_size.dart';
 import '../../../core/models/unit_option.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
 import '../../../services/logo_service.dart';
@@ -26,7 +27,6 @@ class SizeEntry {
 
 class AddMeasurementViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
-  final _snackbarService = locator<SnackbarService>();
   final _measurementService = locator<MeasurementService>();
   final _groupService = locator<GroupService>();
   final _logoService = locator<LogoService>();
@@ -125,7 +125,7 @@ class AddMeasurementViewModel extends BaseViewModel {
       rebuildUi();
       return option;
     } catch (e) {
-      _snackbarService.showSnackbar(message: 'Could not add unit: $e');
+      showErrorFor(e, fallback: 'Could not add the unit. Please try again.');
       return null;
     }
   }
@@ -146,7 +146,7 @@ class AddMeasurementViewModel extends BaseViewModel {
       }
       rebuildUi();
     } catch (e) {
-      _snackbarService.showSnackbar(message: 'Could not remove unit: $e');
+      showErrorFor(e, fallback: 'Could not remove the unit. Please try again.');
     }
   }
 
@@ -238,7 +238,7 @@ class AddMeasurementViewModel extends BaseViewModel {
       await _groupService.touch(groupId);
       _navigationService.back(result: true);
     } catch (e) {
-      _snackbarService.showSnackbar(message: 'Could not add measurement: $e');
+      showErrorFor(e, fallback: 'Could not add the measurement. Please try again.');
     }
     setBusy(false);
   }

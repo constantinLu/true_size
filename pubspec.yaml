@@ -1,6 +1,6 @@
 name: true_size
 description: A comprehensive size and measurement tracking app
-version: 1.0.14+15
+version: 1.0.15+16
 
 environment:
   sdk: '>=3.7.0 <4.0.0'
@@ -66,6 +66,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  mocktail: ^1.0.4
   build_runner: ^2.4.7
   stacked_generator: ^2.0.4
   auto_route_generator: ^10.6.0

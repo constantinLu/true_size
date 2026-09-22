@@ -6,6 +6,7 @@ import '../../../app/app.locator.dart';
 import '../../../core/enums/gender.dart';
 import '../../../core/models/body_measurement.dart';
 import '../../../core/models/body_part.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/body_service.dart';
 import '../../../services/settings_service.dart';
@@ -58,9 +59,10 @@ class BodyPartDetailViewModel extends BaseViewModel {
     notifyListeners();
     try {
       await _bodyService.deleteEntry(uid, partKey, entry);
-    } catch (_) {
+    } catch (e) {
       _entries = previous;
       notifyListeners();
+      showAppError('Could not delete the entry. Please try again.');
     }
   }
 

@@ -6,6 +6,7 @@ import 'package:uuid/uuid.dart';
 import '../../../app/app.locator.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/models/group.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/group_service.dart';
 
@@ -13,7 +14,6 @@ import '../../../services/group_service.dart';
 /// afterwards from the group's detail screen.
 class AddGroupFormViewModel extends BaseViewModel {
   final _navigationService = locator<NavigationService>();
-  final _snackbarService = locator<SnackbarService>();
   final _groupService = locator<GroupService>();
   final _authService = locator<AuthService>();
 
@@ -49,7 +49,7 @@ class AddGroupFormViewModel extends BaseViewModel {
     if (name.isEmpty) return;
     final uid = _authService.currentUser?.uid;
     if (uid == null) {
-      _snackbarService.showSnackbar(message: 'You need to be signed in.');
+      showAppError('You need to be signed in.');
       return;
     }
 
@@ -70,7 +70,7 @@ class AddGroupFormViewModel extends BaseViewModel {
       await _groupService.add(group);
       _navigationService.back(result: true);
     } catch (e) {
-      _snackbarService.showSnackbar(message: 'Could not create group: $e');
+      showErrorFor(e, fallback: 'Could not create the group. Please try again.');
     }
     setBusy(false);
   }

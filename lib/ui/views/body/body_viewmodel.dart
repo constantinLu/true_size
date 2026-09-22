@@ -6,6 +6,7 @@ import '../../../app/app.router.dart';
 import '../../../core/enums/gender.dart';
 import '../../../core/models/body_measurement.dart';
 import '../../../core/models/body_part.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/body_service.dart';
 import '../../../services/search_service.dart';
@@ -70,7 +71,11 @@ class BodyViewModel extends StreamViewModel<Map<String, BodyMeasurement>> {
   Future<void> save(BodyPart part, double value) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null) return;
-    await _bodyService.addEntry(uid, part.key, value);
+    try {
+      await _bodyService.addEntry(uid, part.key, value);
+    } catch (e) {
+      showAppError('Could not save the measurement. Please try again.');
+    }
   }
 
   Future<void> openPart(BodyPart part) async {

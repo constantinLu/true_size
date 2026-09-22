@@ -10,6 +10,7 @@ import '../../../app/app.locator.dart';
 import '../../../core/constants/background_themes.dart';
 import '../../../core/constants/dates.dart';
 import '../../../core/enums/gender.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/auth_service.dart';
 import '../../../services/settings_service.dart';
 import '../../common/confirm_sheet.dart';
@@ -56,6 +57,8 @@ class ProfileViewModel extends BaseViewModel {
     rebuildUi();
     try {
       await _auth.uploadAvatar(bytes);
+    } catch (e) {
+      showAppError('Could not upload your photo. Please try again.');
     } finally {
       _uploadingAvatar = false;
       rebuildUi();
@@ -63,7 +66,11 @@ class ProfileViewModel extends BaseViewModel {
   }
 
   Future<void> removeAvatar() async {
-    await _auth.removeAvatar();
+    try {
+      await _auth.removeAvatar();
+    } catch (e) {
+      showAppError('Could not remove your photo. Please try again.');
+    }
     rebuildUi();
   }
 

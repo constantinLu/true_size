@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 import 'package:stacked_services/stacked_services.dart';
@@ -6,6 +8,7 @@ import '../../../app/app.locator.dart';
 import '../../../app/app.router.dart';
 import '../../../core/models/group.dart';
 import '../../../core/models/measurement.dart';
+import '../../../core/utils/app_error.dart';
 import '../../../services/firestore_service.dart';
 import '../../../services/local_deletion_service.dart';
 import '../../../services/measurement_service.dart';
@@ -42,7 +45,7 @@ class GroupDetailViewModel extends BaseViewModel {
           ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
       }
     } catch (e) {
-      setError(e);
+      setError(cleanErrorMessage(e, fallback: 'Could not load this group.'));
     }
     setBusy(false);
   }
@@ -77,20 +80,26 @@ class GroupDetailViewModel extends BaseViewModel {
       icon: Icons.delete_outline_rounded,
     );
     if (!confirmed) return;
+    await deleteGroup();
+  }
 
-    // Optimistic: hide the group everywhere and return to the main tab, then
-    // delete on Firestore in the background.
+  /// Optimistically hides the group and returns to the main tab, then removes it
+  /// (and its measurements) from Firestore. The navigation is intentionally NOT
+  /// awaited - its future only completes when the root route is popped (never),
+  /// which previously blocked the Firestore delete from ever running.
+  @visibleForTesting
+  Future<void> deleteGroup() async {
     _deletions.hideGroup(groupId);
-    await _navigationService.clearStackAndShow(Routes.rootView);
+    unawaited(_navigationService.clearStackAndShow(Routes.rootView));
 
     try {
+      // Delete the group's measurements too, so none are left orphaned.
+      final items = await _measurementService.getByGroupId(groupId);
+      await Future.wait(items.map((m) => _measurementService.delete(m.id)));
       await _firestoreService.deleteGroup(groupId);
     } catch (e) {
       _deletions.unhideGroup(groupId);
-      _snackbarService.showSnackbar(
-        message: 'Failed to delete group. Please try again.',
-        duration: const Duration(seconds: 3),
-      );
+      showAppError('Could not delete the group. Please try again.');
     }
   }
 
