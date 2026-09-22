@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../common/app_widgets.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import 'lock_viewmodel.dart';
@@ -37,9 +38,8 @@ class LockView extends StackedView<LockViewModel> {
                         color: viewModel.failed ? const Color(0xFFB36273) : context.neutrals.textSecondary,
                       )),
                   const Spacer(flex: 2),
-                  GestureDetector(
+                  PressableScale(
                     onTap: viewModel.retry,
-                    behavior: HitTestBehavior.opaque,
                     child: Container(
                       width: 84,
                       height: 84,
@@ -54,9 +54,11 @@ class LockView extends StackedView<LockViewModel> {
                   const SizedBox(height: 14),
                   Text('Tap to unlock', style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
                   const Spacer(flex: 2),
-                  TextButton(
-                    onPressed: viewModel.signOut,
-                    child: Text('Sign out', style: AppTypography.button.copyWith(color: context.neutrals.textSecondary)),
+                  PressableScale.wrap(
+                    child: TextButton(
+                      onPressed: viewModel.signOut,
+                      child: Text('Sign out', style: AppTypography.button.copyWith(color: context.neutrals.textSecondary)),
+                    ),
                   ),
                   const SizedBox(height: 8),
                 ],

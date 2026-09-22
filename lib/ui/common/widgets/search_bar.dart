@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_sizes.dart';
+import '../app_widgets.dart';
 import '../ui_helpers.dart';
 
 class SearchBar extends StatefulWidget {
@@ -92,12 +93,14 @@ class _SearchBarState extends State<SearchBar> {
             ),
           ),
           if (_hasText)
-            IconButton(
-              onPressed: _clearText,
-              icon: const Icon(
-                Icons.clear,
-                color: AppColors.textTertiary,
-                size: 18,
+            PressableScale.wrap(
+              child: IconButton(
+                onPressed: _clearText,
+                icon: const Icon(
+                  Icons.clear,
+                  color: AppColors.textTertiary,
+                  size: 18,
+                ),
               ),
             ),
         ],

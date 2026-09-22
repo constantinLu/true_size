@@ -57,9 +57,8 @@ class _AddOptionsSheet extends StatelessWidget {
   Widget _option(BuildContext context, AddOption value, IconData icon, String title, String subtitle, Color color) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
-      child: GestureDetector(
+      child: PressableScale(
         onTap: () => Navigator.pop(context, value),
-        behavior: HitTestBehavior.opaque,
         child: SoftCard(
           color: context.neutrals.surfaceHigh,
           padding: const EdgeInsets.all(14),

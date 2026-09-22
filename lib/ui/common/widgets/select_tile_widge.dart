@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../app_widgets.dart';
+
 class SelectionTile extends StatelessWidget {
   final IconData? icon;
   final String label;
@@ -16,10 +18,11 @@ class SelectionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
+    return PressableScale.wrap(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
         padding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 8,
@@ -50,6 +53,7 @@ class SelectionTile extends StatelessWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

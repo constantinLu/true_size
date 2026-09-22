@@ -57,10 +57,12 @@ class DetailEditButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return IconButton(
-      icon: const Icon(Icons.edit_rounded, size: 20),
-      onPressed: onTap,
-      tooltip: 'Edit',
+    return PressableScale.wrap(
+      child: IconButton(
+        icon: const Icon(Icons.edit_rounded, size: 20),
+        onPressed: onTap,
+        tooltip: 'Edit',
+      ),
     );
   }
 }
@@ -146,7 +148,7 @@ class DetailHero extends StatelessWidget {
     // itself lets the user switch between a Lucide icon and a brand logo.
     if (onIconTap == null) return avatar;
     final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onIconTap,
       child: Stack(
         clipBehavior: Clip.none,
@@ -300,23 +302,25 @@ class ArchiveDeleteActions extends StatelessWidget {
         SizedBox(
           width: 54,
           height: 54,
-          child: OutlinedButton(
-            onPressed: onDelete,
-            style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.zero,
-              foregroundColor: AppColors.negative,
-              side: BorderSide(
-                color: AppColors.negative.withValues(alpha: 0.5),
+          child: PressableScale.wrap(
+            child: OutlinedButton(
+              onPressed: onDelete,
+              style: OutlinedButton.styleFrom(
+                padding: EdgeInsets.zero,
+                foregroundColor: AppColors.negative,
+                side: BorderSide(
+                  color: AppColors.negative.withValues(alpha: 0.5),
+                ),
+                backgroundColor: AppColors.negative.withValues(alpha: 0.10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
               ),
-              backgroundColor: AppColors.negative.withValues(alpha: 0.10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+              child: const Icon(
+                Icons.delete_outline_rounded,
+                size: 22,
+                color: AppColors.negative,
               ),
-            ),
-            child: const Icon(
-              Icons.delete_outline_rounded,
-              size: 22,
-              color: AppColors.negative,
             ),
           ),
         ),
@@ -325,7 +329,8 @@ class ArchiveDeleteActions extends StatelessWidget {
         Expanded(
           child: SizedBox(
             height: 54,
-            child: OutlinedButton.icon(
+            child: PressableScale.wrap(
+              child: OutlinedButton.icon(
               onPressed: onToggleArchive,
               icon: Icon(
                 archived ? Icons.unarchive_rounded : Icons.archive_rounded,
@@ -345,6 +350,7 @@ class ArchiveDeleteActions extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
                 ),
+              ),
               ),
             ),
           ),

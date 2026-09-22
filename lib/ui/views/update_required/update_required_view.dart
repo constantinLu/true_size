@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../services/update_service.dart';
+import '../../common/app_widgets.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import 'update_required_viewmodel.dart';
@@ -132,17 +133,19 @@ class _ActionArea extends StatelessWidget {
         ],
         SizedBox(
           height: 52,
-          child: ElevatedButton.icon(
-            onPressed: viewModel.startUpdate,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: primary,
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          child: PressableScale.wrap(
+            child: ElevatedButton.icon(
+              onPressed: viewModel.startUpdate,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primary,
+                foregroundColor: Colors.white,
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+              ),
+              icon: const Icon(Icons.download_rounded, size: 20),
+              label: Text(viewModel.errorMessage != null ? 'Try again' : 'Update now',
+                  style: AppTypography.button.copyWith(color: Colors.white)),
             ),
-            icon: const Icon(Icons.download_rounded, size: 20),
-            label: Text(viewModel.errorMessage != null ? 'Try again' : 'Update now',
-                style: AppTypography.button.copyWith(color: Colors.white)),
           ),
         ),
       ],

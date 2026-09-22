@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '../../core/enums/gender.dart';
 import '../../core/models/body_part.dart';
 import '../theme/app_typography.dart';
+import 'app_widgets.dart';
 
 /// Full-screen annotated silhouette: every part marker with its value shown in a
 /// callout beside it. Opened by long-pressing the silhouette on the Body tab.
@@ -70,9 +71,8 @@ class _BodyMarkersView extends StatelessWidget {
             Positioned(
               top: 4,
               right: 8,
-              child: GestureDetector(
+              child: PressableScale(
                 onTap: () => Navigator.of(context).pop(),
-                behavior: HitTestBehavior.opaque,
                 child: Container(
                   width: 40,
                   height: 40,

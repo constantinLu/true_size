@@ -3,6 +3,7 @@ import 'dart:ui' show ImageFilter;
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../common/app_widgets.dart';
 import '../../common/top_bar.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
@@ -172,22 +173,24 @@ class _AddButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Container(
-          width: 48,
-          height: 48,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            gradient: brandGradient(primary),
-            boxShadow: [
-              BoxShadow(color: primary.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6)),
-            ],
+    return PressableScale.wrap(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              gradient: brandGradient(primary),
+              boxShadow: [
+                BoxShadow(color: primary.withValues(alpha: 0.4), blurRadius: 16, offset: const Offset(0, 6)),
+              ],
+            ),
+            child: const Icon(Icons.add_rounded, size: 26, color: Colors.white),
           ),
-          child: const Icon(Icons.add_rounded, size: 26, color: Colors.white),
         ),
       ),
     );

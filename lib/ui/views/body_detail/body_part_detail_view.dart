@@ -194,9 +194,9 @@ class _TimelineRow extends StatelessWidget {
                       ],
                     ),
                   ),
-                  GestureDetector(
+                  PressableScale(
                     onTap: onDelete,
-                    behavior: HitTestBehavior.opaque,
+                    pressedScale: 0.8,
                     child: Padding(
                       padding: const EdgeInsets.all(6),
                       child: Icon(Icons.delete_outline_rounded, size: 19, color: context.neutrals.textFaint),

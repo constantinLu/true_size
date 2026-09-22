@@ -74,7 +74,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
             children: [
               Align(
                 alignment: Alignment.centerLeft,
-                child: GestureDetector(
+                child: PressableScale(
                   onTap: vm.close,
                   child: Container(
                     width: 40,
@@ -107,11 +107,11 @@ class ProfileView extends StackedView<ProfileViewModel> {
       image = Image.memory(bytes, fit: BoxFit.cover, gaplessPlayback: true);
     } else if (photo != null && photo.isNotEmpty) {
       image = Image.network(photo, fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => const Icon(Icons.person_rounded, color: Colors.white, size: 44));
+          errorBuilder: (_, _, _) => const Icon(Icons.person_rounded, color: Colors.white, size: 44));
     } else {
       image = const Icon(Icons.person_rounded, color: Colors.white, size: 44);
     }
-    return GestureDetector(
+    return PressableScale(
       onTap: vm.uploadingAvatar ? null : () => _editAvatar(context, vm),
       child: Stack(
         clipBehavior: Clip.none,
@@ -234,9 +234,8 @@ class ProfileView extends StackedView<ProfileViewModel> {
     final selected = vm.themeMode == mode;
     final primary = Theme.of(context).colorScheme.primary;
     return Expanded(
-      child: GestureDetector(
+      child: PressableScale(
         onTap: () => vm.setThemeMode(mode),
-        behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: selected ? BoxDecoration(color: primary, borderRadius: BorderRadius.circular(10)) : null,
@@ -265,7 +264,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
           runSpacing: spacing,
           children: [
             for (final c in vm.colorChoices)
-              GestureDetector(
+              PressableScale(
                 onTap: () => vm.setPrimaryColor(c),
                 child: Container(
                   width: size,
@@ -317,9 +316,8 @@ class ProfileView extends StackedView<ProfileViewModel> {
     final selected = vm.gender == gender;
     final primary = Theme.of(context).colorScheme.primary;
     return Expanded(
-      child: GestureDetector(
+      child: PressableScale(
         onTap: () => vm.setGender(gender),
-        behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.symmetric(vertical: 10),
           decoration: selected ? BoxDecoration(color: primary, borderRadius: BorderRadius.circular(10)) : null,
@@ -354,7 +352,7 @@ class ProfileView extends StackedView<ProfileViewModel> {
               scrollDirection: Axis.horizontal,
               padding: EdgeInsets.zero,
               itemCount: vm.backgroundThemes.length,
-              separatorBuilder: (_, __) => const SizedBox(width: 12),
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
               itemBuilder: (context, i) => _backgroundThumb(context, vm, vm.backgroundThemes[i]),
             ),
           ),
@@ -366,9 +364,8 @@ class ProfileView extends StackedView<ProfileViewModel> {
   Widget _backgroundThumb(BuildContext context, ProfileViewModel vm, BackgroundTheme theme) {
     final primary = Theme.of(context).colorScheme.primary;
     final selected = vm.backgroundTheme.id == theme.id;
-    return GestureDetector(
+    return PressableScale(
       onTap: () => vm.setBackgroundTheme(theme),
-      behavior: HitTestBehavior.opaque,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -494,9 +491,8 @@ class ProfileView extends StackedView<ProfileViewModel> {
 
   Widget _signOutButton(BuildContext context, ProfileViewModel vm) {
     const danger = Color(0xFFB36273);
-    return GestureDetector(
+    return PressableScale(
       onTap: () => vm.signOut(context),
-      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 15),

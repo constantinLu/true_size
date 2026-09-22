@@ -3,6 +3,7 @@ import 'package:sizer/sizer.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../core/models/brand.dart';
+import '../../common/app_widgets.dart';
 import 'brand_viewmodel.dart';
 
 class BrandView extends StackedView<BrandViewModel> {
@@ -24,7 +25,7 @@ class BrandView extends StackedView<BrandViewModel> {
   @override
   Widget builder(
       BuildContext context, BrandViewModel viewModel, Widget? child) {
-    return GestureDetector(
+    return PressableScale(
       onTap: null, //viewModel.showBrandSelector,
       child: Container(
         height: 30.sp,

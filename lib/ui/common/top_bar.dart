@@ -61,7 +61,7 @@ class FloatingTopBar extends StatelessWidget {
                       ),
                       child: Row(
                         children: [
-                          GestureDetector(
+                          PressableScale(
                             onTap: onOpenProfile,
                             child: AvatarCircle(
                               imageBytes: avatarBytes,
@@ -173,12 +173,11 @@ class _SearchBoxState extends State<_SearchBox> {
               ),
             ),
             if (widget.controller.text.isNotEmpty)
-              GestureDetector(
+              PressableScale(
                 onTap: () {
                   widget.controller.clear();
                   widget.onChanged('');
                 },
-                behavior: HitTestBehavior.opaque,
                 child: Icon(Icons.close_rounded, size: 18, color: context.neutrals.textSecondary),
               ),
           ],

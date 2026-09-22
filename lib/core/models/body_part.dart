@@ -72,7 +72,7 @@ class BodyPart {
         male: (0.56, 0.400), female: (0.50, 0.410), min: 58, max: 130, initial: 82),
     BodyPart(key: 'hips', label: 'Hips',
         howTo: 'Measure around the fullest part of the hips and seat, keeping the tape level.',
-        male: (0.56, 0.500), female: (0.50, 0.510), min: 70, max: 140, initial: 96),
+        male: (0.56, 0.455), female: (0.50, 0.465), min: 70, max: 140, initial: 96),
     BodyPart(key: 'inseam', label: 'Inseam',
         howTo: 'Measure along the inner leg from the crotch straight down to the ankle bone.',
         male: (0.56, 0.600), female: (0.50, 0.600), min: 60, max: 100, initial: 82),

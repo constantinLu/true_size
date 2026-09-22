@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../ui/common/app_widgets.dart';
+
 class IconSelectorSheet extends StatelessWidget {
   final SheetRequest request;
   final Function(SheetResponse) completer;
@@ -20,9 +22,11 @@ class IconSelectorSheet extends StatelessWidget {
       child: Wrap(
         spacing: 12,
         children: icons.map((icon) {
-          return IconButton(
-            icon: Icon(icon, size: 28),
-            onPressed: () => completer(SheetResponse(data: icon)),
+          return PressableScale.wrap(
+            child: IconButton(
+              icon: Icon(icon, size: 28),
+              onPressed: () => completer(SheetResponse(data: icon)),
+            ),
           );
         }).toList(),
       ),

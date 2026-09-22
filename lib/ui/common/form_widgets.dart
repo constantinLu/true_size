@@ -160,9 +160,8 @@ class SelectorField extends StatelessWidget {
       children: [
         _FieldLabel(label),
         const SizedBox(height: 8),
-        GestureDetector(
+        PressableScale(
           onTap: onTap,
-          behavior: HitTestBehavior.opaque,
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
             decoration: BoxDecoration(
@@ -272,7 +271,7 @@ class SquareChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
@@ -330,7 +329,7 @@ class DateField extends StatelessWidget {
       children: [
         _FieldLabel(label),
         const SizedBox(height: 8),
-        GestureDetector(
+        PressableScale(
           onTap: () async {
             final now = DateTime.now();
             final parsed = value.isEmpty ? now : (DateTime.tryParse(value) ?? now);
@@ -366,9 +365,8 @@ class DateField extends StatelessWidget {
                 ),
                 const Spacer(),
                 if (onClear != null && hasValue)
-                  GestureDetector(
+                  PressableScale(
                     onTap: onClear,
-                    behavior: HitTestBehavior.opaque,
                     child: Icon(Icons.close_rounded, size: 18, color: context.neutrals.textFaint),
                   ),
               ],
@@ -393,18 +391,20 @@ class PrimaryButton extends StatelessWidget {
     final enabled = onTap != null && !busy;
     return SizedBox(
       height: 54,
-      child: FilledButton(
-        onPressed: enabled ? onTap : null,
-        style: FilledButton.styleFrom(
-          backgroundColor: primary,
-          disabledBackgroundColor: primary.withValues(alpha: 0.4),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          textStyle: AppTypography.button,
+      child: PressableScale.wrap(
+        child: FilledButton(
+          onPressed: enabled ? onTap : null,
+          style: FilledButton.styleFrom(
+            backgroundColor: primary,
+            disabledBackgroundColor: primary.withValues(alpha: 0.4),
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            textStyle: AppTypography.button,
+          ),
+          child: busy
+              ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+              : Text(label),
         ),
-        child: busy
-            ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-            : Text(label),
       ),
     );
   }
@@ -449,15 +449,17 @@ Future<bool?> showConfirmSheet(
                 Expanded(
                   child: SizedBox(
                     height: 54,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: ctx.neutrals.textPrimary,
-                        side: BorderSide(color: ctx.neutrals.stroke),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        textStyle: AppTypography.button,
+                    child: PressableScale.wrap(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx, false),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: ctx.neutrals.textPrimary,
+                          side: BorderSide(color: ctx.neutrals.stroke),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          textStyle: AppTypography.button,
+                        ),
+                        child: Text(cancelLabel),
                       ),
-                      child: Text(cancelLabel),
                     ),
                   ),
                 ),
@@ -465,15 +467,17 @@ Future<bool?> showConfirmSheet(
                 Expanded(
                   child: SizedBox(
                     height: 54,
-                    child: FilledButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      style: FilledButton.styleFrom(
-                        backgroundColor: destructive ? AppColors.negative : Theme.of(ctx).colorScheme.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        textStyle: AppTypography.button,
+                    child: PressableScale.wrap(
+                      child: FilledButton(
+                        onPressed: () => Navigator.pop(ctx, true),
+                        style: FilledButton.styleFrom(
+                          backgroundColor: destructive ? AppColors.negative : Theme.of(ctx).colorScheme.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          textStyle: AppTypography.button,
+                        ),
+                        child: Text(confirmLabel),
                       ),
-                      child: Text(confirmLabel),
                     ),
                   ),
                 ),
@@ -595,12 +599,11 @@ class _SelectionSheetState<T> extends State<_SelectionSheet<T>> {
               children: [
                 Expanded(child: Text(widget.title, style: Theme.of(context).textTheme.headlineMedium)),
                 if (_deleteMode)
-                  GestureDetector(
+                  PressableScale(
                     onTap: () => setState(() {
                       _deleteMode = false;
                       _error = null;
                     }),
-                    behavior: HitTestBehavior.opaque,
                     child: Text('Done',
                         style: AppTypography.button.copyWith(color: Theme.of(context).colorScheme.primary)),
                   ),
@@ -723,18 +726,19 @@ class _DeletableChipState extends State<_DeletableChip> with SingleTickerProvide
         Padding(
           // Room so the badge is not clipped by the Wrap's tight bounds.
           padding: const EdgeInsets.only(top: 6, right: 6),
-          child: GestureDetector(
-            onLongPress: widget.onLongPress,
-            child: SquareChip(label: widget.label, icon: widget.icon, iconColor: widget.iconColor, active: widget.active, onTap: widget.onTap),
+          child: PressableScale.wrap(
+            child: GestureDetector(
+              onLongPress: widget.onLongPress,
+              child: SquareChip(label: widget.label, icon: widget.icon, iconColor: widget.iconColor, active: widget.active, onTap: widget.onTap),
+            ),
           ),
         ),
         if (widget.showDelete)
           Positioned(
             top: 0,
             right: 0,
-            child: GestureDetector(
+            child: PressableScale(
               onTap: widget.onDelete,
-              behavior: HitTestBehavior.opaque,
               child: Container(
                 width: 22,
                 height: 22,
@@ -914,9 +918,8 @@ class _CalendarSheetState extends State<_CalendarSheet> {
             Row(
               children: [
                 Expanded(
-                  child: GestureDetector(
+                  child: PressableScale(
                     onTap: widget.hideYear ? null : () => setState(() => _pickingYear = !_pickingYear),
-                    behavior: HitTestBehavior.opaque,
                     child: Row(
                       children: [
                         Flexible(
@@ -1030,7 +1033,7 @@ class _NavArrow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final enabled = onTap != null;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         width: 38,
@@ -1080,9 +1083,8 @@ class _DayCell extends StatelessWidget {
       textColor = context.neutrals.textPrimary;
     }
 
-    return GestureDetector(
+    return PressableScale(
       onTap: enabled ? onTap : null,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -1120,9 +1122,8 @@ class _YearCell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         alignment: Alignment.center,
         decoration: BoxDecoration(
@@ -1355,7 +1356,7 @@ class _ColorSwatchRow extends StatelessWidget {
           runSpacing: spacing,
           children: [
             for (final c in colors)
-              GestureDetector(
+              PressableScale(
                 onTap: () => onSelect(c),
                 child: Container(
                   width: size,
@@ -1386,7 +1387,7 @@ class _CreateChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
@@ -1538,7 +1539,7 @@ class _IconHero extends StatelessWidget {
               ),
             ),
             // Focal disc.
-            GestureDetector(
+            PressableScale(
               onTap: onTap,
               child: IconMedallion(icon: iconForKey(iconKey), color: primary, size: 96, iconSize: 42),
             ),
@@ -1557,9 +1558,8 @@ class _CircleIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         width: 38,
         height: 38,
@@ -1787,7 +1787,7 @@ class _IconPickerSheetState extends State<_IconPickerSheet> {
           runSpacing: 12,
           children: [
             for (final url in _logoResults)
-              GestureDetector(
+              PressableScale(
                 onTap: () => Navigator.pop(context, IconPickResult.logo(url)),
                 child: Container(
                   width: 64,
@@ -1880,9 +1880,8 @@ class _IconLogoToggle extends StatelessWidget {
 
   Widget _segment(BuildContext context, String label, bool active, VoidCallback onTap) {
     final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 7),
@@ -1916,7 +1915,7 @@ class _IconWrap extends StatelessWidget {
       runSpacing: 10,
       children: [
         for (final key in keys)
-          GestureDetector(
+          PressableScale(
             onTap: () => Navigator.pop(context, IconPickResult.icon(key)),
             child: Container(
               width: 48,

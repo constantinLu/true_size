@@ -199,9 +199,8 @@ class _BodyPartCardState extends State<_BodyPartCard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          GestureDetector(
+          PressableScale(
             onTap: _openWithHalo,
-            behavior: HitTestBehavior.opaque,
             child: Row(
             children: [
               _BodyPartChip(gender: widget.gender, part: part),
@@ -229,9 +228,8 @@ class _BodyPartCardState extends State<_BodyPartCard>
                 ),
               ),
               if (_changed)
-                GestureDetector(
+                PressableScale(
                   onTap: _saving ? null : _save,
-                  behavior: HitTestBehavior.opaque,
                   child: Container(
                     width: 44,
                     height: 44,
@@ -295,9 +293,8 @@ class _RoundIconButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         width: 44,
         height: 44,

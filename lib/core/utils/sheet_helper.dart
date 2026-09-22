@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:stacked_services/stacked_services.dart';
 
+import '../../ui/common/app_widgets.dart';
+
 Future<void> showCustomBottomSheet({
   required String title,
   String? subtitle,
@@ -51,9 +53,11 @@ Future<void> showCustomBottomSheet({
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.close, color: Colors.grey),
+                      PressableScale.wrap(
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                        ),
                       ),
                     ],
                   ),
@@ -92,13 +96,13 @@ Widget buildSelectableTile({
   required bool isSelected,
   required VoidCallback onTap,
 }) {
-  return GestureDetector(
+  return PressableScale(
     onTap: onTap,
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: isSelected
-            ? Colors.white.withOpacity(0.2)
+            ? Colors.white.withValues(alpha: 0.2)
             : const Color(0xFF2C2C2E),
         borderRadius: BorderRadius.circular(20),
         border: isSelected ? Border.all(color: Colors.white, width: 1) : null,
@@ -161,7 +165,7 @@ Future<void> _showIconSelectorBottomSheet({
       itemBuilder: (context, index) {
         final iconName = icons[index];
         final iconData = iconDataMap[iconName] ?? Icons.help;
-        return GestureDetector(
+        return PressableScale(
           onTap: () {
             onIconSelected(iconName);
             //navigationService.back();

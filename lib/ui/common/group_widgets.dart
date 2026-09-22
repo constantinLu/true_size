@@ -153,62 +153,64 @@ class MeasurementTile extends StatelessWidget {
       if (hasBrand) brand,
       if (trailingGroup != null) trailingGroup!,
     ].join(' · ');
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              EntryAvatar(
-                logoUrl: m.brand?.logo,
-                icon: iconForKey(m.icon),
-                color: accent,
-                size: 40,
-                iconSize: 20,
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(m.name,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: AppTypography.listItemTitle.copyWith(color: context.neutrals.textPrimary)),
-                    if (meta.isNotEmpty) ...[
-                      const SizedBox(height: 3),
-                      Text(meta,
+    return PressableScale.wrap(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                EntryAvatar(
+                  logoUrl: m.brand?.logo,
+                  icon: iconForKey(m.icon),
+                  color: accent,
+                  size: 40,
+                  iconSize: 20,
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(m.name,
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: AppTypography.caption.copyWith(color: context.neutrals.textSecondary)),
+                          style: AppTypography.listItemTitle.copyWith(color: context.neutrals.textPrimary)),
+                      if (meta.isNotEmpty) ...[
+                        const SizedBox(height: 3),
+                        Text(meta,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: AppTypography.caption.copyWith(color: context.neutrals.textSecondary)),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 150),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    for (final s in m.sizes)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 2),
-                        child: Text(
-                          s.unit.symbol.isEmpty ? s.value : '${s.value} ${s.unit.symbol}',
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                          textAlign: TextAlign.right,
-                          style: AppTypography.transactionAmount.copyWith(color: context.neutrals.textPrimary),
+                const SizedBox(width: 8),
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 150),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      for (final s in m.sizes)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            s.unit.symbol.isEmpty ? s.value : '${s.value} ${s.unit.symbol}',
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.right,
+                            style: AppTypography.transactionAmount.copyWith(color: context.neutrals.textPrimary),
+                          ),
                         ),
-                      ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),

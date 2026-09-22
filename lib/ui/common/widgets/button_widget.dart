@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../views/add_measurement/add_group_form_viewmodel.dart';
+import '../app_widgets.dart';
 import '../palette.dart';
 
 class ButtonWidget extends StatelessWidget {
@@ -13,7 +14,7 @@ class ButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: null,
       //viewModel.addMeasurement,
       child: Container(

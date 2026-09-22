@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../common/app_widgets.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../../theme/color_utils.dart';
@@ -102,9 +103,8 @@ class _GoogleButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: busy ? null : onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         height: 56,

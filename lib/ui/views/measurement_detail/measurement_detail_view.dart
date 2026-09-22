@@ -82,9 +82,8 @@ class _GroupActions extends StatelessWidget {
     return Row(
       children: [
         // Small square delete.
-        GestureDetector(
+        PressableScale(
           onTap: onDelete,
-          behavior: HitTestBehavior.opaque,
           child: Container(
             width: 54,
             height: 54,
@@ -98,9 +97,8 @@ class _GroupActions extends StatelessWidget {
         const SizedBox(width: 12),
         // Wide add.
         Expanded(
-          child: GestureDetector(
+          child: PressableScale(
             onTap: onAdd,
-            behavior: HitTestBehavior.opaque,
             child: Container(
               height: 54,
               decoration: BoxDecoration(color: primary, borderRadius: BorderRadius.circular(14)),

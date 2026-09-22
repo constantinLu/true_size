@@ -20,16 +20,18 @@ class AddGroupFormView extends StackedView<AddGroupFormViewModel> {
       onSubmit: viewModel.canSubmit ? viewModel.submit : null,
       children: [
         Center(
-          child: GestureDetector(
+          child: PressableScale(
             onTap: () => _pickIcon(context, viewModel),
             child: IconMedallion(icon: iconForKey(viewModel.iconKey), color: viewModel.color, size: 76, iconSize: 34),
           ),
         ),
         const SizedBox(height: 8),
         Center(
-          child: TextButton(
-            onPressed: () => _pickIcon(context, viewModel),
-            child: Text('Choose icon', style: AppTypography.button.copyWith(color: Theme.of(context).colorScheme.primary)),
+          child: PressableScale.wrap(
+            child: TextButton(
+              onPressed: () => _pickIcon(context, viewModel),
+              child: Text('Choose icon', style: AppTypography.button.copyWith(color: Theme.of(context).colorScheme.primary)),
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -74,7 +76,7 @@ class _ColorSwatches extends StatelessWidget {
           runSpacing: spacing,
           children: [
             for (final c in vm.colorChoices)
-              GestureDetector(
+              PressableScale(
                 onTap: () => vm.setColor(c),
                 child: Container(
                   width: size,

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 import '../theme/app_neutrals.dart';
 import '../theme/app_typography.dart';
+import 'app_widgets.dart';
 
 /// A confirm/cancel prompt shown as a bottom sheet (never a center dialog).
 /// Returns true when the user confirms. Use [danger] for destructive actions
@@ -131,9 +132,8 @@ class _SheetButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         height: 52,
         alignment: Alignment.center,

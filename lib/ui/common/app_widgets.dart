@@ -72,7 +72,7 @@ class AvatarCircle extends StatelessWidget {
         width: size,
         height: size,
         gaplessPlayback: true,
-        errorBuilder: (_, __, ___) => Center(child: fallback),
+        errorBuilder: (_, _, _) => Center(child: fallback),
       );
     } else if (url != null && url.isNotEmpty) {
       child = Image.network(
@@ -80,7 +80,7 @@ class AvatarCircle extends StatelessWidget {
         fit: BoxFit.cover,
         width: size,
         height: size,
-        errorBuilder: (_, __, ___) => Center(child: fallback),
+        errorBuilder: (_, _, _) => Center(child: fallback),
       );
     } else {
       child = Center(child: fallback);
@@ -149,7 +149,7 @@ class EntryAvatar extends StatelessWidget {
         fit: BoxFit.cover,
         width: size,
         height: size,
-        errorBuilder: (_, __, ___) => Center(child: fallback),
+        errorBuilder: (_, _, _) => Center(child: fallback),
         loadingBuilder: (context, child, progress) =>
             progress == null ? child : Center(child: fallback),
       ),
@@ -296,11 +296,7 @@ class GlassCircle extends StatelessWidget {
       ),
     );
     if (onTap == null) return disc;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: disc,
-    );
+    return PressableScale(onTap: onTap, child: disc);
   }
 }
 
@@ -403,21 +399,23 @@ class CircleAction extends StatelessWidget {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Material(
-          color: color == null
-              ? context.neutrals.surfaceHigh
-              : color!.withValues(alpha: 0.16),
-          shape: const CircleBorder(),
-          child: InkWell(
-            customBorder: const CircleBorder(),
-            onTap: onTap,
-            child: SizedBox(
-              width: 56,
-              height: 56,
-              child: Icon(
-                icon,
-                color: color ?? context.neutrals.textPrimary,
-                size: 24,
+        PressableScale.wrap(
+          child: Material(
+            color: color == null
+                ? context.neutrals.surfaceHigh
+                : color!.withValues(alpha: 0.16),
+            shape: const CircleBorder(),
+            child: InkWell(
+              customBorder: const CircleBorder(),
+              onTap: onTap,
+              child: SizedBox(
+                width: 56,
+                height: 56,
+                child: Icon(
+                  icon,
+                  color: color ?? context.neutrals.textPrimary,
+                  size: 24,
+                ),
               ),
             ),
           ),
@@ -443,19 +441,21 @@ class CircleBackButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      color: context.neutrals.surfaceHigh,
-      shape: const CircleBorder(),
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onTap ?? () => Navigator.of(context).maybePop(),
-        child: SizedBox(
-          width: 40,
-          height: 40,
-          child: Icon(
-            Icons.arrow_back_rounded,
-            size: 20,
-            color: context.neutrals.textPrimary,
+    return PressableScale.wrap(
+      child: Material(
+        color: context.neutrals.surfaceHigh,
+        shape: const CircleBorder(),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: onTap ?? () => Navigator.of(context).maybePop(),
+          child: SizedBox(
+            width: 40,
+            height: 40,
+            child: Icon(
+              Icons.arrow_back_rounded,
+              size: 20,
+              color: context.neutrals.textPrimary,
+            ),
           ),
         ),
       ),
@@ -477,13 +477,15 @@ class ArchiveToggle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return IconButton(
-      onPressed: onTap,
-      tooltip: showing ? 'Hide archived' : 'Show archived',
-      icon: Icon(
-        showing ? Icons.archive_rounded : Icons.archive_outlined,
-        size: 22,
-        color: showing ? primary : context.neutrals.textSecondary,
+    return PressableScale.wrap(
+      child: IconButton(
+        onPressed: onTap,
+        tooltip: showing ? 'Hide archived' : 'Show archived',
+        icon: Icon(
+          showing ? Icons.archive_rounded : Icons.archive_outlined,
+          size: 22,
+          color: showing ? primary : context.neutrals.textSecondary,
+        ),
       ),
     );
   }
@@ -521,7 +523,7 @@ class DashboardHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        GestureDetector(
+        PressableScale(
           onTap: onOpenProfile,
           child: AvatarCircle(
             imageBytes: avatarBytes,
@@ -551,9 +553,9 @@ class _HeaderSearchPill extends StatelessWidget {
         ? Colors.white.withValues(alpha: 0.18)
         : context.neutrals.surfaceHigh;
     final fg = light ? Colors.white70 : context.neutrals.textSecondary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
+      pressedScale: 0.98,
       child: Container(
         height: 40,
         padding: const EdgeInsets.symmetric(horizontal: 14),
@@ -601,7 +603,7 @@ class HeaderCircleButton extends StatelessWidget {
     final fg = active
         ? primary
         : (light ? Colors.white : context.neutrals.textPrimary);
-    final button = GestureDetector(
+    final button = PressableScale(
       onTap: onTap,
       child: Container(
         width: 40,
@@ -611,6 +613,92 @@ class HeaderCircleButton extends StatelessWidget {
       ),
     );
     return tooltip == null ? button : Tooltip(message: tooltip!, child: button);
+  }
+}
+
+/// Gives a tappable [child] clear press feedback: it quickly scales down and
+/// dims while held, then springs back on release. This is the single source of
+/// the app-wide "button press" animation, used two ways:
+///
+///  * Default constructor - PressableScale *owns* the tap: pass the button's
+///    handler as [onTap] and give it a bare visual [child] (e.g. a coloured
+///    [Container] with an icon). Used for custom buttons that would otherwise
+///    show no response to a tap. A null [onTap] means disabled: no tap, no
+///    animation, so it can follow a button's enabled state.
+///  * [PressableScale.wrap] - scale only, around a child that already handles
+///    its own tap (an [IconButton], `OutlinedButton`, `InkWell`, ...). It never
+///    steals the gesture, so the child's own ripple / onPressed keep working and
+///    just gain the scale on top.
+///
+/// Press tracking uses a [Listener] (raw pointer events) rather than the gesture
+/// arena, so wrapping an interactive child does not fight it for the tap, and a
+/// press that turns into a scroll is cancelled cleanly.
+class PressableScale extends StatefulWidget {
+  const PressableScale({
+    super.key,
+    required this.child,
+    required this.onTap,
+    this.pressedScale = 0.86,
+  }) : _ownsTap = true;
+
+  /// Scale-only feedback around an already-interactive [child]. The child keeps
+  /// handling its own tap; this just adds the shrink-on-press animation.
+  const PressableScale.wrap({
+    super.key,
+    required this.child,
+    this.pressedScale = 0.94,
+  })  : onTap = null,
+        _ownsTap = false;
+
+  final Widget child;
+  final VoidCallback? onTap;
+
+  /// How far the child shrinks while held down (1.0 = no shrink).
+  final double pressedScale;
+
+  /// Whether this instance provides the tap handler ([onTap]) or merely wraps a
+  /// child that handles its own tap.
+  final bool _ownsTap;
+
+  @override
+  State<PressableScale> createState() => _PressableScaleState();
+}
+
+class _PressableScaleState extends State<PressableScale> {
+  bool _down = false;
+
+  void _set(bool v) {
+    if (mounted && _down != v) setState(() => _down = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // Owns-tap buttons with a null handler are disabled: no animation.
+    final active = widget._ownsTap ? widget.onTap != null : true;
+    const duration = Duration(milliseconds: 110);
+
+    Widget content = Listener(
+      onPointerDown: active ? (_) => _set(true) : null,
+      onPointerUp: active ? (_) => _set(false) : null,
+      onPointerCancel: active ? (_) => _set(false) : null,
+      child: AnimatedScale(
+        scale: _down ? widget.pressedScale : 1.0,
+        duration: duration,
+        curve: Curves.easeOut,
+        child: AnimatedOpacity(
+          opacity: _down ? 0.65 : 1.0,
+          duration: duration,
+          child: widget.child,
+        ),
+      ),
+    );
+
+    if (!widget._ownsTap) return content;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: widget.onTap,
+      child: content,
+    );
   }
 }
 

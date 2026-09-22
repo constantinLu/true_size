@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../app_widgets.dart';
 
 class TileWidget extends StatelessWidget {
   final String label;
@@ -18,7 +19,7 @@ class TileWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(
@@ -28,7 +29,7 @@ class TileWidget extends StatelessWidget {
         decoration: BoxDecoration(
           color: isSelected
               ? AppColors.primary
-              : AppColors.secondary.withOpacity(0.1),
+              : AppColors.secondary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Text(

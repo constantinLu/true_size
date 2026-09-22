@@ -88,9 +88,8 @@ class _DeleteButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const danger = Color(0xFFB36273);
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 15),

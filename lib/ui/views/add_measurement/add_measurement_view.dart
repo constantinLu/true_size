@@ -26,16 +26,18 @@ class AddMeasurementView extends StackedView<AddMeasurementViewModel> {
       onSubmit: viewModel.canSubmit ? viewModel.submit : null,
       children: [
         Center(
-          child: GestureDetector(
+          child: PressableScale(
             onTap: () => _pickIcon(context, viewModel),
             child: IconMedallion(icon: iconForKey(viewModel.iconKey), color: primary, size: 72, iconSize: 32),
           ),
         ),
         const SizedBox(height: 8),
         Center(
-          child: TextButton(
-            onPressed: () => _pickIcon(context, viewModel),
-            child: Text('Choose icon', style: AppTypography.button.copyWith(color: primary)),
+          child: PressableScale.wrap(
+            child: TextButton(
+              onPressed: () => _pickIcon(context, viewModel),
+              child: Text('Choose icon', style: AppTypography.button.copyWith(color: primary)),
+            ),
           ),
         ),
         const SizedBox(height: 12),
@@ -105,9 +107,8 @@ class _SizeRow extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           flex: 2,
-          child: GestureDetector(
+          child: PressableScale(
             onTap: () => _pickUnit(context),
-            behavior: HitTestBehavior.opaque,
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 15),
               decoration: BoxDecoration(
@@ -133,9 +134,8 @@ class _SizeRow extends StatelessWidget {
         ),
         if (canRemove) ...[
           const SizedBox(width: 6),
-          GestureDetector(
+          PressableScale(
             onTap: () => vm.removeSize(index),
-            behavior: HitTestBehavior.opaque,
             child: Padding(
               padding: const EdgeInsets.all(6),
               child: Icon(Icons.close_rounded, size: 20, color: context.neutrals.textFaint),
@@ -195,9 +195,8 @@ class _AddSizeButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final primary = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
+    return PressableScale(
       onTap: onTap,
-      behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../common/app_widgets.dart';
 import '../../common/palette.dart';
 import 'icon_selector_viewmodel.dart';
 
@@ -52,7 +53,7 @@ class IconSelectorView extends StackedView<IconSelectorViewModel> {
                   itemBuilder: (context, index) {
                     final entry =
                         viewModel.filteredIcons.entries.elementAt(index);
-                    return GestureDetector(
+                    return PressableScale(
                       onTap: () => onIconSelected(entry.key),
                       child: Container(
                         decoration: BoxDecoration(
@@ -76,9 +77,11 @@ class IconSelectorView extends StackedView<IconSelectorViewModel> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back, color: Palette.whiteCultured),
-            onPressed: () => viewModel.goBack(),
+          PressableScale.wrap(
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back, color: Palette.whiteCultured),
+              onPressed: () => viewModel.goBack(),
+            ),
           ),
           const SizedBox(width: 30),
           Container(
@@ -102,7 +105,7 @@ class IconSelectorView extends StackedView<IconSelectorViewModel> {
   Widget _buildToggle(
       IconSelectorViewModel viewModel, bool isEmoji, String label) {
     final isSelected = viewModel.showingEmoji == isEmoji;
-    return GestureDetector(
+    return PressableScale(
       onTap: () => viewModel.toggleBtn(isEmoji),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -175,7 +178,7 @@ class IconSelectorView extends StackedView<IconSelectorViewModel> {
               final iconData = allIcons[iconName];
               if (iconData == null) return const SizedBox.shrink();
 
-              return GestureDetector(
+              return PressableScale(
                 onTap: () => onIconSelected(iconName),
                 child: Container(
                   decoration: BoxDecoration(
