@@ -184,6 +184,13 @@ class _BodyMarkersView extends StatelessWidget {
             child: _Callout(
                 part: p, value: valueOf(p.key), alignEnd: false, accent: primary),
           ),
+        // Left-vs-right comparison strip in the free space beneath the figure.
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          child: _OverlayComparisons(valueOf: valueOf, accent: primary),
+        ),
       ],
     );
   }
@@ -280,4 +287,193 @@ class _LeaderPainter extends CustomPainter {
   @override
   bool shouldRepaint(_LeaderPainter old) =>
       old.lines != lines || old.color != color;
+}
+
+/// The left-vs-right comparison strip beneath the silhouette in the annotated
+/// overlay. One compact row per paired part (biceps, forearms, thighs, calves)
+/// that has both sides recorded. Drawn straight onto the dark background - no
+/// card - with the larger side a darker tone and the smaller side lighter.
+class _OverlayComparisons extends StatelessWidget {
+  const _OverlayComparisons({required this.valueOf, required this.accent});
+  final double? Function(String key) valueOf;
+  final Color accent;
+
+  static const _pairs = [
+    ('Biceps', 'bicep'),
+    ('Forearms', 'forearm'),
+    ('Thighs', 'thigh'),
+    ('Calves', 'calf'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = <_CompareRow>[];
+    for (final pair in _pairs) {
+      final l = valueOf('${pair.$2}_left');
+      final r = valueOf('${pair.$2}_right');
+      if (l == null || r == null) continue;
+      rows.add(_CompareRow(label: pair.$1, left: l, right: r, accent: accent));
+    }
+    if (rows.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(22, 8, 22, 12),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.compare_arrows_rounded, size: 13, color: Colors.white54),
+              const SizedBox(width: 6),
+              Text('LEFT VS RIGHT',
+                  style: AppTypography.badge
+                      .copyWith(color: Colors.white54, letterSpacing: 1.6)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          for (int i = 0; i < rows.length; i++) ...[
+            if (i != 0) const SizedBox(height: 10),
+            rows[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _CompareRow extends StatelessWidget {
+  const _CompareRow({
+    required this.label,
+    required this.left,
+    required this.right,
+    required this.accent,
+  });
+  final String label;
+  final double left;
+  final double right;
+  final Color accent;
+
+  @override
+  Widget build(BuildContext context) {
+    final leftBigger = left >= right;
+    return Row(
+      children: [
+        SizedBox(
+          width: 62,
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: AppTypography.caption.copyWith(color: Colors.white70)),
+        ),
+        SizedBox(
+          width: 30,
+          child: Text(_fmt(left),
+              textAlign: TextAlign.right,
+              style: AppTypography.caption.copyWith(
+                color: leftBigger ? Colors.white : Colors.white54,
+                fontWeight: leftBigger ? AppTypography.semibold : FontWeight.w400,
+              )),
+        ),
+        const SizedBox(width: 8),
+        Expanded(child: _MiniDivergingBars(left: left, right: right, accent: accent)),
+        const SizedBox(width: 8),
+        SizedBox(
+          width: 30,
+          child: Text(_fmt(right),
+              textAlign: TextAlign.left,
+              style: AppTypography.caption.copyWith(
+                color: !leftBigger ? Colors.white : Colors.white54,
+                fontWeight: !leftBigger ? AppTypography.semibold : FontWeight.w400,
+              )),
+        ),
+      ],
+    );
+  }
+}
+
+/// Two bars diverging from a centre spine, animating outward on build. The
+/// larger side is a darker gradient of [accent], the smaller side a lighter one.
+class _MiniDivergingBars extends StatelessWidget {
+  const _MiniDivergingBars({required this.left, required this.right, required this.accent});
+  final double left;
+  final double right;
+  final Color accent;
+
+  static Color _shade(Color c, double delta) {
+    final hsl = HSLColor.fromColor(c);
+    return hsl.withLightness((hsl.lightness + delta).clamp(0.0, 1.0)).toColor();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final maxV = math.max(left, right);
+    final leftFraction = maxV <= 0 ? 0.0 : left / maxV;
+    final rightFraction = maxV <= 0 ? 0.0 : right / maxV;
+    final leftBigger = left >= right;
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0, end: 1),
+      duration: const Duration(milliseconds: 750),
+      curve: Curves.easeOutCubic,
+      builder: (context, t, _) {
+        return SizedBox(
+          height: 12,
+          child: LayoutBuilder(
+            builder: (context, c) {
+              final half = c.maxWidth / 2;
+              const gap = 3.0;
+              final lw = math.max(0.0, (half - gap) * leftFraction * t);
+              final rw = math.max(0.0, (half - gap) * rightFraction * t);
+              return Stack(
+                children: [
+                  Positioned(
+                    left: half - 0.5,
+                    top: 0,
+                    bottom: 0,
+                    child: Container(width: 1, color: Colors.white.withValues(alpha: 0.22)),
+                  ),
+                  Positioned(
+                    right: half + gap,
+                    top: 1,
+                    bottom: 1,
+                    width: lw,
+                    child: _bar(toLeft: true, bigger: leftBigger),
+                  ),
+                  Positioned(
+                    left: half + gap,
+                    top: 1,
+                    bottom: 1,
+                    width: rw,
+                    child: _bar(toLeft: false, bigger: !leftBigger),
+                  ),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _bar({required bool toLeft, required bool bigger}) {
+    // Larger side: darker gradient of the accent; smaller side: lighter.
+    final colors = bigger
+        ? [accent, _shade(accent, -0.16)]
+        : [_shade(accent, 0.16), _shade(accent, 0.30)];
+    const radius = Radius.circular(6);
+    final corners = BorderRadius.horizontal(
+      left: toLeft ? radius : Radius.zero,
+      right: toLeft ? Radius.zero : radius,
+    );
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: corners,
+        gradient: LinearGradient(
+          // Start at the spine, deepen toward the tip.
+          begin: toLeft ? Alignment.centerRight : Alignment.centerLeft,
+          end: toLeft ? Alignment.centerLeft : Alignment.centerRight,
+          colors: colors,
+        ),
+      ),
+    );
+  }
 }

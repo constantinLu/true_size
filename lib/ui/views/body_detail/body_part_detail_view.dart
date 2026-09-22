@@ -6,7 +6,6 @@ import '../../../core/models/body_measurement.dart';
 import '../../common/app_widgets.dart';
 import '../../common/body_silhouette.dart';
 import '../../common/detail_widgets.dart';
-import '../../common/symmetry_comparison.dart';
 import '../../theme/app_neutrals.dart';
 import '../../theme/app_typography.dart';
 import '../body/body_view.dart' show fmtBody;
@@ -49,17 +48,6 @@ class BodyPartDetailView extends StackedView<BodyPartDetailViewModel> {
           ),
         ),
         const SizedBox(height: 24),
-        if (viewModel.hasComparison) ...[
-          SectionHeader('Left vs Right'),
-          const SizedBox(height: 10),
-          SymmetryComparison(
-            left: viewModel.leftValue!,
-            right: viewModel.rightValue!,
-            unit: part.unit,
-            accent: primary,
-          ),
-          const SizedBox(height: 24),
-        ],
         SectionHeader('How to measure'),
         const SizedBox(height: 10),
         SoftCard(

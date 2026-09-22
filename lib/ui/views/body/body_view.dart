@@ -79,11 +79,11 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final changed = vm.lastChanged;
-    // The whole header is long-pressable (not just the silhouette) so tapping
-    // and holding anywhere in this top area opens the annotated overlay.
+    // The whole header is double-tappable (not just the silhouette) so a
+    // double-tap anywhere in this top area opens the annotated overlay.
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onLongPress: () => showBodyMarkers(
+      onDoubleTap: () => showBodyMarkers(
         context: context,
         gender: vm.gender,
         parts: vm.parts,
@@ -111,7 +111,7 @@ class _Header extends StatelessWidget {
                 children: [
                   Icon(Icons.touch_app_rounded, size: 14, color: context.neutrals.textFaint),
                   const SizedBox(width: 6),
-                  Text('Press and hold the body to see every measurement',
+                  Text('Double tap to see detailed comparisons',
                       style: AppTypography.caption.copyWith(color: context.neutrals.textFaint)),
                 ],
               ),
