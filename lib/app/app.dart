@@ -12,6 +12,7 @@ import '../services/measurement_service.dart';
 import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
+import '../services/unit_service.dart';
 import '../services/update_service.dart';
 import '../services/user_service.dart';
 import '../ui/views/add_measurement/add_group_form_view.dart';
@@ -51,6 +52,7 @@ import '../ui/views/update_required/update_required_view.dart';
     LazySingleton(classType: GroupService),
     LazySingleton(classType: BrandService),
     LazySingleton(classType: TagService),
+    LazySingleton(classType: UnitService),
     LazySingleton(classType: SettingsService),
     LazySingleton(classType: LogoService),
     LazySingleton(classType: SearchService),

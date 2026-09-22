@@ -30,7 +30,8 @@ class GroupCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final color = groupColor(group.color);
     final count = group.measurements.length;
-    return SoftCard(
+    return PressableScale.wrap(
+      child: SoftCard(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
       onTap: onTap,
       child: Column(
@@ -82,6 +83,7 @@ class GroupCard extends StatelessWidget {
           const SizedBox(height: 14),
           _TapeMeasureStrip(color: color),
         ],
+      ),
       ),
     );
   }

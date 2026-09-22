@@ -24,6 +24,7 @@ import '../services/measurement_service.dart';
 import '../services/search_service.dart';
 import '../services/settings_service.dart';
 import '../services/tag_service.dart';
+import '../services/unit_service.dart';
 import '../services/update_service.dart';
 import '../services/user_service.dart';
 
@@ -50,6 +51,7 @@ Future<void> setupLocator({
   locator.registerLazySingleton(() => GroupService());
   locator.registerLazySingleton(() => BrandService());
   locator.registerLazySingleton(() => TagService());
+  locator.registerLazySingleton(() => UnitService());
   locator.registerLazySingleton(() => SettingsService());
   locator.registerLazySingleton(() => LogoService());
   locator.registerLazySingleton(() => SearchService());

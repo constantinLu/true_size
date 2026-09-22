@@ -8,6 +8,7 @@ import '../models/brand.dart';
 import '../models/group.dart';
 import '../models/measurement.dart';
 import '../models/measurement_size.dart';
+import '../models/unit_option.dart';
 
 /// One seeded size reading.
 class _S {
@@ -153,7 +154,7 @@ Future<void> runSeed(String uid) async {
         id: const Uuid().v4(),
         icon: m.icon,
         name: m.name,
-        sizes: [for (final s in m.sizes) MeasurementSize(value: s.value, unit: s.unit)],
+        sizes: [for (final s in m.sizes) MeasurementSize(value: s.value, unit: UnitOption.fromBuiltin(s.unit))],
         brand: brand,
         notes: m.notes,
         groupId: groupRef.id,

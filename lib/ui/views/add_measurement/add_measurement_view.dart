@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
 
 import '../../../core/constants/app_icons.dart';
-import '../../../core/enums/unit.dart';
 import '../../../core/models/measurement.dart';
+import '../../../core/models/unit_option.dart';
 import '../../common/app_widgets.dart';
 import '../../common/form_widgets.dart';
 import '../../theme/app_neutrals.dart';
@@ -119,7 +119,7 @@ class _SizeRow extends StatelessWidget {
                 children: [
                   Expanded(
                     child: Text(
-                      entry.unit.symbol.isEmpty ? entry.unit.displayName : entry.unit.symbol,
+                      entry.unit.symbol.isEmpty ? entry.unit.label : entry.unit.symbol,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: AppTypography.body.copyWith(
@@ -147,12 +147,23 @@ class _SizeRow extends StatelessWidget {
   }
 
   Future<void> _pickUnit(BuildContext context) async {
-    final picked = await showSelectionSheet<Unit>(
+    final picked = await showSelectionSheet<UnitOption>(
       context,
       title: 'Unit',
+      subtitle: 'Pick a unit, or create your own',
       options: vm.units,
       selected: vm.sizeEntries[index].unit,
-      labelOf: (u) => u.symbol.isEmpty ? u.displayName : '${u.displayName} · ${u.symbol}',
+      labelOf: (u) => u.symbol.isEmpty ? u.label : '${u.label} · ${u.symbol}',
+      canDelete: vm.canDeleteUnit,
+      onDelete: (u) async {
+        await vm.deleteUnit(u);
+        return null;
+      },
+      onCreateNew: () async {
+        final res = await showCreateUnitSheet(context);
+        if (res == null) return null;
+        return vm.createUnit(res.name, res.symbol);
+      },
     );
     if (picked != null) vm.setUnit(index, picked);
   }

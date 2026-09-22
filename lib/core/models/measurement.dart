@@ -5,6 +5,7 @@ import '../enums/unit.dart';
 import '../utils/icon_helper.dart';
 import 'brand.dart';
 import 'measurement_size.dart';
+import 'unit_option.dart';
 
 class Measurement {
   final String id;
@@ -36,7 +37,8 @@ class Measurement {
   /// The primary (first) size's value / unit. Kept for callers that only care
   /// about a single reading.
   String get value => sizes.isEmpty ? '' : sizes.first.value;
-  Unit get unit => sizes.isEmpty ? Unit.shoeSize : sizes.first.unit;
+  UnitOption get unit =>
+      sizes.isEmpty ? UnitOption.fromBuiltin(Unit.shoeSize) : sizes.first.unit;
 
   /// Reads the sizes list from a stored document, falling back to the legacy
   /// single top-level `value` / `unit` fields for documents written before
@@ -53,10 +55,7 @@ class Measurement {
     return [
       MeasurementSize(
         value: (data['value'] ?? '0').toString(),
-        unit: Unit.values.firstWhere(
-          (u) => u.name == data['unit'],
-          orElse: () => Unit.cm,
-        ),
+        unit: UnitOption.fromStored(id: (data['unit'] ?? 'cm').toString()),
       ),
     ];
   }
@@ -66,7 +65,7 @@ class Measurement {
         // Mirror the first size into the legacy fields so anything still
         // reading `value` / `unit` keeps working.
         'value': value,
-        'unit': unit.name,
+        'unit': unit.id,
       };
 
   // Convert to Firestore document

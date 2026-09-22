@@ -150,16 +150,18 @@ class _FloatingNav extends StatelessWidget {
     final active = index == i;
     final color = active ? Theme.of(context).colorScheme.primary : context.neutrals.textFaint;
     return Expanded(
-      child: InkWell(
-        onTap: () => onTap(i),
-        borderRadius: BorderRadius.circular(28),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 22, color: color),
-            const SizedBox(height: 3),
-            Text(label, style: AppTypography.tabLabel.copyWith(fontSize: 10, color: color)),
-          ],
+      child: PressableScale.wrap(
+        child: InkWell(
+          onTap: () => onTap(i),
+          borderRadius: BorderRadius.circular(28),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 22, color: color),
+              const SizedBox(height: 3),
+              Text(label, style: AppTypography.tabLabel.copyWith(fontSize: 10, color: color)),
+            ],
+          ),
         ),
       ),
     );

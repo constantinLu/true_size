@@ -490,6 +490,94 @@ Future<bool?> showConfirmSheet(
   );
 }
 
+/// A small sheet to create a custom unit: a display [name] and a short symbol.
+/// Returns the entered values, or null if the user backs out.
+Future<({String name, String symbol})?> showCreateUnitSheet(BuildContext context) {
+  return showModalBottomSheet<({String name, String symbol})>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: context.neutrals.surface,
+    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+      child: const _CreateUnitSheet(),
+    ),
+  );
+}
+
+class _CreateUnitSheet extends StatefulWidget {
+  const _CreateUnitSheet();
+
+  @override
+  State<_CreateUnitSheet> createState() => _CreateUnitSheetState();
+}
+
+class _CreateUnitSheetState extends State<_CreateUnitSheet> {
+  final _name = TextEditingController();
+  final _symbol = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    _name.addListener(_onChanged);
+  }
+
+  void _onChanged() => setState(() {});
+
+  @override
+  void dispose() {
+    _name.dispose();
+    _symbol.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final canSave = _name.text.trim().isNotEmpty;
+    return SafeArea(
+      top: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const _SheetHandle(),
+            const SizedBox(height: 16),
+            Text('New unit', style: Theme.of(context).textTheme.headlineMedium),
+            const SizedBox(height: 4),
+            Text('Give it a name and a short symbol.',
+                style: AppTypography.smallMonetary.copyWith(color: context.neutrals.textSecondary)),
+            const SizedBox(height: 18),
+            LabeledField(
+              label: 'Name',
+              controller: _name,
+              hint: 'e.g. US shoe size',
+              textCapitalization: TextCapitalization.words,
+            ),
+            const SizedBox(height: 14),
+            LabeledField(
+              label: 'Symbol (optional)',
+              controller: _symbol,
+              hint: 'e.g. US',
+            ),
+            const SizedBox(height: 20),
+            PrimaryButton(
+              label: 'Add unit',
+              onTap: canSave
+                  ? () => Navigator.pop(
+                        context,
+                        (name: _name.text.trim(), symbol: _symbol.text.trim()),
+                      )
+                  : null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 /// Shows a picker sheet of squary chips and returns the chosen option.
 /// A trailing "Create your own" chip runs [onCreateNew], and if that returns a
 /// value the sheet closes selecting it.
